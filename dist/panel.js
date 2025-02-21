@@ -76,6 +76,7 @@ let PanelCard = class PanelCard extends r$2 {
     constructor() {
         super(...arguments);
         this._isElementLoaded = false;
+        this._tag = "smartqasa-main-card";
     }
     getCardSize() {
         return 1;
@@ -99,12 +100,10 @@ let PanelCard = class PanelCard extends r$2 {
             this._createMainCard();
             return;
         }
-        if (changedProps.has("hass")) {
-            this._mainCard.hass = this.hass;
-        }
-        if (changedProps.has("_config")) {
+        if (changedProps.has("_config"))
             this._mainCard.setConfig(this._config);
-        }
+        if (changedProps.has("hass"))
+            this._mainCard.hass = this.hass;
     }
     render() {
         if (!this._mainCard)
@@ -112,9 +111,7 @@ let PanelCard = class PanelCard extends r$2 {
         return x `${this._mainCard}`;
     }
     _testElementsLoaded() {
-        const tag = "smartqasa-main-card";
-        if (!customElements.get(tag)) {
-            console.warn(`Waiting for ${tag} to load...`);
+        if (!customElements.get(this._tag)) {
             setTimeout(() => this._testElementsLoaded(), 500);
             return;
         }
@@ -123,7 +120,7 @@ let PanelCard = class PanelCard extends r$2 {
     _createMainCard() {
         if (!this._isElementLoaded || !this._config)
             return;
-        const element = document.createElement("smartqasa-main-card");
+        const element = document.createElement(this._tag);
         element.setConfig(this._config);
         if (this.hass)
             element.hass = this.hass;

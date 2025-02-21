@@ -32,6 +32,7 @@ export class PanelCard extends LitElement {
   @state() private _config?: Config;
   @state() private _mainCard?: LovelaceCard;
   @state() private _isElementLoaded = false;
+  private _tag = "smartqasa-main-card";
 
   static get styles(): CSSResult {
     return css`
@@ -56,12 +57,8 @@ export class PanelCard extends LitElement {
       return;
     }
 
-    if (changedProps.has("hass")) {
-      this._mainCard.hass = this.hass;
-    }
-    if (changedProps.has("_config")) {
-      this._mainCard.setConfig(this._config!);
-    }
+    if (changedProps.has("_config")) this._mainCard.setConfig(this._config!);
+    if (changedProps.has("hass")) this._mainCard.hass = this.hass;
   }
 
   protected render(): TemplateResult | typeof nothing {
@@ -70,9 +67,7 @@ export class PanelCard extends LitElement {
   }
 
   private _testElementsLoaded(): void {
-    const tag = "smartqasa-main-card";
-    if (!customElements.get(tag)) {
-      console.warn(`Waiting for ${tag} to load...`);
+    if (!customElements.get(this._tag)) {
       setTimeout(() => this._testElementsLoaded(), 500);
       return;
     }
@@ -83,9 +78,7 @@ export class PanelCard extends LitElement {
   private _createMainCard(): void {
     if (!this._isElementLoaded || !this._config) return;
 
-    const element = document.createElement(
-      "smartqasa-main-card"
-    ) as LovelaceCard;
+    const element = document.createElement(this._tag) as LovelaceCard;
     element.setConfig(this._config);
     if (this.hass) element.hass = this.hass;
 
