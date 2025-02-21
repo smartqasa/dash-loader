@@ -75,8 +75,8 @@ const t=t=>(e,o)=>{ void 0!==o?o.addInitializer((()=>{customElements.define(t,e)
 let PanelCard = class PanelCard extends r$2 {
     constructor() {
         super(...arguments);
-        this._isElementLoaded = false;
-        this._tag = "smartqasa-main-card";
+        this.isElementLoaded = false;
+        this.tag = "smartqasa-main-card";
     }
     getCardSize() {
         return 1;
@@ -90,41 +90,41 @@ let PanelCard = class PanelCard extends r$2 {
     }
     connectedCallback() {
         super.connectedCallback();
-        this._testElementsLoaded();
+        this.testElementsLoaded();
     }
     setConfig(config) {
-        this._config = config;
+        this.config = config;
     }
     willUpdate(changedProps) {
-        if (!this._mainCard) {
-            this._createMainCard();
+        if (!this.mainCard) {
+            this.createMainCard();
             return;
         }
-        if (changedProps.has("_config"))
-            this._mainCard.setConfig(this._config);
+        if (changedProps.has("config"))
+            this.mainCard.setConfig(this.config);
         if (changedProps.has("hass"))
-            this._mainCard.hass = this.hass;
+            this.mainCard.hass = this.hass;
     }
     render() {
-        if (!this._mainCard)
+        if (!this.mainCard)
             return E;
-        return x `${this._mainCard}`;
+        return x `${this.mainCard}`;
     }
-    _testElementsLoaded() {
-        if (!customElements.get(this._tag)) {
-            setTimeout(() => this._testElementsLoaded(), 500);
+    testElementsLoaded() {
+        if (!customElements.get(this.tag)) {
+            setTimeout(() => this.testElementsLoaded(), 500);
             return;
         }
-        this._isElementLoaded = true;
+        this.isElementLoaded = true;
     }
-    _createMainCard() {
-        if (!this._isElementLoaded || !this._config)
+    createMainCard() {
+        if (!this.isElementLoaded || !this.config)
             return;
-        const element = document.createElement(this._tag);
-        element.setConfig(this._config);
+        const element = document.createElement(this.tag);
+        element.setConfig(this.config);
         if (this.hass)
             element.hass = this.hass;
-        this._mainCard = element;
+        this.mainCard = element;
     }
 };
 __decorate([
@@ -132,13 +132,13 @@ __decorate([
 ], PanelCard.prototype, "hass", void 0);
 __decorate([
     r()
-], PanelCard.prototype, "_config", void 0);
+], PanelCard.prototype, "config", void 0);
 __decorate([
     r()
-], PanelCard.prototype, "_mainCard", void 0);
+], PanelCard.prototype, "mainCard", void 0);
 __decorate([
     r()
-], PanelCard.prototype, "_isElementLoaded", void 0);
+], PanelCard.prototype, "isElementLoaded", void 0);
 PanelCard = __decorate([
     t("smartqasa-panel-card")
 ], PanelCard);
