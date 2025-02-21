@@ -1,0 +1,30 @@
+{
+  "name": "dash-loader",
+  "version": "1.0.0",
+  "description": "Dashboard Loader",
+  "main": "index.js",
+  "scripts": {
+    "clean": "rm -rf dist",
+    "build": "npm run clean && rollup -c",
+    "watch": "npm run clean && rollup -c --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/smartqasa/dash-loader.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/smartqasa/dash-loader/issues"
+  },
+  "homepage": "https://github.com/smartqasa/dash-loader#readme",
+  "devDependencies": {
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^16.0.0",
+    "@rollup/plugin-typescript": "^12.1.2",
+    "@types/node": "^22.13.4",
+    "lit": "^3.2.1",
+    "rollup": "^4.34.8"
+  }
+}
