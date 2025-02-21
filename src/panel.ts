@@ -1,8 +1,14 @@
-import { css, CSSResult, html, LitElement, nothing, TemplateResult } from "lit";
+import {
+  css,
+  CSSResult,
+  html,
+  LitElement,
+  nothing,
+  PropertyValues,
+  TemplateResult,
+} from "lit";
 import { customElement, property, state } from "lit/decorators.js";
-import { unsafeHTML } from "lit-html/directives/unsafe-html.js";
-
-import { HomeAssistant, LovelaceCardConfig } from "./types";
+import { HomeAssistant, LovelaceCard, LovelaceCardConfig } from "./types";
 
 interface Config extends LovelaceCardConfig {
   area: string;
@@ -22,9 +28,11 @@ export class PanelCard extends LitElement {
     return 1;
   }
 
-  @property({ attribute: false }) public hass?: HomeAssistant;
+  //@property({ attribute: false }) public hass?: HomeAssistant;
   @state() private _config?: Config;
-  @state() private _isElementsLoaded = false;
+  @state() private _mainCard?: LovelaceCard;
+  @state() private _isElementLoaded = false;
+  private _tag = "smartqasa-main-card";
 
   static get styles(): CSSResult {
     return css`
@@ -43,22 +51,37 @@ export class PanelCard extends LitElement {
     this._config = config;
   }
 
+  protected willUpdate(changedProps: PropertyValues): void {
+    if (!this._mainCard) {
+      this._createMainCard();
+      return;
+    }
+
+    if (changedProps.has("_config")) this._mainCard.setConfig(this._config!);
+    //if (changedProps.has("hass")) this._mainCard.hass = this.hass;
+  }
+
   protected render(): TemplateResult | typeof nothing {
-    if (!this._isElementsLoaded || !this._config || !this.hass) return nothing;
-
-    console.log("Rendering main card", this._config);
-
-    return html`${unsafeHTML(
-      `<smartqasa-main-card .config=${this._config} .hass=${this.hass}></smartqasa-main-card>`
-    )}`;
+    if (!this._mainCard) return nothing;
+    return html`${this._mainCard}`;
   }
 
   private _testElementsLoaded(): void {
-    if (!customElements.get("smartqasa-main-card")) {
+    if (!customElements.get(this._tag)) {
       setTimeout(() => this._testElementsLoaded(), 500);
       return;
     }
 
-    this._isElementsLoaded = true;
+    this._isElementLoaded = true;
+  }
+
+  private _createMainCard(): void {
+    if (!this._isElementLoaded || !this._config) return;
+
+    const element = document.createElement(this._tag) as LovelaceCard;
+    element.setConfig(this._config);
+    //if (this.hass) element.hass = this.hass;
+
+    this._mainCard = element;
   }
 }
