@@ -66,7 +66,7 @@ const t=t=>(e,o)=>{ void 0!==o?o.addInitializer((()=>{customElements.define(t,e)
  * SPDX-License-Identifier: BSD-3-Clause
  */const o={attribute:true,type:String,converter:u$1,reflect:false,hasChanged:f$1},r=(t=o,e,r)=>{const{kind:n,metadata:i}=r;let s=globalThis.litPropertyMetadata.get(i);if(void 0===s&&globalThis.litPropertyMetadata.set(i,s=new Map),s.set(r.name,t),"accessor"===n){const{name:o}=r;return {set(r){const n=e.get.call(this);e.set.call(this,r),this.requestUpdate(o,n,t);},init(e){return void 0!==e&&this.P(o,void 0,t),e}}}if("setter"===n){const{name:o}=r;return function(r){const n=this[o];e.call(this,r),this.requestUpdate(o,n,t);}}throw Error("Unsupported decorator location: "+n)};function n(t){return (e,o)=>"object"==typeof o?r(t,e,o):((t,e,o)=>{const r=e.hasOwnProperty(o);return e.constructor.createProperty(o,r?{...t,wrapped:true}:t),r?Object.getOwnPropertyDescriptor(e,o):void 0})(t,e,o)}
 
-let SmartQasaPanelCard = class SmartQasaPanelCard extends r$1 {
+let PanelCard = class PanelCard extends r$1 {
     constructor() {
         super(...arguments);
         this._loaded = false;
@@ -80,7 +80,7 @@ let SmartQasaPanelCard = class SmartQasaPanelCard extends r$1 {
       height: 100%;
       background: var(--primary-background-color, white);
     }
-    .loader {
+    .panel {
       border: 6px solid #ccc;
       border-top: 6px solid #000;
       border-radius: 50%;
@@ -111,15 +111,15 @@ let SmartQasaPanelCard = class SmartQasaPanelCard extends r$1 {
     render() {
         return this._loaded
             ? x `<smartqasa-main-card></smartqasa-main-card>`
-            : x `<div class="loader"></div>`;
+            : x `<div class="panel"></div>`;
     }
 };
 __decorate([
     n({ type: Boolean })
-], SmartQasaPanelCard.prototype, "_loaded", void 0);
-SmartQasaPanelCard = __decorate([
+], PanelCard.prototype, "_loaded", void 0);
+PanelCard = __decorate([
     t("smartqasa-panel-card")
-], SmartQasaPanelCard);
+], PanelCard);
 
-export { SmartQasaPanelCard };
+export { PanelCard };
 //# sourceMappingURL=panel.js.map

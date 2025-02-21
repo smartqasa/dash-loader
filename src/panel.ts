@@ -2,7 +2,7 @@ import { css, html, LitElement } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 
 @customElement("smartqasa-panel-card")
-export class SmartQasaPanelCard extends LitElement {
+export class PanelCard extends LitElement {
   @property({ type: Boolean }) private _loaded = false;
 
   static styles = css`
@@ -14,7 +14,7 @@ export class SmartQasaPanelCard extends LitElement {
       height: 100%;
       background: var(--primary-background-color, white);
     }
-    .loader {
+    .panel {
       border: 6px solid #ccc;
       border-top: 6px solid #000;
       border-radius: 50%;
@@ -48,6 +48,6 @@ export class SmartQasaPanelCard extends LitElement {
   protected render() {
     return this._loaded
       ? html`<smartqasa-main-card></smartqasa-main-card>`
-      : html`<div class="loader"></div>`;
+      : html`<div class="panel"></div>`;
   }
 }
