@@ -23,7 +23,7 @@ export class PanelCard extends LitElement {
   @property({ attribute: false }) public hass?: HomeAssistant;
   @state() private _config?: Config;
   @state() private _mainCard?: LovelaceCard;
-  @state() private _isLoaded = false;
+  @state() private _isElementLoaded = false;
 
   static styles = css`
     :host {
@@ -52,40 +52,55 @@ export class PanelCard extends LitElement {
     }
   `;
 
-  public setConfig(config: Config) {
-    this._config = config;
-    this._loadMainCard();
+  public connectedCallback(): void {
+    super.connectedCallback();
+    this._testElementsLoaded();
   }
 
-  private _loadMainCard(): void {
-    if (!this._config || !this.hass) return;
+  public setConfig(config: Config) {
+    this._config = config;
+  }
 
-    const tag = "smartqasa-main-card";
-
-    if (!customElements.get(tag)) {
-      console.warn(`Waiting for ${tag} to load...`);
-      setTimeout(() => this._loadMainCard(), 500);
+  protected willUpdate(changedProps: PropertyValues): void {
+    if (!this._mainCard) {
+      this._createMainCard();
       return;
     }
 
-    const element = document.createElement(tag) as LovelaceCard;
-    element.setConfig(this._config);
-    element.hass = this.hass;
-
-    this._isLoaded = true;
+    if (changedProps.has("hass")) {
+      this._mainCard.hass = this.hass;
+    }
+    if (changedProps.has("_config")) {
+      this._mainCard.setConfig(this._config!);
+    }
   }
 
   protected render(): TemplateResult {
-    if (!this.hass) return html`<p>HA not available.</p>`;
-    if (!this._config) return html`<p>No config found.</p>`;
-
-    return this._isLoaded
+    return this._mainCard
       ? html`${this._mainCard}`
       : html`<div class="panel"></div>`;
   }
 
-  protected firstUpdated(_changedProperties: PropertyValues): void {
-    super.firstUpdated(_changedProperties);
-    this._loadMainCard();
+  private _testElementsLoaded(): void {
+    const tag = "smartqasa-main-card";
+    if (!customElements.get(tag)) {
+      console.warn(`Waiting for ${tag} to load...`);
+      setTimeout(() => this._testElementsLoaded(), 500);
+      return;
+    }
+
+    this._isElementLoaded = true;
+  }
+
+  private _createMainCard(): void {
+    if (!this._isElementLoaded || !this._config) return;
+
+    const element = document.createElement(
+      "smartqasa-main-card"
+    ) as LovelaceCard;
+    element.setConfig(this._config);
+    if (this.hass) element.hass = this.hass;
+
+    this._mainCard = element;
   }
 }

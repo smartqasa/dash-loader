@@ -75,7 +75,7 @@ const t=t=>(e,o)=>{ void 0!==o?o.addInitializer((()=>{customElements.define(t,e)
 let PanelCard = class PanelCard extends r$2 {
     constructor() {
         super(...arguments);
-        this._isLoaded = false;
+        this._isElementLoaded = false;
     }
     getCardSize() {
         return 1;
@@ -106,36 +106,47 @@ let PanelCard = class PanelCard extends r$2 {
       }
     }
   `; }
+    connectedCallback() {
+        super.connectedCallback();
+        this._testElementsLoaded();
+    }
     setConfig(config) {
         this._config = config;
-        this._loadMainCard();
     }
-    _loadMainCard() {
-        if (!this._config || !this.hass)
-            return;
-        const tag = "smartqasa-main-card";
-        if (!customElements.get(tag)) {
-            console.warn(`Waiting for ${tag} to load...`);
-            setTimeout(() => this._loadMainCard(), 500);
+    willUpdate(changedProps) {
+        if (!this._mainCard) {
+            this._createMainCard();
             return;
         }
-        const element = document.createElement(tag);
-        element.setConfig(this._config);
-        element.hass = this.hass;
-        this._isLoaded = true;
+        if (changedProps.has("hass")) {
+            this._mainCard.hass = this.hass;
+        }
+        if (changedProps.has("_config")) {
+            this._mainCard.setConfig(this._config);
+        }
     }
     render() {
-        if (!this.hass)
-            return x `<p>HA not available.</p>`;
-        if (!this._config)
-            return x `<p>No config found.</p>`;
-        return this._isLoaded
+        return this._mainCard
             ? x `${this._mainCard}`
             : x `<div class="panel"></div>`;
     }
-    firstUpdated(_changedProperties) {
-        super.firstUpdated(_changedProperties);
-        this._loadMainCard();
+    _testElementsLoaded() {
+        const tag = "smartqasa-main-card";
+        if (!customElements.get(tag)) {
+            console.warn(`Waiting for ${tag} to load...`);
+            setTimeout(() => this._testElementsLoaded(), 500);
+            return;
+        }
+        this._isElementLoaded = true;
+    }
+    _createMainCard() {
+        if (!this._isElementLoaded || !this._config)
+            return;
+        const element = document.createElement("smartqasa-main-card");
+        element.setConfig(this._config);
+        if (this.hass)
+            element.hass = this.hass;
+        this._mainCard = element;
     }
 };
 __decorate([
@@ -149,7 +160,7 @@ __decorate([
 ], PanelCard.prototype, "_mainCard", void 0);
 __decorate([
     r()
-], PanelCard.prototype, "_isLoaded", void 0);
+], PanelCard.prototype, "_isElementLoaded", void 0);
 PanelCard = __decorate([
     t("smartqasa-panel-card")
 ], PanelCard);
