@@ -119,6 +119,9 @@ let PanelCard = class PanelCard extends r$2 {
         this.requestUpdate();
     }
     render() {
+        if (!this._config) {
+            return x `<p>No config found.</p>`;
+        }
         return this._loaded
             ? x `<smartqasa-main-card
           .config=${this._config}
@@ -134,7 +137,7 @@ __decorate([
     r()
 ], PanelCard.prototype, "_config", void 0);
 __decorate([
-    n({ type: Boolean })
+    r()
 ], PanelCard.prototype, "_loaded", void 0);
 PanelCard = __decorate([
     t("smartqasa-panel-card")

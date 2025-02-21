@@ -18,7 +18,7 @@ interface Config extends LovelaceCardConfig {
 export class PanelCard extends LitElement {
   @property({ attribute: false }) public hass?: HomeAssistant;
   @state() private _config?: Config;
-  @property({ type: Boolean }) private _loaded = false;
+  @state() private _loaded = false;
 
   static styles = css`
     :host {
@@ -66,6 +66,10 @@ export class PanelCard extends LitElement {
   }
 
   protected render() {
+    if (!this._config) {
+      return html`<p>No config found.</p>`;
+    }
+
     return this._loaded
       ? html`<smartqasa-main-card
           .config=${this._config}
