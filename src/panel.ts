@@ -33,14 +33,6 @@ export class PanelCard extends LitElement {
   @state() private _mainCard?: LovelaceCard;
   @state() private _isElementLoaded = false;
 
-  static get styles(): CSSResult {
-    return css`
-      :host {
-        max-width: 100vw;
-      }
-    `;
-  }
-
   public connectedCallback(): void {
     super.connectedCallback();
     this._testElementsLoaded();
