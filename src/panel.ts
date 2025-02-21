@@ -8,7 +8,7 @@ import {
   TemplateResult,
 } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
-import { HomeAssistant, LovelaceCard, LovelaceCardConfig } from "./types";
+import { LovelaceCard, LovelaceCardConfig } from "./types";
 
 interface Config extends LovelaceCardConfig {
   area: string;
