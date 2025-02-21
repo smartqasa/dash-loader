@@ -75,7 +75,10 @@ const t=t=>(e,o)=>{ void 0!==o?o.addInitializer((()=>{customElements.define(t,e)
 let PanelCard = class PanelCard extends r$2 {
     constructor() {
         super(...arguments);
-        this._loaded = false;
+        this._isLoaded = false;
+    }
+    getCardSize() {
+        return 1;
     }
     static { this.styles = i$3 `
     :host {
@@ -104,34 +107,35 @@ let PanelCard = class PanelCard extends r$2 {
     }
   `; }
     setConfig(config) {
-        this.config = config;
-        this.requestUpdate();
+        this._config = config;
+        this._loadMainCard();
     }
-    connectedCallback() {
-        super.connectedCallback();
-        this._waitForMainCard();
-    }
-    async _waitForMainCard() {
-        while (!customElements.get("smartqasa-main-card")) {
-            await new Promise((resolve) => setTimeout(resolve, 500));
+    _loadMainCard() {
+        if (!this._config || !this.hass)
+            return;
+        const tag = "smartqasa-main-card";
+        if (!customElements.get(tag)) {
+            console.warn(`Waiting for ${tag} to load...`);
+            setTimeout(() => this._loadMainCard(), 500);
+            return;
         }
-        console.log("Main card loaded");
-        this._loaded = true;
-        this.requestUpdate();
+        const element = document.createElement(tag);
+        element.setConfig(this._config);
+        element.hass = this.hass;
+        this._isLoaded = true;
     }
     render() {
         if (!this.hass)
             return x `<p>HA not available.</p>`;
-        if (!this.config)
+        if (!this._config)
             return x `<p>No config found.</p>`;
-        if (!this._loaded) {
-            return x `<div class="panel"></div>`;
-        }
-        console.log("Rendering main card");
-        return x ` <smartqasa-main-card
-      .config=${this.config}
-      .hass=${this.hass}
-    ></smartqasa-main-card>`;
+        return this._isLoaded
+            ? x `${this._mainCard}`
+            : x `<div class="panel"></div>`;
+    }
+    firstUpdated(_changedProperties) {
+        super.firstUpdated(_changedProperties);
+        this._loadMainCard();
     }
 };
 __decorate([
@@ -139,10 +143,13 @@ __decorate([
 ], PanelCard.prototype, "hass", void 0);
 __decorate([
     r()
-], PanelCard.prototype, "config", void 0);
+], PanelCard.prototype, "_config", void 0);
 __decorate([
     r()
-], PanelCard.prototype, "_loaded", void 0);
+], PanelCard.prototype, "_mainCard", void 0);
+__decorate([
+    r()
+], PanelCard.prototype, "_isLoaded", void 0);
 PanelCard = __decorate([
     t("smartqasa-panel-card")
 ], PanelCard);

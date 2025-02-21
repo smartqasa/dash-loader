@@ -1,6 +1,6 @@
-import { css, html, LitElement, TemplateResult } from "lit";
+import { css, html, LitElement, PropertyValues, TemplateResult } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
-import { HomeAssistant, LovelaceCardConfig } from "./types";
+import { HomeAssistant, LovelaceCard, LovelaceCardConfig } from "./types";
 
 interface Config extends LovelaceCardConfig {
   area: string;
@@ -16,9 +16,14 @@ interface Config extends LovelaceCardConfig {
 
 @customElement("smartqasa-panel-card")
 export class PanelCard extends LitElement {
-  @property({ attribute: false }) public hass: HomeAssistant | undefined;
-  @state() private config: Config | undefined;
-  @state() private _loaded = false;
+  public getCardSize(): number | Promise<number> {
+    return 1;
+  }
+
+  @property({ attribute: false }) public hass?: HomeAssistant;
+  @state() private _config?: Config;
+  @state() private _mainCard?: LovelaceCard;
+  @state() private _isLoaded = false;
 
   static styles = css`
     :host {
@@ -48,36 +53,39 @@ export class PanelCard extends LitElement {
   `;
 
   public setConfig(config: Config) {
-    this.config = config;
-    this.requestUpdate();
+    this._config = config;
+    this._loadMainCard();
   }
 
-  connectedCallback() {
-    super.connectedCallback();
-    this._waitForMainCard();
-  }
+  private _loadMainCard(): void {
+    if (!this._config || !this.hass) return;
 
-  private async _waitForMainCard(): Promise<void> {
-    while (!customElements.get("smartqasa-main-card")) {
-      await new Promise((resolve) => setTimeout(resolve, 500));
+    const tag = "smartqasa-main-card";
+
+    if (!customElements.get(tag)) {
+      console.warn(`Waiting for ${tag} to load...`);
+      setTimeout(() => this._loadMainCard(), 500);
+      return;
     }
-    console.log("Main card loaded");
-    this._loaded = true;
-    this.requestUpdate();
+
+    const element = document.createElement(tag) as LovelaceCard;
+    element.setConfig(this._config);
+    element.hass = this.hass;
+
+    this._isLoaded = true;
   }
 
   protected render(): TemplateResult {
     if (!this.hass) return html`<p>HA not available.</p>`;
-    if (!this.config) return html`<p>No config found.</p>`;
+    if (!this._config) return html`<p>No config found.</p>`;
 
-    if (!this._loaded) {
-      return html`<div class="panel"></div>`;
-    }
+    return this._isLoaded
+      ? html`${this._mainCard}`
+      : html`<div class="panel"></div>`;
+  }
 
-    console.log("Rendering main card");
-    return html` <smartqasa-main-card
-      .config=${this.config}
-      .hass=${this.hass}
-    ></smartqasa-main-card>`;
+  protected firstUpdated(_changedProperties: PropertyValues): void {
+    super.firstUpdated(_changedProperties);
+    this._loadMainCard();
   }
 }
