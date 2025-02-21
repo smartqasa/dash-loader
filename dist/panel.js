@@ -75,8 +75,7 @@ const t=t=>(e,o)=>{ void 0!==o?o.addInitializer((()=>{customElements.define(t,e)
 let PanelCard = class PanelCard extends r$2 {
     constructor() {
         super(...arguments);
-        this._isElementLoaded = false;
-        this._tag = "smartqasa-main-card";
+        this._isElementsLoaded = false;
     }
     getCardSize() {
         return 1;
@@ -95,36 +94,20 @@ let PanelCard = class PanelCard extends r$2 {
     setConfig(config) {
         this._config = config;
     }
-    willUpdate(changedProps) {
-        if (!this._mainCard) {
-            this._createMainCard();
-            return;
-        }
-        if (changedProps.has("_config"))
-            this._mainCard.setConfig(this._config);
-        if (changedProps.has("hass"))
-            this._mainCard.hass = this.hass;
-    }
     render() {
-        if (!this._mainCard)
+        if (!this._isElementsLoaded || !this._config || !this.hass)
             return E;
-        return x `${this._mainCard}`;
+        return x `<smartqasa-main-card
+      .config=${this._config}
+      .hass=${this.hass}
+    ></smartqasa-main-card>`;
     }
     _testElementsLoaded() {
-        if (!customElements.get(this._tag)) {
+        if (!customElements.get("smartqasa-main-card")) {
             setTimeout(() => this._testElementsLoaded(), 500);
             return;
         }
-        this._isElementLoaded = true;
-    }
-    _createMainCard() {
-        if (!this._isElementLoaded || !this._config)
-            return;
-        const element = document.createElement(this._tag);
-        element.setConfig(this._config);
-        if (this.hass)
-            element.hass = this.hass;
-        this._mainCard = element;
+        this._isElementsLoaded = true;
     }
 };
 __decorate([
@@ -135,10 +118,7 @@ __decorate([
 ], PanelCard.prototype, "_config", void 0);
 __decorate([
     r()
-], PanelCard.prototype, "_mainCard", void 0);
-__decorate([
-    r()
-], PanelCard.prototype, "_isElementLoaded", void 0);
+], PanelCard.prototype, "_isElementsLoaded", void 0);
 PanelCard = __decorate([
     t("smartqasa-panel-card")
 ], PanelCard);
