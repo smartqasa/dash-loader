@@ -26,5 +26,8 @@
     "@types/node": "^22.13.4",
     "lit": "^3.2.1",
     "rollup": "^4.34.8"
+  },
+  "dependencies": {
+    "home-assistant-js-websocket": "^9.4.0"
   }
 }

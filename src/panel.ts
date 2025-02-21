@@ -1,8 +1,23 @@
 import { css, html, LitElement } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
+import { HomeAssistant, LovelaceCardConfig } from "./types";
+
+interface Config extends LovelaceCardConfig {
+  area: string;
+  name?: string;
+  picture?: string;
+  audio_player?: string;
+  video_player?: string;
+  video_sound?: string;
+  header_chips?: LovelaceCardConfig[];
+  area_chips?: LovelaceCardConfig[];
+  tiles?: LovelaceCardConfig[];
+}
 
 @customElement("smartqasa-panel-card")
 export class PanelCard extends LitElement {
+  @property({ attribute: false }) public hass?: HomeAssistant;
+  @state() private _config?: Config;
   @property({ type: Boolean }) private _loaded = false;
 
   static styles = css`
@@ -32,6 +47,11 @@ export class PanelCard extends LitElement {
     }
   `;
 
+  public setConfig(config: Config) {
+    this._config = config;
+    this.requestUpdate();
+  }
+
   connectedCallback() {
     super.connectedCallback();
     this._waitForMainCard();
@@ -47,7 +67,10 @@ export class PanelCard extends LitElement {
 
   protected render() {
     return this._loaded
-      ? html`<smartqasa-main-card></smartqasa-main-card>`
+      ? html`<smartqasa-main-card
+          .config=${this._config}
+          .hass=${this.hass}
+        ></smartqasa-main-card>`
       : html`<div class="panel"></div>`;
   }
 }
