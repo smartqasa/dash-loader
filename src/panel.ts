@@ -1,4 +1,4 @@
-import { css, html, LitElement } from "lit";
+import { css, html, LitElement, TemplateResult } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { HomeAssistant, LovelaceCardConfig } from "./types";
 
@@ -16,8 +16,8 @@ interface Config extends LovelaceCardConfig {
 
 @customElement("smartqasa-panel-card")
 export class PanelCard extends LitElement {
-  @property({ attribute: false }) public hass?: HomeAssistant;
-  @state() private _config?: Config;
+  @property({ attribute: false }) public hass: HomeAssistant | undefined;
+  @state() private config: Config | undefined;
   @state() private _loaded = false;
 
   static styles = css`
@@ -48,7 +48,7 @@ export class PanelCard extends LitElement {
   `;
 
   public setConfig(config: Config) {
-    this._config = config;
+    this.config = config;
     this.requestUpdate();
   }
 
@@ -61,20 +61,23 @@ export class PanelCard extends LitElement {
     while (!customElements.get("smartqasa-main-card")) {
       await new Promise((resolve) => setTimeout(resolve, 500));
     }
+    console.log("Main card loaded");
     this._loaded = true;
     this.requestUpdate();
   }
 
-  protected render() {
-    if (!this._config) {
-      return html`<p>No config found.</p>`;
+  protected render(): TemplateResult {
+    if (!this.hass) return html`<p>HA not available.</p>`;
+    if (!this.config) return html`<p>No config found.</p>`;
+
+    if (!this._loaded) {
+      return html`<div class="panel"></div>`;
     }
 
-    return this._loaded
-      ? html`<smartqasa-main-card
-          .config=${this._config}
-          .hass=${this.hass}
-        ></smartqasa-main-card>`
-      : html`<div class="panel"></div>`;
+    console.log("Rendering main card");
+    return html` <smartqasa-main-card
+      .config=${this.config}
+      .hass=${this.hass}
+    ></smartqasa-main-card>`;
   }
 }

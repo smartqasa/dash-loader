@@ -104,7 +104,7 @@ let PanelCard = class PanelCard extends r$2 {
     }
   `; }
     setConfig(config) {
-        this._config = config;
+        this.config = config;
         this.requestUpdate();
     }
     connectedCallback() {
@@ -115,19 +115,23 @@ let PanelCard = class PanelCard extends r$2 {
         while (!customElements.get("smartqasa-main-card")) {
             await new Promise((resolve) => setTimeout(resolve, 500));
         }
+        console.log("Main card loaded");
         this._loaded = true;
         this.requestUpdate();
     }
     render() {
-        if (!this._config) {
+        if (!this.hass)
+            return x `<p>HA not available.</p>`;
+        if (!this.config)
             return x `<p>No config found.</p>`;
+        if (!this._loaded) {
+            return x `<div class="panel"></div>`;
         }
-        return this._loaded
-            ? x `<smartqasa-main-card
-          .config=${this._config}
-          .hass=${this.hass}
-        ></smartqasa-main-card>`
-            : x `<div class="panel"></div>`;
+        console.log("Rendering main card");
+        return x ` <smartqasa-main-card
+      .config=${this.config}
+      .hass=${this.hass}
+    ></smartqasa-main-card>`;
     }
 };
 __decorate([
@@ -135,7 +139,7 @@ __decorate([
 ], PanelCard.prototype, "hass", void 0);
 __decorate([
     r()
-], PanelCard.prototype, "_config", void 0);
+], PanelCard.prototype, "config", void 0);
 __decorate([
     r()
 ], PanelCard.prototype, "_loaded", void 0);
