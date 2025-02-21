@@ -80,27 +80,13 @@ let PanelCard = class PanelCard extends r$2 {
     getCardSize() {
         return 1;
     }
-    static { this.styles = i$3 `
-    :host {
-      width: 100vw;
-    }
-    .panel {
-      border: 6px solid #ccc;
-      border-top: 6px solid #000;
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      animation: spin 1s linear infinite;
-    }
-    @keyframes spin {
-      0% {
-        transform: rotate(0deg);
+    static get styles() {
+        return i$3 `
+      :host {
+        width: 100vw;
       }
-      100% {
-        transform: rotate(360deg);
-      }
+    `;
     }
-  `; }
     connectedCallback() {
         super.connectedCallback();
         this._testElementsLoaded();
@@ -121,9 +107,9 @@ let PanelCard = class PanelCard extends r$2 {
         }
     }
     render() {
-        return this._mainCard
-            ? x `${this._mainCard}`
-            : x `<div class="panel"></div>`;
+        if (!this._mainCard)
+            return E;
+        return x `${this._mainCard}`;
     }
     _testElementsLoaded() {
         const tag = "smartqasa-main-card";
