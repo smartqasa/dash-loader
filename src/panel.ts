@@ -43,6 +43,7 @@ export class PanelCard extends LitElement {
 
   protected render(): TemplateResult | typeof nothing {
     if (!this._isElementsLoaded || !this._config || !this.hass) return nothing;
+    console.log("Rendering");
 
     return html`<smartqasa-main-card
       .config=${this._config}

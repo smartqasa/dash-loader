@@ -97,6 +97,7 @@ let PanelCard = class PanelCard extends r$2 {
     render() {
         if (!this._isElementsLoaded || !this._config || !this.hass)
             return E;
+        console.log("Rendering");
         return x `<smartqasa-main-card
       .config=${this._config}
       .hass=${this.hass}
