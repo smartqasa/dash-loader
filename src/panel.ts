@@ -1,5 +1,7 @@
 import { css, CSSResult, html, LitElement, nothing, TemplateResult } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
+import { unsafeHTML } from "lit-html/directives/unsafe-html.js";
+
 import { HomeAssistant, LovelaceCardConfig } from "./types";
 
 interface Config extends LovelaceCardConfig {
@@ -46,14 +48,9 @@ export class PanelCard extends LitElement {
 
     console.log("Rendering main card", this._config);
 
-    return html`
-      <div>
-        <smartqasa-main-card
-          .config=${this._config}
-          .hass=${this.hass}
-        ></smartqasa-main-card>
-      </div>
-    `;
+    return html`${unsafeHTML(
+      `<smartqasa-main-card .config=${this._config} .hass=${this.hass}></smartqasa-main-card>`
+    )}`;
   }
 
   private _testElementsLoaded(): void {
