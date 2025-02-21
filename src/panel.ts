@@ -1,12 +1,4 @@
-import {
-  css,
-  CSSResult,
-  html,
-  LitElement,
-  nothing,
-  PropertyValues,
-  TemplateResult,
-} from "lit";
+import { css, html, LitElement, PropertyValues, TemplateResult } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { HomeAssistant, LovelaceCard, LovelaceCardConfig } from "./types";
 
@@ -33,6 +25,33 @@ export class PanelCard extends LitElement {
   @state() private _mainCard?: LovelaceCard;
   @state() private _isElementLoaded = false;
 
+  static styles = css`
+    :host {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      background: var(--primary-background-color, white);
+    }
+    .panel {
+      border: 6px solid #ccc;
+      border-top: 6px solid #000;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  `;
+
   public connectedCallback(): void {
     super.connectedCallback();
     this._testElementsLoaded();
@@ -56,9 +75,10 @@ export class PanelCard extends LitElement {
     }
   }
 
-  protected render(): TemplateResult | typeof nothing {
-    if (this._mainCard) return nothing;
-    return html`${this._mainCard}`;
+  protected render(): TemplateResult {
+    return this._mainCard
+      ? html`${this._mainCard}`
+      : html`<div class="panel"></div>`;
   }
 
   private _testElementsLoaded(): void {
