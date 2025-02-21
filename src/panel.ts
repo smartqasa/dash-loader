@@ -27,12 +27,7 @@ export class PanelCard extends LitElement {
 
   static styles = css`
     :host {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      height: 100%;
-      background: var(--primary-background-color, white);
+      width: 100vw;
     }
     .panel {
       border: 6px solid #ccc;
