@@ -8,7 +8,7 @@ import {
   TemplateResult,
 } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
-import { LovelaceCard, LovelaceCardConfig } from "./types";
+import { HomeAssistant, LovelaceCard, LovelaceCardConfig } from "./types";
 
 interface Config extends LovelaceCardConfig {
   area: string;
@@ -28,7 +28,7 @@ export class PanelCard extends LitElement {
     return 1;
   }
 
-  //@property({ attribute: false }) public hass?: HomeAssistant;
+  @property({ attribute: false }) public hass?: HomeAssistant;
   @state() private _config?: Config;
   @state() private _mainCard?: LovelaceCard;
   @state() private _isElementLoaded = false;
@@ -58,7 +58,7 @@ export class PanelCard extends LitElement {
     }
 
     if (changedProps.has("_config")) this._mainCard.setConfig(this._config!);
-    //if (changedProps.has("hass")) this._mainCard.hass = this.hass;
+    if (changedProps.has("hass")) this._mainCard.hass = this.hass;
   }
 
   protected render(): TemplateResult | typeof nothing {
@@ -80,7 +80,7 @@ export class PanelCard extends LitElement {
 
     const element = document.createElement(this._tag) as LovelaceCard;
     element.setConfig(this._config);
-    //if (this.hass) element.hass = this.hass;
+    if (this.hass) element.hass = this.hass;
 
     this._mainCard = element;
   }

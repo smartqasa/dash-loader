@@ -102,7 +102,8 @@ let PanelCard = class PanelCard extends r$2 {
         }
         if (changedProps.has("_config"))
             this._mainCard.setConfig(this._config);
-        //if (changedProps.has("hass")) this._mainCard.hass = this.hass;
+        if (changedProps.has("hass"))
+            this._mainCard.hass = this.hass;
     }
     render() {
         if (!this._mainCard)
@@ -121,10 +122,14 @@ let PanelCard = class PanelCard extends r$2 {
             return;
         const element = document.createElement(this._tag);
         element.setConfig(this._config);
-        //if (this.hass) element.hass = this.hass;
+        if (this.hass)
+            element.hass = this.hass;
         this._mainCard = element;
     }
 };
+__decorate([
+    n({ attribute: false })
+], PanelCard.prototype, "hass", void 0);
 __decorate([
     r()
 ], PanelCard.prototype, "_config", void 0);
