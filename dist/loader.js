@@ -415,4 +415,4 @@ ScreenSaver = __decorate([
 
 // Initialize global variables
 window.smartqasa = window.smartqasa || {};
-//# sourceMappingURL=index.js.map
+//# sourceMappingURL=loader.js.map
