@@ -72,6 +72,12 @@ const t=t=>(e,o)=>{ void 0!==o?o.addInitializer((()=>{customElements.define(t,e)
  * SPDX-License-Identifier: BSD-3-Clause
  */function r(r){return n({...r,state:true,attribute:false})}
 
+window.customCards.push({
+    type: "smartqasa-panel-card",
+    name: "SmartQasa panel Card",
+    preview: true,
+    description: "A SmartQasa card for displaying the Main panel card.",
+});
 let PanelCard = class PanelCard extends r$2 {
     constructor() {
         super(...arguments);

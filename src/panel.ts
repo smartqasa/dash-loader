@@ -22,6 +22,13 @@ interface Config extends LovelaceCardConfig {
   tiles?: LovelaceCardConfig[];
 }
 
+window.customCards.push({
+  type: "smartqasa-panel-card",
+  name: "SmartQasa panel Card",
+  preview: true,
+  description: "A SmartQasa card for displaying the Main panel card.",
+});
+
 @customElement("smartqasa-panel-card")
 export class PanelCard extends LitElement {
   public getCardSize(): number | Promise<number> {
