@@ -1,3 +1,4 @@
+import image from "@rollup/plugin-image";
 import resolve from "@rollup/plugin-node-resolve";
 import typescript from "@rollup/plugin-typescript";
 import json from "@rollup/plugin-json";
@@ -10,11 +11,12 @@ export default {
     sourcemap: true,
   },
   plugins: [
-    resolve(), // Resolves node_modules dependencies
-    json(), // Allows importing JSON files
+    image(),
+    resolve(),
+    json(),
     typescript({
-      experimentalDecorators: true, // Enable decorators
-      emitDecoratorMetadata: false, // Prevent TypeScript 5+ issues
+      experimentalDecorators: true,
+      emitDecoratorMetadata: false,
     }),
   ],
 };
