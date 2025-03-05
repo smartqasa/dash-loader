@@ -3,11 +3,11 @@ import typescript from "@rollup/plugin-typescript";
 import json from "@rollup/plugin-json";
 
 export default {
-  input: "src/panel.ts", // Your entry point
+  input: "src/index.ts",
   output: {
-    file: "dist/panel.js", // Output file
-    format: "es", // ES module (needed for Home Assistant)
-    sourcemap: true, // Enable debugging
+    file: "dist/index.js",
+    format: "es",
+    sourcemap: true,
   },
   plugins: [
     resolve(), // Resolves node_modules dependencies
