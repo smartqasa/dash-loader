@@ -306,13 +306,13 @@ let ScreenSaver = class ScreenSaver extends r$2 {
     }
     willUpdate(changedProps) {
         if (changedProps.has("hass") && this.hass) {
-            const rebootDevicesState = this.hass.states["input_button.reboot_devices"]?.state;
-            if (this.rebootDevicesState !== rebootDevicesState) {
-                this.rebootDevicesState = rebootDevicesState;
+            const reboot = this.hass.states["input_button.reboot_devices"]?.state;
+            if (reboot && this.rebootDevicesState !== reboot) {
+                this.rebootDevicesState = reboot;
             }
-            const refreshDevicesState = this.hass.states["input_button.refresh_devices"]?.state;
-            if (this.refreshDevicesState !== refreshDevicesState) {
-                this.refreshDevicesState = refreshDevicesState;
+            const refresh = this.hass.states["input_button.refresh_devices"]?.state;
+            if (refresh && this.refreshDevicesState !== refresh) {
+                this.refreshDevicesState = refresh;
             }
         }
     }
