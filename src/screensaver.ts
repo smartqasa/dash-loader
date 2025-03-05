@@ -34,13 +34,14 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
 
   @property({ attribute: false }) public hass?: HomeAssistant;
   @state() protected config?: Config;
+  @state() private rebootDevicesState: string = "off";
+  @state() private refreshDevicesState: string = "off";
   @state() private time: string = "Loading...";
   @state() private date: string = "Loading...";
 
+  private initialized = false;
   private moveTimerId: number | undefined;
   private timeIntervalId: number | undefined;
-  private deviceRefreshState: string | undefined;
-  private deviceRebootState: string | undefined;
 
   static get styles(): CSSResultGroup {
     return css`
@@ -131,6 +132,21 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
     this.config = config;
   }
 
+  protected willUpdate(changedProps: PropertyValues): void {
+    if (changedProps.has("hass") && this.hass) {
+      const rebootDevicesState =
+        this.hass.states["input_button.reboot_devices"]?.state;
+      if (this.rebootDevicesState !== rebootDevicesState) {
+        this.rebootDevicesState = rebootDevicesState;
+      }
+      const refreshDevicesState =
+        this.hass.states["input_button.refresh_devices"]?.state;
+      if (this.refreshDevicesState !== refreshDevicesState) {
+        this.refreshDevicesState = refreshDevicesState;
+      }
+    }
+  }
+
   protected render(): TemplateResult | typeof nothing {
     if (!this.config) return nothing;
 
@@ -167,12 +183,12 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
 
   protected updated(changedProps: PropertyValues): void {
     if (changedProps.has("hass") && this.hass) {
-      this.deviceRefreshState = deviceRefresh(
-        this.hass,
-        this.deviceRefreshState
-      );
-
-      this.deviceRebootState = deviceReboot(this.hass, this.deviceRebootState);
+      if (this.initialized) {
+        if (changedProps.has("rebootDevicesState")) deviceReboot();
+        if (changedProps.has("refreshDevicesState")) deviceRefresh();
+      } else {
+        this.initialized = true;
+      }
     }
   }
 

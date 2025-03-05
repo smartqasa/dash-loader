@@ -1,5 +1,3 @@
-import { HomeAssistant } from "./types";
-
 const delay = (ms: number): Promise<void> =>
   new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -28,50 +26,16 @@ const executeFullyAction = async (action: FullyAction): Promise<void> => {
   window.fully[action]();
 };
 
-type DeviceAction = "refresh" | "reboot";
-
-const handleDeviceAction = (
-  hass: HomeAssistant,
-  entityId: string,
-  currentState: string | undefined,
-  action: DeviceAction
-): string => {
-  const state = hass.states[entityId]?.state;
-  if (currentState === undefined || currentState === state) {
-    return state;
+export function deviceRefresh(): void {
+  if (typeof window.fully !== "undefined") {
+    void executeFullyAction("restartApp");
+  } else if (typeof window.browser_mod !== "undefined") {
+    window.browser_mod.service("refresh");
   }
+}
 
-  if (action === "refresh") {
-    if (typeof window.fully !== "undefined") {
-      void executeFullyAction("restartApp");
-    } else if (typeof window.browser_mod !== "undefined") {
-      window.browser_mod.service("refresh");
-    }
-  } else if (action === "reboot") {
+export function deviceReboot(): void {
+  if (typeof window.fully !== "undefined") {
     void executeFullyAction("reboot");
   }
-
-  return state;
-};
-
-export const deviceRefresh = (
-  hass: HomeAssistant,
-  deviceRefreshState: string | undefined
-): string =>
-  handleDeviceAction(
-    hass,
-    "input_button.refresh_devices",
-    deviceRefreshState,
-    "refresh"
-  );
-
-export const deviceReboot = (
-  hass: HomeAssistant,
-  deviceRebootState: string | undefined
-): string =>
-  handleDeviceAction(
-    hass,
-    "input_button.reboot_devices",
-    deviceRebootState,
-    "reboot"
-  );
+}
