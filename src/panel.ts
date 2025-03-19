@@ -23,13 +23,13 @@ interface Config extends LovelaceCardConfig {
 }
 
 window.customCards.push({
-  type: "smartqasa-panel-card",
-  name: "SmartQasa panel Card",
+  type: "panel-card",
+  name: "Panel Card",
   preview: true,
   description: "A SmartQasa card for displaying the Main panel card.",
 });
 
-@customElement("smartqasa-panel-card")
+@customElement("panel-card")
 export class PanelCard extends LitElement {
   public getCardSize(): number | Promise<number> {
     return 1;
@@ -39,7 +39,7 @@ export class PanelCard extends LitElement {
   @state() private config?: Config;
   @state() private mainCard?: LovelaceCard;
   @state() private isElementLoaded = false;
-  private tag = "smartqasa-main-card";
+  private tag = "main-card";
 
   static get styles(): CSSResult {
     return css`
