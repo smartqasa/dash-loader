@@ -220,8 +220,8 @@ let ScreenSaver = class ScreenSaver extends r$2 {
         return i$3 `
       :host {
         display: block;
-        width: 100%;
-        height: 100%;
+        width: 100vw;
+        height: 100vh;
         background-color: black;
         box-sizing: border-box;
       }
