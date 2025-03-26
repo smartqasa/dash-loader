@@ -220,10 +220,9 @@ let ScreenSaver = class ScreenSaver extends r$2 {
         return i$3 `
       :host {
         display: block;
-        width: 100%;
-        height: 100%;
+        width: 100vw;
+        height: 100vh;
         background-color: black;
-        box-sizing: border-box;
       }
       .container {
         width: 100%;
@@ -240,6 +239,9 @@ let ScreenSaver = class ScreenSaver extends r$2 {
         animation: fade-in 1.5s forwards;
         align-items: center;
         justify-content: center;
+        max-width: 100%;
+        box-sizing: border-box;
+        overflow: hidden;
       }
       .time,
       .date {
@@ -247,6 +249,7 @@ let ScreenSaver = class ScreenSaver extends r$2 {
         line-height: normal;
         white-space: nowrap;
         transition: all 0.5s ease-in-out;
+        max-width: 100vw;
       }
       .time {
         font-size: 7rem;
@@ -408,8 +411,8 @@ let ScreenSaver = class ScreenSaver extends r$2 {
         if (container && element) {
             const maxWidth = container.clientWidth - element.clientWidth;
             const maxHeight = container.clientHeight - element.clientHeight;
-            const randomX = Math.max(0, Math.floor(Math.random() * maxWidth));
-            const randomY = Math.max(0, Math.floor(Math.random() * maxHeight));
+            const randomX = Math.min(Math.max(0, Math.floor(Math.random() * maxWidth)), maxWidth);
+            const randomY = Math.min(Math.max(0, Math.floor(Math.random() * maxHeight)), maxHeight);
             element.style.left = `${randomX}px`;
             element.style.top = `${randomY}px`;
         }

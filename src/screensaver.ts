@@ -47,10 +47,9 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
     return css`
       :host {
         display: block;
-        width: 100%;
-        height: 100%;
+        width: 100vw;
+        height: 100vh;
         background-color: black;
-        box-sizing: border-box;
       }
       .container {
         width: 100%;
@@ -67,6 +66,9 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
         animation: fade-in 1.5s forwards;
         align-items: center;
         justify-content: center;
+        max-width: 100%;
+        box-sizing: border-box;
+        overflow: hidden;
       }
       .time,
       .date {
@@ -74,6 +76,7 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
         line-height: normal;
         white-space: nowrap;
         transition: all 0.5s ease-in-out;
+        max-width: 100vw;
       }
       .time {
         font-size: 7rem;
@@ -249,8 +252,14 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
       const maxWidth = container.clientWidth - element.clientWidth;
       const maxHeight = container.clientHeight - element.clientHeight;
 
-      const randomX = Math.max(0, Math.floor(Math.random() * maxWidth));
-      const randomY = Math.max(0, Math.floor(Math.random() * maxHeight));
+      const randomX = Math.min(
+        Math.max(0, Math.floor(Math.random() * maxWidth)),
+        maxWidth
+      );
+      const randomY = Math.min(
+        Math.max(0, Math.floor(Math.random() * maxHeight)),
+        maxHeight
+      );
 
       element.style.left = `${randomX}px`;
       element.style.top = `${randomY}px`;
