@@ -218,16 +218,11 @@ let ScreenSaver = class ScreenSaver extends r$2 {
     }
     static get styles() {
         return i$3 `
-      :host {
-        display: block;
-        width: 100vw;
-        height: 100vh;
-        background-color: black;
-      }
       .container {
-        width: 100%;
-        height: 100%;
+        width: 100vh;
+        height: 100vw;
         position: relative;
+        background-color: black;
       }
       .element {
         display: flex;
