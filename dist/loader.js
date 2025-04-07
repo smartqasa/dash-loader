@@ -114,6 +114,7 @@ let PanelCard = class PanelCard extends r$2 {
     render() {
         if (!this.mainCard)
             return E;
+        console.log(this.hass);
         return x `${this.mainCard}`;
     }
     testElementsLoaded() {
