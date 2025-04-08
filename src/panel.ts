@@ -70,7 +70,6 @@ export class PanelCard extends LitElement {
 
   protected render(): TemplateResult | typeof nothing {
     if (!this.mainCard) return nothing;
-    console.log(this.hass);
     return html`${this.mainCard}`;
   }
 
