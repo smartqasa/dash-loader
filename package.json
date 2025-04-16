@@ -1,6 +1,6 @@
 {
   "name": "dash-loader",
-  "version": "1.0.0",
+  "version": "2025.4.16-rc1",
   "description": "Dashboard Loader",
   "type": "module",
   "author": "Tom Bruno",
@@ -22,6 +22,7 @@
   "devDependencies": {
     "@rollup/plugin-image": "^3.0.3",
     "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-replace": "^6.0.1",
     "@rollup/plugin-node-resolve": "^16.0.0",
     "@rollup/plugin-typescript": "^12.1.2",
     "@types/node": "^22.13.4",
@@ -29,6 +30,8 @@
     "rollup": "^4.34.8"
   },
   "dependencies": {
-    "home-assistant-js-websocket": "^9.4.0"
+    "@rollup/plugin-replace": "^6.0.2",
+    "home-assistant-js-websocket": "^9.4.0",
+    "replace": "^1.2.2"
   }
 }
