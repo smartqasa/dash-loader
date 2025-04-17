@@ -442,5 +442,5 @@ ScreenSaver = __decorate([
 
 // Initialize global variables
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"2025.4.16-rc1"} (Built: ${"2025-04-17T15:31:23.785Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"2025.4.16-rc1"} (Built: ${"2025-04-17T22:10:09.703Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

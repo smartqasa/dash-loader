@@ -35,9 +35,9 @@ export class PanelCard extends LitElement {
     return 1;
   }
 
-  @property({ attribute: false }) public hass?: HomeAssistant;
-  @state() private config?: Config;
-  @state() private mainCard?: LovelaceCard;
+  @property({ attribute: false }) public hass: HomeAssistant | undefined;
+  @state() private config: Config | undefined;
+  @state() private mainCard: LovelaceCard | undefined;
   @state() private isElementLoaded = false;
 
   static get styles(): CSSResult {
