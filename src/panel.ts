@@ -39,7 +39,6 @@ export class PanelCard extends LitElement {
   @state() private config?: Config;
   @state() private mainCard?: LovelaceCard;
   @state() private isElementLoaded = false;
-  private tag = "main-card";
 
   static get styles(): CSSResult {
     return css`
@@ -74,7 +73,7 @@ export class PanelCard extends LitElement {
   }
 
   private testElementsLoaded(): void {
-    if (!customElements.get(this.tag)) {
+    if (!customElements.get("main-card")) {
       setTimeout(() => this.testElementsLoaded(), 500);
       return;
     }
@@ -85,7 +84,7 @@ export class PanelCard extends LitElement {
   private createMainCard(): void {
     if (!this.isElementLoaded || !this.config) return;
 
-    const element = document.createElement(this.tag) as LovelaceCard;
+    const element = document.createElement("main-card") as LovelaceCard;
     element.setConfig(this.config);
     if (this.hass) element.hass = this.hass;
 

@@ -82,7 +82,6 @@ let PanelCard = class PanelCard extends i {
     constructor() {
         super(...arguments);
         this.isElementLoaded = false;
-        this.tag = "main-card";
     }
     getCardSize() {
         return 1;
@@ -117,7 +116,7 @@ let PanelCard = class PanelCard extends i {
         return x `${this.mainCard}`;
     }
     testElementsLoaded() {
-        if (!customElements.get(this.tag)) {
+        if (!customElements.get("main-card")) {
             setTimeout(() => this.testElementsLoaded(), 500);
             return;
         }
@@ -126,7 +125,7 @@ let PanelCard = class PanelCard extends i {
     createMainCard() {
         if (!this.isElementLoaded || !this.config)
             return;
-        const element = document.createElement(this.tag);
+        const element = document.createElement("main-card");
         element.setConfig(this.config);
         if (this.hass)
             element.hass = this.hass;
@@ -443,5 +442,5 @@ ScreenSaver = __decorate([
 
 // Initialize global variables
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"2025.4.16-rc1"} (Built: ${"2025-04-16T21:58:52.121Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"2025.4.16-rc1"} (Built: ${"2025-04-17T15:31:23.785Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
