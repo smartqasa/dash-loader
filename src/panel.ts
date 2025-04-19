@@ -38,11 +38,13 @@ export class PanelCard extends LitElement {
 
   @property({ attribute: false }) public hass: HomeAssistant | undefined;
   @property({ attribute: false }) private config: Config | undefined;
-  @state() private rebootDevicesState: string = "off";
-  @state() private refreshDevicesState: string = "off";
+
   @state() private initialized = false;
   @state() private isElementLoaded = false;
   @state() private mainCard: LovelaceCard | undefined;
+
+  private rebootTime: string | undefined;
+  private refreshTime: string | undefined;
 
   static get styles(): CSSResult {
     return css`
@@ -64,20 +66,6 @@ export class PanelCard extends LitElement {
     this.config = config;
   }
 
-  protected willUpdate(changedProps: PropertyValues): void {
-    if (changedProps.has("hass") && this.hass) {
-      const reboot = this.hass.states["input_button.reboot_devices"]?.state;
-      if (reboot !== undefined && this.rebootDevicesState !== reboot) {
-        this.rebootDevicesState = reboot;
-      }
-
-      const refresh = this.hass.states["input_button.refresh_devices"]?.state;
-      if (refresh !== undefined && this.refreshDevicesState !== refresh) {
-        this.refreshDevicesState = refresh;
-      }
-    }
-  }
-
   protected render(): TemplateResult | typeof nothing {
     if (!this.mainCard) return nothing;
     return html`${this.mainCard}`;
@@ -95,21 +83,18 @@ export class PanelCard extends LitElement {
         this.tryCreateMainCard();
       }
 
-      if (this.initialized) {
-        if (
-          changedProps.get("rebootDevicesState") !== this.rebootDevicesState
-        ) {
-          deviceReboot();
-        }
-
-        if (
-          changedProps.get("refreshDevicesState") !== this.refreshDevicesState
-        ) {
-          deviceRefresh();
-        }
-      } else {
-        this.initialized = true;
+      const rebootTime = this.hass.states["input_button.reboot_devices"]?.state;
+      if (this.rebootTime !== undefined) {
+        if (this.rebootTime !== rebootTime) deviceReboot();
       }
+      this.rebootTime = rebootTime;
+
+      const refreshTime =
+        this.hass.states["input_button.refresh_devices"]?.state;
+      if (this.refreshTime !== undefined) {
+        if (this.refreshTime !== refreshTime) deviceRefresh();
+      }
+      this.refreshTime = refreshTime;
     }
   }
 

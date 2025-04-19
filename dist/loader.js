@@ -114,8 +114,6 @@ window.customCards.push({
 let PanelCard = class PanelCard extends i {
     constructor() {
         super(...arguments);
-        this.rebootDevicesState = "off";
-        this.refreshDevicesState = "off";
         this.initialized = false;
         this.isElementLoaded = false;
     }
@@ -139,18 +137,6 @@ let PanelCard = class PanelCard extends i {
     setConfig(config) {
         this.config = config;
     }
-    willUpdate(changedProps) {
-        if (changedProps.has("hass") && this.hass) {
-            const reboot = this.hass.states["input_button.reboot_devices"]?.state;
-            if (reboot !== undefined && this.rebootDevicesState !== reboot) {
-                this.rebootDevicesState = reboot;
-            }
-            const refresh = this.hass.states["input_button.refresh_devices"]?.state;
-            if (refresh !== undefined && this.refreshDevicesState !== refresh) {
-                this.refreshDevicesState = refresh;
-            }
-        }
-    }
     render() {
         if (!this.mainCard)
             return E;
@@ -168,17 +154,18 @@ let PanelCard = class PanelCard extends i {
             else {
                 this.tryCreateMainCard();
             }
-            if (this.initialized) {
-                if (changedProps.get("rebootDevicesState") !== this.rebootDevicesState) {
+            const rebootTime = this.hass.states["input_button.reboot_devices"]?.state;
+            if (this.rebootTime !== undefined) {
+                if (this.rebootTime !== rebootTime)
                     deviceReboot();
-                }
-                if (changedProps.get("refreshDevicesState") !== this.refreshDevicesState) {
+            }
+            this.rebootTime = rebootTime;
+            const refreshTime = this.hass.states["input_button.refresh_devices"]?.state;
+            if (this.refreshTime !== undefined) {
+                if (this.refreshTime !== refreshTime)
                     deviceRefresh();
-                }
             }
-            else {
-                this.initialized = true;
-            }
+            this.refreshTime = refreshTime;
         }
     }
     disconnectedCallback() {
@@ -200,12 +187,6 @@ __decorate([
 __decorate([
     n({ attribute: false })
 ], PanelCard.prototype, "config", void 0);
-__decorate([
-    r()
-], PanelCard.prototype, "rebootDevicesState", void 0);
-__decorate([
-    r()
-], PanelCard.prototype, "refreshDevicesState", void 0);
 __decorate([
     r()
 ], PanelCard.prototype, "initialized", void 0);
@@ -345,11 +326,11 @@ let ScreenSaver = class ScreenSaver extends i {
     willUpdate(changedProps) {
         if (changedProps.has("hass") && this.hass) {
             const reboot = this.hass.states["input_button.reboot_devices"]?.state;
-            if (reboot !== undefined && this.rebootDevicesState !== reboot) {
+            if (this.rebootDevicesState !== reboot) {
                 this.rebootDevicesState = reboot;
             }
             const refresh = this.hass.states["input_button.refresh_devices"]?.state;
-            if (refresh !== undefined && this.refreshDevicesState !== refresh) {
+            if (this.refreshDevicesState !== refresh) {
                 this.refreshDevicesState = refresh;
             }
         }
@@ -482,5 +463,5 @@ ScreenSaver = __decorate([
 
 // Initialize global variables
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"2025.4.16-rc1"} (Built: ${"2025-04-19T10:19:47.821Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"2025.4.16-rc1"} (Built: ${"2025-04-19T11:12:15.506Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

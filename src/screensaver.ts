@@ -136,12 +136,12 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
   protected willUpdate(changedProps: PropertyValues): void {
     if (changedProps.has("hass") && this.hass) {
       const reboot = this.hass.states["input_button.reboot_devices"]?.state;
-      if (reboot !== undefined && this.rebootDevicesState !== reboot) {
+      if (this.rebootDevicesState !== reboot) {
         this.rebootDevicesState = reboot;
       }
 
       const refresh = this.hass.states["input_button.refresh_devices"]?.state;
-      if (refresh !== undefined && this.refreshDevicesState !== refresh) {
+      if (this.refreshDevicesState !== refresh) {
         this.refreshDevicesState = refresh;
       }
     }
