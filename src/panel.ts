@@ -1,12 +1,4 @@
-import {
-  css,
-  CSSResult,
-  html,
-  LitElement,
-  nothing,
-  PropertyValues,
-  TemplateResult,
-} from "lit";
+import { css, CSSResult, html, LitElement, nothing, TemplateResult } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { HomeAssistant, LovelaceCard, LovelaceCardConfig } from "./types";
 
@@ -36,7 +28,7 @@ export class PanelCard extends LitElement {
   }
 
   @property({ attribute: false }) public hass: HomeAssistant | undefined;
-  @state() private config: Config | undefined;
+  @property({ attribute: false }) private config: Config | undefined;
   @state() private mainCard: LovelaceCard | undefined;
   @state() private isElementLoaded = false;
 
@@ -50,21 +42,14 @@ export class PanelCard extends LitElement {
 
   public connectedCallback(): void {
     super.connectedCallback();
-    this.testElementsLoaded();
+    customElements.whenDefined("main-card").then(() => {
+      this.isElementLoaded = true;
+      this.tryCreateMainCard();
+    });
   }
 
   public setConfig(config: Config) {
     this.config = config;
-  }
-
-  protected willUpdate(changedProps: PropertyValues): void {
-    if (!this.mainCard) {
-      this.createMainCard();
-      return;
-    }
-
-    if (changedProps.has("config")) this.mainCard.setConfig(this.config!);
-    if (changedProps.has("hass")) this.mainCard.hass = this.hass;
   }
 
   protected render(): TemplateResult | typeof nothing {
@@ -72,22 +57,27 @@ export class PanelCard extends LitElement {
     return html`${this.mainCard}`;
   }
 
-  private testElementsLoaded(): void {
-    if (!customElements.get("main-card")) {
-      setTimeout(() => this.testElementsLoaded(), 500);
-      return;
-    }
+  protected updated(): void {
+    this.tryCreateMainCard();
 
-    this.isElementLoaded = true;
+    if (this.mainCard) {
+      if (this.config) this.mainCard.setConfig(this.config);
+      if (this.hass) this.mainCard.hass = this.hass;
+    }
   }
 
-  private createMainCard(): void {
-    if (!this.isElementLoaded || !this.config) return;
+  public disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this.mainCard = undefined;
+  }
+
+  private tryCreateMainCard(): void {
+    if (!this.config || !this.hass || this.mainCard || !this.isElementLoaded)
+      return;
 
     const element = document.createElement("main-card") as LovelaceCard;
     element.setConfig(this.config);
-    if (this.hass) element.hass = this.hass;
-
+    element.hass = this.hass;
     this.mainCard = element;
   }
 }

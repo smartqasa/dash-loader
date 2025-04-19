@@ -95,40 +95,38 @@ let PanelCard = class PanelCard extends i {
     }
     connectedCallback() {
         super.connectedCallback();
-        this.testElementsLoaded();
+        customElements.whenDefined("main-card").then(() => {
+            this.isElementLoaded = true;
+            this.tryCreateMainCard();
+        });
     }
     setConfig(config) {
         this.config = config;
-    }
-    willUpdate(changedProps) {
-        if (!this.mainCard) {
-            this.createMainCard();
-            return;
-        }
-        if (changedProps.has("config"))
-            this.mainCard.setConfig(this.config);
-        if (changedProps.has("hass"))
-            this.mainCard.hass = this.hass;
     }
     render() {
         if (!this.mainCard)
             return E;
         return x `${this.mainCard}`;
     }
-    testElementsLoaded() {
-        if (!customElements.get("main-card")) {
-            setTimeout(() => this.testElementsLoaded(), 500);
-            return;
+    updated() {
+        this.tryCreateMainCard();
+        if (this.mainCard) {
+            if (this.config)
+                this.mainCard.setConfig(this.config);
+            if (this.hass)
+                this.mainCard.hass = this.hass;
         }
-        this.isElementLoaded = true;
     }
-    createMainCard() {
-        if (!this.isElementLoaded || !this.config)
+    disconnectedCallback() {
+        super.disconnectedCallback();
+        this.mainCard = undefined;
+    }
+    tryCreateMainCard() {
+        if (!this.config || !this.hass || this.mainCard || !this.isElementLoaded)
             return;
         const element = document.createElement("main-card");
         element.setConfig(this.config);
-        if (this.hass)
-            element.hass = this.hass;
+        element.hass = this.hass;
         this.mainCard = element;
     }
 };
@@ -136,7 +134,7 @@ __decorate([
     n({ attribute: false })
 ], PanelCard.prototype, "hass", void 0);
 __decorate([
-    r()
+    n({ attribute: false })
 ], PanelCard.prototype, "config", void 0);
 __decorate([
     r()
@@ -442,5 +440,5 @@ ScreenSaver = __decorate([
 
 // Initialize global variables
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"2025.4.16-rc1"} (Built: ${"2025-04-17T22:10:09.703Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"2025.4.16-rc1"} (Built: ${"2025-04-19T02:47:53.935Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
