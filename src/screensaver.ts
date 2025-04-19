@@ -32,8 +32,8 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
     return 100;
   }
 
-  @property({ attribute: false }) public hass?: HomeAssistant;
-  @state() protected config?: Config;
+  @property({ attribute: false }) public hass: HomeAssistant | undefined;
+  @property({ attribute: false }) private config: Config | undefined;
   @state() private rebootDevicesState: string = "off";
   @state() private refreshDevicesState: string = "off";
   @state() private time: string = "Loading...";
@@ -136,12 +136,12 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
   protected willUpdate(changedProps: PropertyValues): void {
     if (changedProps.has("hass") && this.hass) {
       const reboot = this.hass.states["input_button.reboot_devices"]?.state;
-      if (reboot && this.rebootDevicesState !== reboot) {
+      if (reboot !== undefined && this.rebootDevicesState !== reboot) {
         this.rebootDevicesState = reboot;
       }
 
       const refresh = this.hass.states["input_button.refresh_devices"]?.state;
-      if (refresh && this.refreshDevicesState !== refresh) {
+      if (refresh !== undefined && this.refreshDevicesState !== refresh) {
         this.refreshDevicesState = refresh;
       }
     }
@@ -184,8 +184,17 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
   protected updated(changedProps: PropertyValues): void {
     if (changedProps.has("hass") && this.hass) {
       if (this.initialized) {
-        if (changedProps.has("rebootDevicesState")) deviceReboot();
-        if (changedProps.has("refreshDevicesState")) deviceRefresh();
+        if (
+          changedProps.get("rebootDevicesState") !== this.rebootDevicesState
+        ) {
+          deviceReboot();
+        }
+
+        if (
+          changedProps.get("refreshDevicesState") !== this.refreshDevicesState
+        ) {
+          deviceRefresh();
+        }
       } else {
         this.initialized = true;
       }
