@@ -225,11 +225,8 @@ window.customCards.push({
 let ScreenSaver = class ScreenSaver extends i {
     constructor() {
         super(...arguments);
-        this.rebootDevicesState = "off";
-        this.refreshDevicesState = "off";
         this.time = "Loading...";
         this.date = "Loading...";
-        this.initialized = false;
     }
     getCardSize() {
         return 100;
@@ -323,18 +320,6 @@ let ScreenSaver = class ScreenSaver extends i {
             throw new Error("Invalid configuration provided");
         this.config = config;
     }
-    willUpdate(changedProps) {
-        if (changedProps.has("hass") && this.hass) {
-            const reboot = this.hass.states["input_button.reboot_devices"]?.state;
-            if (this.rebootDevicesState !== reboot) {
-                this.rebootDevicesState = reboot;
-            }
-            const refresh = this.hass.states["input_button.refresh_devices"]?.state;
-            if (this.refreshDevicesState !== refresh) {
-                this.refreshDevicesState = refresh;
-            }
-        }
-    }
     render() {
         if (!this.config)
             return E;
@@ -369,17 +354,18 @@ let ScreenSaver = class ScreenSaver extends i {
     }
     updated(changedProps) {
         if (changedProps.has("hass") && this.hass) {
-            if (this.initialized) {
-                if (changedProps.get("rebootDevicesState") !== this.rebootDevicesState) {
+            const rebootTime = this.hass.states["input_button.reboot_devices"]?.state;
+            if (this.rebootTime !== undefined) {
+                if (this.rebootTime !== rebootTime)
                     deviceReboot();
-                }
-                if (changedProps.get("refreshDevicesState") !== this.refreshDevicesState) {
+            }
+            this.rebootTime = rebootTime;
+            const refreshTime = this.hass.states["input_button.refresh_devices"]?.state;
+            if (this.refreshTime !== undefined) {
+                if (this.refreshTime !== refreshTime)
                     deviceRefresh();
-                }
             }
-            else {
-                this.initialized = true;
-            }
+            this.refreshTime = refreshTime;
         }
     }
     disconnectedCallback() {
@@ -447,12 +433,6 @@ __decorate([
 ], ScreenSaver.prototype, "config", void 0);
 __decorate([
     r()
-], ScreenSaver.prototype, "rebootDevicesState", void 0);
-__decorate([
-    r()
-], ScreenSaver.prototype, "refreshDevicesState", void 0);
-__decorate([
-    r()
 ], ScreenSaver.prototype, "time", void 0);
 __decorate([
     r()
@@ -463,5 +443,5 @@ ScreenSaver = __decorate([
 
 // Initialize global variables
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"2025.4.16-rc1"} (Built: ${"2025-04-19T11:12:15.506Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"2025.4.16-rc1"} (Built: ${"2025-04-19T11:21:05.856Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
