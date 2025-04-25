@@ -8,16 +8,18 @@ import {
   TemplateResult,
 } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
-import { HomeAssistant, LovelaceCard, LovelaceCardConfig } from "./types";
+import {
+  HomeAssistant,
+  LovelaceCard,
+  LovelaceCardConfig,
+  PopupElement,
+} from "./types";
 import { deviceRefresh, deviceReboot } from "./device-actions";
 
 interface Config extends LovelaceCardConfig {
   area: string;
   name?: string;
   picture?: string;
-  audioplayer?: string;
-  videoplayer?: string;
-  videosound?: string;
   headerchips?: LovelaceCardConfig[];
   areachips?: LovelaceCardConfig[];
   tiles?: LovelaceCardConfig[];
@@ -39,7 +41,6 @@ export class PanelCard extends LitElement {
   @property({ attribute: false }) public hass: HomeAssistant | undefined;
   @property({ attribute: false }) private config: Config | undefined;
 
-  @state() private initialized = false;
   @state() private isElementLoaded = false;
   @state() private mainCard: LovelaceCard | undefined;
 
@@ -82,6 +83,14 @@ export class PanelCard extends LitElement {
       } else {
         this.tryCreateMainCard();
       }
+
+      const popups = document.querySelectorAll(
+        "popup-dialog"
+      ) as NodeListOf<PopupElement>;
+      popups.forEach((popup) => {
+        popup.hass = this.hass;
+        console.log("PanelCard updated popup-dialog hass:", this.hass);
+      });
 
       const rebootTime = this.hass.states["input_button.reboot_devices"]?.state;
       if (this.rebootTime !== undefined) {

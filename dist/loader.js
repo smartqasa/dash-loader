@@ -114,7 +114,6 @@ window.customCards.push({
 let PanelCard = class PanelCard extends i {
     constructor() {
         super(...arguments);
-        this.initialized = false;
         this.isElementLoaded = false;
     }
     getCardSize() {
@@ -154,6 +153,11 @@ let PanelCard = class PanelCard extends i {
             else {
                 this.tryCreateMainCard();
             }
+            const popups = document.querySelectorAll("popup-dialog");
+            popups.forEach((popup) => {
+                popup.hass = this.hass;
+                console.log("PanelCard updated popup-dialog hass:", this.hass);
+            });
             const rebootTime = this.hass.states["input_button.reboot_devices"]?.state;
             if (this.rebootTime !== undefined) {
                 if (this.rebootTime !== rebootTime)
@@ -187,9 +191,6 @@ __decorate([
 __decorate([
     n({ attribute: false })
 ], PanelCard.prototype, "config", void 0);
-__decorate([
-    r()
-], PanelCard.prototype, "initialized", void 0);
 __decorate([
     r()
 ], PanelCard.prototype, "isElementLoaded", void 0);
@@ -443,5 +444,5 @@ ScreenSaver = __decorate([
 
 // Initialize global variables
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"2025.4.16-rc1"} (Built: ${"2025-04-19T11:21:05.856Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"2025.4.16-rc1"} (Built: ${"2025-04-25T11:54:06.368Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
