@@ -233,7 +233,7 @@ export type PopupConfig = {
   timeout?: number;
   card: LovelaceCardConfig & { type: string };
   hass?: HomeAssistant;
-  isOpen: boolean;
+  isOpen?: boolean;
 };
 
 export interface PopupElement extends HTMLElement {
@@ -243,7 +243,7 @@ export interface PopupElement extends HTMLElement {
   timeout: number;
   card: LovelaceCardConfig & { type: string };
   hass?: HomeAssistant;
-  isOpen: boolean;
+  isOpen?: boolean;
 }
 
 export interface Resources {

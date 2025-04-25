@@ -89,7 +89,6 @@ export class PanelCard extends LitElement {
       ) as NodeListOf<PopupElement>;
       popups.forEach((popup) => {
         popup.hass = this.hass;
-        console.log("PanelCard updated popup-dialog hass:", this.hass);
       });
 
       const rebootTime = this.hass.states["input_button.reboot_devices"]?.state;
