@@ -95,13 +95,20 @@ function deviceRefresh() {
     if (typeof window.fully !== "undefined") {
         void executeFullyAction("restartApp");
     }
-    else if (typeof window.browser_mod !== "undefined") {
-        window.browser_mod.service("refresh");
+    else {
+        const url = new URL(window.location.href);
+        url.searchParams.set("nocache", Date.now().toString());
+        window.location.href = url.toString();
     }
 }
 function deviceReboot() {
     if (typeof window.fully !== "undefined") {
         void executeFullyAction("reboot");
+    }
+    else {
+        const url = new URL(window.location.href);
+        url.searchParams.set("nocache", Date.now().toString());
+        window.location.href = url.toString();
     }
 }
 
@@ -443,5 +450,5 @@ ScreenSaver = __decorate([
 
 // Initialize global variables
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"2025.4.16-rc1"} (Built: ${"2025-04-25T11:57:06.648Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"2025.4.16-rc1"} (Built: ${"2025-04-28T20:23:56.934Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

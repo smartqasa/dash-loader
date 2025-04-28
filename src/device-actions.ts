@@ -29,13 +29,19 @@ const executeFullyAction = async (action: FullyAction): Promise<void> => {
 export function deviceRefresh(): void {
   if (typeof window.fully !== "undefined") {
     void executeFullyAction("restartApp");
-  } else if (typeof window.browser_mod !== "undefined") {
-    window.browser_mod.service("refresh");
+  } else {
+    const url = new URL(window.location.href);
+    url.searchParams.set("nocache", Date.now().toString());
+    window.location.href = url.toString();
   }
 }
 
 export function deviceReboot(): void {
   if (typeof window.fully !== "undefined") {
     void executeFullyAction("reboot");
+  } else {
+    const url = new URL(window.location.href);
+    url.searchParams.set("nocache", Date.now().toString());
+    window.location.href = url.toString();
   }
 }
