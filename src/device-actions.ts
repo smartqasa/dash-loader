@@ -1,9 +1,9 @@
 const delay = (ms: number): Promise<void> =>
   new Promise((resolve) => setTimeout(resolve, ms));
 
-type FullyAction = "restartApp" | "reboot";
-
-const executeFullyAction = async (action: FullyAction): Promise<void> => {
+async function executeFullyAction(
+  action: "restartApp" | "reboot"
+): Promise<void> {
   if (typeof window.fully === "undefined") return;
 
   const timings = {
@@ -24,24 +24,29 @@ const executeFullyAction = async (action: FullyAction): Promise<void> => {
   await delay(timings.clearCache);
 
   window.fully[action]();
-};
+}
+
+function bustCacheAndReload(): void {
+  const url = new URL(window.location.href);
+  url.searchParams.set("nocache", Date.now().toString());
+
+  window.history.replaceState(null, "", url.toString());
+
+  window.location.reload();
+}
 
 export function deviceRefresh(): void {
-  if (typeof window.fully !== "undefined") {
-    void executeFullyAction("restartApp");
+  if (typeof window.fully === "undefined") {
+    bustCacheAndReload();
   } else {
-    const url = new URL(window.location.href);
-    url.searchParams.set("nocache", Date.now().toString());
-    window.location.href = url.toString();
+    void executeFullyAction("restartApp");
   }
 }
 
 export function deviceReboot(): void {
-  if (typeof window.fully !== "undefined") {
-    void executeFullyAction("reboot");
+  if (typeof window.fully === "undefined") {
+    bustCacheAndReload();
   } else {
-    const url = new URL(window.location.href);
-    url.searchParams.set("nocache", Date.now().toString());
-    window.location.href = url.toString();
+    void executeFullyAction("reboot");
   }
 }

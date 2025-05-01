@@ -73,7 +73,7 @@ const t=t=>(e,o)=>{ void 0!==o?o.addInitializer((()=>{customElements.define(t,e)
  */function r(r){return n({...r,state:true,attribute:false})}
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-const executeFullyAction = async (action) => {
+async function executeFullyAction(action) {
     if (typeof window.fully === "undefined")
         return;
     const timings = {
@@ -90,25 +90,27 @@ const executeFullyAction = async (action) => {
     window.fully.clearCache();
     await delay(timings.clearCache);
     window.fully[action]();
-};
+}
+function bustCacheAndReload() {
+    const url = new URL(window.location.href);
+    url.searchParams.set("nocache", Date.now().toString());
+    window.history.replaceState(null, "", url.toString());
+    window.location.reload();
+}
 function deviceRefresh() {
-    if (typeof window.fully !== "undefined") {
-        void executeFullyAction("restartApp");
+    if (typeof window.fully === "undefined") {
+        bustCacheAndReload();
     }
     else {
-        const url = new URL(window.location.href);
-        url.searchParams.set("nocache", Date.now().toString());
-        window.location.href = url.toString();
+        void executeFullyAction("restartApp");
     }
 }
 function deviceReboot() {
-    if (typeof window.fully !== "undefined") {
-        void executeFullyAction("reboot");
+    if (typeof window.fully === "undefined") {
+        bustCacheAndReload();
     }
     else {
-        const url = new URL(window.location.href);
-        url.searchParams.set("nocache", Date.now().toString());
-        window.location.href = url.toString();
+        void executeFullyAction("reboot");
     }
 }
 
@@ -450,5 +452,5 @@ ScreenSaver = __decorate([
 
 // Initialize global variables
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"2025.4.30rc1"} (Built: ${"2025-04-30T13:36:35.217Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"2025.4.30rc1"} (Built: ${"2025-05-01T12:34:20.520Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
