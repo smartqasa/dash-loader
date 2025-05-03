@@ -19,6 +19,19 @@ declare global {
   }
 }
 
+export type ActionItem =
+  | {
+      type: "service";
+      service: string;
+      data?: Record<string, any>;
+      target?: Record<string, any>;
+    }
+  | {
+      type: "function";
+      function: string;
+      arguments?: any[];
+    };
+
 export interface Context {
   id: string;
   parent_id?: string;
@@ -233,17 +246,17 @@ export type PopupConfig = {
   timeout?: number;
   card: LovelaceCardConfig & { type: string };
   hass?: HomeAssistant;
-  isOpen?: boolean;
+  button1?: string;
+  action1?: ActionItem[];
+  button2?: string;
+  action2?: ActionItem[];
+  button3?: string;
+  action3?: ActionItem[];
 };
 
-export interface PopupElement extends HTMLElement {
-  title: string;
-  size: "normal" | "fullscreen";
-  dismissable: boolean;
-  timeout: number;
-  card: LovelaceCardConfig & { type: string };
-  hass?: HomeAssistant;
-  isOpen?: boolean;
+export interface PopupElement extends LovelaceCard {
+  config: PopupConfig;
+  isOpen: boolean;
 }
 
 export interface Resources {
