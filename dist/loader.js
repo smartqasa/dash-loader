@@ -210,14 +210,23 @@ PanelCard = __decorate([
 ], PanelCard);
 
 const formattedDate = (date = new Date()) => {
+    if (isNaN(date.getTime()))
+        return "Unknown";
     const options = {
         weekday: "long",
         month: "short",
         day: "numeric",
     };
-    return date.toLocaleDateString(undefined, options);
+    try {
+        return date.toLocaleDateString(undefined, options);
+    }
+    catch (e) {
+        return date.toDateString();
+    }
 };
 const formattedTime = (date = new Date()) => {
+    if (isNaN(date.getTime()))
+        return "Unknown";
     const hours = date.getHours();
     const minutes = date.getMinutes();
     return `${hours % 12 || 12}:${minutes < 10 ? "0" + minutes : minutes}`;
@@ -452,5 +461,5 @@ ScreenSaver = __decorate([
 
 // Initialize global variables
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"2025.4.30rc1"} (Built: ${"2025-05-03T12:53:35.711Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"2025.4.30rc1"} (Built: ${"2025-05-17T05:57:55.863Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
