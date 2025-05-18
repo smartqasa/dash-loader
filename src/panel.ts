@@ -124,8 +124,8 @@ export class PanelCard extends LitElement {
   static get styles(): CSSResult {
     return css`
       :host {
-        width: 100vw;
         display: block;
+        width: 100%;
         height: 100vh;
       }
       :host(.admin-view) {

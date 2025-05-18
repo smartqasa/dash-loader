@@ -192,8 +192,8 @@ let PanelCard = class PanelCard extends i {
     static get styles() {
         return i$3 `
       :host {
-        width: 100vw;
         display: block;
+        width: 100%;
         height: 100vh;
       }
       :host(.admin-view) {
@@ -470,5 +470,5 @@ ScreenSaver = __decorate([
 
 // Initialize global variables
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"2025.4.30rc1"} (Built: ${"2025-05-18T07:19:39.234Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"2025.4.30rc1"} (Built: ${"2025-05-18T07:34:47.026Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
