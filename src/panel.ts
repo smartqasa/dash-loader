@@ -47,14 +47,6 @@ export class PanelCard extends LitElement {
   private rebootTime: string | undefined;
   private refreshTime: string | undefined;
 
-  static get styles(): CSSResult {
-    return css`
-      :host {
-        width: 100vw;
-      }
-    `;
-  }
-
   public connectedCallback(): void {
     super.connectedCallback();
     customElements.whenDefined("main-card").then(() => {
@@ -69,6 +61,14 @@ export class PanelCard extends LitElement {
 
   protected render(): TemplateResult | typeof nothing {
     if (!this.mainCard) return nothing;
+
+    const isAdmin = this.hass?.user?.is_admin || false;
+    const isAdminModeOn =
+      this.hass?.states["input_boolean.admin_mode"]?.state === "on" || false;
+    const isAdminView = isAdmin || isAdminModeOn;
+
+    this.classList.toggle("admin-view", isAdminView);
+
     return html`${this.mainCard}`;
   }
 
@@ -119,5 +119,18 @@ export class PanelCard extends LitElement {
     element.setConfig(this.config);
     element.hass = this.hass;
     this.mainCard = element;
+  }
+
+  static get styles(): CSSResult {
+    return css`
+      :host {
+        width: 100vw;
+        display: block;
+        height: 100vh;
+      }
+      :host(.admin-view) {
+        height: calc(100vh - 56px);
+      }
+    `;
   }
 }

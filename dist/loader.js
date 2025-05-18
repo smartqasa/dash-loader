@@ -128,13 +128,6 @@ let PanelCard = class PanelCard extends i {
     getCardSize() {
         return 1;
     }
-    static get styles() {
-        return i$3 `
-      :host {
-        width: 100vw;
-      }
-    `;
-    }
     connectedCallback() {
         super.connectedCallback();
         customElements.whenDefined("main-card").then(() => {
@@ -148,6 +141,10 @@ let PanelCard = class PanelCard extends i {
     render() {
         if (!this.mainCard)
             return E;
+        const isAdmin = this.hass?.user?.is_admin || false;
+        const isAdminModeOn = this.hass?.states["input_boolean.admin_mode"]?.state === "on" || false;
+        const isAdminView = isAdmin || isAdminModeOn;
+        this.classList.toggle("admin-view", isAdminView);
         return x `${this.mainCard}`;
     }
     updated(changedProps) {
@@ -191,6 +188,18 @@ let PanelCard = class PanelCard extends i {
         element.setConfig(this.config);
         element.hass = this.hass;
         this.mainCard = element;
+    }
+    static get styles() {
+        return i$3 `
+      :host {
+        width: 100vw;
+        display: block;
+        height: 100vh;
+      }
+      :host(.admin-view) {
+        height: calc(100vh - 56px);
+      }
+    `;
     }
 };
 __decorate([
@@ -461,5 +470,5 @@ ScreenSaver = __decorate([
 
 // Initialize global variables
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"2025.4.30rc1"} (Built: ${"2025-05-17T05:57:55.863Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"2025.4.30rc1"} (Built: ${"2025-05-18T07:19:39.234Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
