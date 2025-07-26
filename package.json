@@ -1,6 +1,6 @@
 {
   "name": "dash-loader",
-  "version": "2025.4.30rc1",
+  "version": "2025.7.1",
   "description": "Dashboard Loader",
   "type": "module",
   "author": "Tom Bruno",
@@ -15,7 +15,9 @@
   "scripts": {
     "clean": "rm -rf dist",
     "build": "npm run clean && rollup -c",
-    "watch": "npm run clean && rollup -c --watch"
+    "watch": "npm run clean && rollup -c --watch",
+    "version:build": "node version.js && npm install --package-lock-only",
+    "release": "npm run version:build && npm run build && git add . && git commit -m \"🔖 Release v$(node -p \"require('./package.json').version\")\" && git tag v$(node -p \"require('./package.json').version\") && git push && git push --tags && gh release create v$(node -p \"require('./package.json').version\") --generate-notes"
   },
   "keywords": [],
   "license": "ISC",

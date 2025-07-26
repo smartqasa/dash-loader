@@ -124,6 +124,30 @@ let PanelCard = class PanelCard extends i {
     constructor() {
         super(...arguments);
         this.isElementLoaded = false;
+        this.offlineDetected = false;
+        this.handleOffline = () => {
+            if (typeof fully === "undefined" || !fully.disableWifi || !fully.enableWifi)
+                return;
+            if (!this.mainCard)
+                return;
+            if (!this.offlineDetected) {
+                this.offlineDetected = true;
+                this.wifiOfflineTimer = window.setTimeout(() => {
+                    fully.disableWifi();
+                    window.setTimeout(() => {
+                        fully.enableWifi();
+                    }, 2000);
+                }, 5 * 60 * 1000);
+            }
+        };
+        this.handleOnline = () => {
+            if (typeof fully === "undefined" || !fully.disableWifi || !fully.enableWifi)
+                return;
+            if (this.offlineDetected) {
+                this.clearWifiTimer();
+                this.offlineDetected = false;
+            }
+        };
     }
     getCardSize() {
         return 1;
@@ -133,6 +157,8 @@ let PanelCard = class PanelCard extends i {
         customElements.whenDefined("main-card").then(() => {
             this.isElementLoaded = true;
             this.tryCreateMainCard();
+            window.addEventListener("offline", this.handleOffline);
+            window.addEventListener("online", this.handleOnline);
         });
     }
     setConfig(config) {
@@ -180,6 +206,8 @@ let PanelCard = class PanelCard extends i {
     disconnectedCallback() {
         super.disconnectedCallback();
         this.mainCard = undefined;
+        window.removeEventListener("offline", this.handleOffline);
+        window.removeEventListener("online", this.handleOnline);
     }
     tryCreateMainCard() {
         if (!this.config || !this.hass || this.mainCard || !this.isElementLoaded)
@@ -188,6 +216,12 @@ let PanelCard = class PanelCard extends i {
         element.setConfig(this.config);
         element.hass = this.hass;
         this.mainCard = element;
+    }
+    clearWifiTimer() {
+        if (this.wifiOfflineTimer) {
+            clearTimeout(this.wifiOfflineTimer);
+            this.wifiOfflineTimer = undefined;
+        }
     }
     static get styles() {
         return i$3 `
@@ -468,7 +502,6 @@ ScreenSaver = __decorate([
     t("screensaver-card")
 ], ScreenSaver);
 
-// Initialize global variables
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"2025.4.30rc1"} (Built: ${"2025-05-18T07:34:47.026Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"2025.7.1"} (Built: ${"2025-07-26T14:20:31.483Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

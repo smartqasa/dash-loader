@@ -16,6 +16,11 @@ import {
 } from "./types";
 import { deviceRefresh, deviceReboot } from "./device-actions";
 
+declare const fully: {
+  disableWifi: () => void;
+  enableWifi: () => void;
+};
+
 interface Config extends LovelaceCardConfig {
   area: string;
   name?: string;
@@ -47,11 +52,17 @@ export class PanelCard extends LitElement {
   private rebootTime: string | undefined;
   private refreshTime: string | undefined;
 
+  private offlineDetected = false;
+  private wifiOfflineTimer?: number;
+
   public connectedCallback(): void {
     super.connectedCallback();
     customElements.whenDefined("main-card").then(() => {
       this.isElementLoaded = true;
       this.tryCreateMainCard();
+
+      window.addEventListener("offline", this.handleOffline);
+      window.addEventListener("online", this.handleOnline);
     });
   }
 
@@ -109,6 +120,9 @@ export class PanelCard extends LitElement {
   public disconnectedCallback(): void {
     super.disconnectedCallback();
     this.mainCard = undefined;
+
+    window.removeEventListener("offline", this.handleOffline);
+    window.removeEventListener("online", this.handleOnline);
   }
 
   private tryCreateMainCard(): void {
@@ -119,6 +133,43 @@ export class PanelCard extends LitElement {
     element.setConfig(this.config);
     element.hass = this.hass;
     this.mainCard = element;
+  }
+
+  private handleOffline = (): void => {
+    if (typeof fully === "undefined" || !fully.disableWifi || !fully.enableWifi)
+      return;
+
+    if (!this.mainCard) return;
+
+    if (!this.offlineDetected) {
+      this.offlineDetected = true;
+      this.wifiOfflineTimer = window.setTimeout(
+        (): void => {
+          fully.disableWifi();
+          window.setTimeout((): void => {
+            fully.enableWifi();
+          }, 2000);
+        },
+        5 * 60 * 1000
+      );
+    }
+  };
+
+  private handleOnline = () => {
+    if (typeof fully === "undefined" || !fully.disableWifi || !fully.enableWifi)
+      return;
+
+    if (this.offlineDetected) {
+      this.clearWifiTimer();
+      this.offlineDetected = false;
+    }
+  };
+
+  private clearWifiTimer() {
+    if (this.wifiOfflineTimer) {
+      clearTimeout(this.wifiOfflineTimer);
+      this.wifiOfflineTimer = undefined;
+    }
   }
 
   static get styles(): CSSResult {
