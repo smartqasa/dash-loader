@@ -186,9 +186,7 @@ let PanelCard = class PanelCard extends i {
                 this.tryCreateMainCard();
             }
             const popups = document.querySelectorAll("popup-dialog");
-            console.log("🔍 Found popups:", popups.length);
             popups.forEach((popup) => {
-                console.log("🛠️ Setting hass on popup", popup);
                 popup.hass = this.hass;
             });
             const rebootTime = this.hass.states["input_button.reboot_devices"]?.state;
@@ -505,5 +503,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"2025.8.1"} (Built: ${"2025-08-06T17:48:55.527Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"2025.8.2"} (Built: ${"2025-08-06T17:51:37.163Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

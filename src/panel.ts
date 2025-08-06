@@ -98,9 +98,7 @@ export class PanelCard extends LitElement {
       const popups = document.querySelectorAll(
         "popup-dialog"
       ) as NodeListOf<PopupElement>;
-      console.log("🔍 Found popups:", popups.length);
       popups.forEach((popup) => {
-        console.log("🛠️ Setting hass on popup", popup);
         popup.hass = this.hass;
       });
 
