@@ -1,3 +1,3 @@
 # dash-loader
 
-Dashboard Loader X
+Dashboard Loader
