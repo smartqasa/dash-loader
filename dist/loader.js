@@ -126,7 +126,7 @@ let PanelCard = class PanelCard extends i {
         this.isElementLoaded = false;
         this.offlineDetected = false;
         this.handleOffline = () => {
-            if (typeof fully === "undefined" || !fully.disableWifi || !fully.enableWifi)
+            if (typeof fully === "undefined")
                 return;
             if (!this.mainCard)
                 return;
@@ -141,7 +141,7 @@ let PanelCard = class PanelCard extends i {
             }
         };
         this.handleOnline = () => {
-            if (typeof fully === "undefined" || !fully.disableWifi || !fully.enableWifi)
+            if (typeof fully === "undefined")
                 return;
             if (this.offlineDetected) {
                 this.clearWifiTimer();
@@ -503,5 +503,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"2025.8.3"} (Built: ${"2025-08-10T17:11:24.697Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"2025.8.4"} (Built: ${"2025-08-11T22:23:14.285Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

@@ -136,8 +136,7 @@ export class PanelCard extends LitElement {
   }
 
   private handleOffline = (): void => {
-    if (typeof fully === "undefined" || !fully.disableWifi || !fully.enableWifi)
-      return;
+    if (typeof fully === "undefined") return;
 
     if (!this.mainCard) return;
 
@@ -156,8 +155,7 @@ export class PanelCard extends LitElement {
   };
 
   private handleOnline = () => {
-    if (typeof fully === "undefined" || !fully.disableWifi || !fully.enableWifi)
-      return;
+    if (typeof fully === "undefined") return;
 
     if (this.offlineDetected) {
       this.clearWifiTimer();
