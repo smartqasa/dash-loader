@@ -128,17 +128,21 @@ let PanelCard = class PanelCard extends i {
         this.handleOffline = () => {
             if (typeof fully === "undefined")
                 return;
-            if (!this.mainCard)
+            if (this.offlineDetected)
                 return;
-            if (!this.offlineDetected) {
-                this.offlineDetected = true;
-                this.wifiOfflineTimer = window.setTimeout(() => {
+            this.offlineDetected = true;
+            this.wifiOfflineTimer = window.setTimeout(() => {
+                try {
                     fully.disableWifi();
-                    window.setTimeout(() => {
+                }
+                catch { }
+                window.setTimeout(() => {
+                    try {
                         fully.enableWifi();
-                    }, 2000);
-                }, 5 * 60 * 1000);
-            }
+                    }
+                    catch { }
+                }, 2000);
+            }, 5 * 60 * 1000);
         };
         this.handleOnline = () => {
             if (typeof fully === "undefined")
@@ -159,6 +163,9 @@ let PanelCard = class PanelCard extends i {
             this.tryCreateMainCard();
             window.addEventListener("offline", this.handleOffline);
             window.addEventListener("online", this.handleOnline);
+            if (navigator && navigator.onLine === false) {
+                this.handleOffline();
+            }
         });
     }
     setConfig(config) {
@@ -208,6 +215,7 @@ let PanelCard = class PanelCard extends i {
         this.mainCard = undefined;
         window.removeEventListener("offline", this.handleOffline);
         window.removeEventListener("online", this.handleOnline);
+        this.clearWifiTimer();
     }
     tryCreateMainCard() {
         if (!this.config || !this.hass || this.mainCard || !this.isElementLoaded)
@@ -503,5 +511,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"2025.8.5"} (Built: ${"2025-08-11T22:24:04.007Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"2025.8.6"} (Built: ${"2025-08-11T22:37:09.982Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

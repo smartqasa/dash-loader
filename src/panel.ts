@@ -63,6 +63,10 @@ export class PanelCard extends LitElement {
 
       window.addEventListener("offline", this.handleOffline);
       window.addEventListener("online", this.handleOnline);
+
+      if (navigator && navigator.onLine === false) {
+        this.handleOffline();
+      }
     });
   }
 
@@ -123,6 +127,8 @@ export class PanelCard extends LitElement {
 
     window.removeEventListener("offline", this.handleOffline);
     window.removeEventListener("online", this.handleOnline);
+
+    this.clearWifiTimer();
   }
 
   private tryCreateMainCard(): void {
@@ -138,20 +144,22 @@ export class PanelCard extends LitElement {
   private handleOffline = (): void => {
     if (typeof fully === "undefined") return;
 
-    if (!this.mainCard) return;
+    if (this.offlineDetected) return;
+    this.offlineDetected = true;
 
-    if (!this.offlineDetected) {
-      this.offlineDetected = true;
-      this.wifiOfflineTimer = window.setTimeout(
-        (): void => {
+    this.wifiOfflineTimer = window.setTimeout(
+      (): void => {
+        try {
           fully.disableWifi();
-          window.setTimeout((): void => {
+        } catch {}
+        window.setTimeout((): void => {
+          try {
             fully.enableWifi();
-          }, 2000);
-        },
-        5 * 60 * 1000
-      );
-    }
+          } catch {}
+        }, 2000);
+      },
+      5 * 60 * 1000
+    );
   };
 
   private handleOnline = () => {
