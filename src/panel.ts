@@ -64,7 +64,7 @@ export class PanelCard extends LitElement {
       window.addEventListener("offline", this.handleOffline);
       window.addEventListener("online", this.handleOnline);
 
-      if (navigator && navigator.onLine === false) {
+      if (typeof navigator !== "undefined" && navigator.onLine === false) {
         this.handleOffline();
       }
     });
@@ -99,11 +99,9 @@ export class PanelCard extends LitElement {
         this.tryCreateMainCard();
       }
 
-      const popups = document.querySelectorAll(
-        "popup-dialog"
-      ) as NodeListOf<PopupElement>;
-      popups.forEach((popup) => {
-        popup.hass = this.hass;
+      const popups = document.querySelectorAll("popup-dialog");
+      popups.forEach((popup: Element) => {
+        if ("hass" in (popup as any)) (popup as any).hass = this.hass;
       });
 
       const rebootTime = this.hass.states["input_button.reboot_devices"]?.state;
@@ -134,11 +132,15 @@ export class PanelCard extends LitElement {
   private tryCreateMainCard(): void {
     if (!this.config || !this.hass || this.mainCard || !this.isElementLoaded)
       return;
-
-    const element = document.createElement("main-card") as LovelaceCard;
-    element.setConfig(this.config);
-    element.hass = this.hass;
-    this.mainCard = element;
+    try {
+      const element = document.createElement("main-card") as LovelaceCard;
+      element.setConfig(this.config);
+      element.hass = this.hass;
+      this.mainCard = element;
+    } catch (err) {
+      console.error("Failed to create main-card:", err);
+      this.mainCard = undefined;
+    }
   }
 
   private handleOffline = (): void => {
