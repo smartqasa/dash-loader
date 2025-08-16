@@ -8,12 +8,7 @@ import {
   TemplateResult,
 } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
-import {
-  HomeAssistant,
-  LovelaceCard,
-  LovelaceCardConfig,
-  PopupElement,
-} from "./types";
+import { HomeAssistant, LovelaceCard, LovelaceCardConfig } from "./types";
 import { deviceRefresh, deviceReboot } from "./device-actions";
 
 declare const fully: {
@@ -52,21 +47,11 @@ export class PanelCard extends LitElement {
   private rebootTime: string | undefined;
   private refreshTime: string | undefined;
 
-  private offlineDetected = false;
-  private wifiOfflineTimer?: number;
-
   public connectedCallback(): void {
     super.connectedCallback();
     customElements.whenDefined("main-card").then(() => {
       this.isElementLoaded = true;
       this.tryCreateMainCard();
-
-      window.addEventListener("offline", this.handleOffline);
-      window.addEventListener("online", this.handleOnline);
-
-      if (typeof navigator !== "undefined" && navigator.onLine === false) {
-        this.handleOffline();
-      }
     });
   }
 
@@ -122,15 +107,10 @@ export class PanelCard extends LitElement {
   public disconnectedCallback(): void {
     super.disconnectedCallback();
     this.mainCard = undefined;
-
-    window.removeEventListener("offline", this.handleOffline);
-    window.removeEventListener("online", this.handleOnline);
-
-    this.clearWifiTimer();
   }
 
   private tryCreateMainCard(): void {
-    if (!this.config || !this.hass || this.mainCard || !this.isElementLoaded)
+    if (!this.config || !this.hass || !this.isElementLoaded || this.mainCard)
       return;
     try {
       const element = document.createElement("main-card") as LovelaceCard;
@@ -140,43 +120,6 @@ export class PanelCard extends LitElement {
     } catch (err) {
       console.error("Failed to create main-card:", err);
       this.mainCard = undefined;
-    }
-  }
-
-  private handleOffline = (): void => {
-    if (typeof fully === "undefined") return;
-
-    if (this.offlineDetected) return;
-    this.offlineDetected = true;
-
-    this.wifiOfflineTimer = window.setTimeout(
-      (): void => {
-        try {
-          fully.disableWifi();
-        } catch {}
-        window.setTimeout((): void => {
-          try {
-            fully.enableWifi();
-          } catch {}
-        }, 2000);
-      },
-      5 * 60 * 1000
-    );
-  };
-
-  private handleOnline = () => {
-    if (typeof fully === "undefined") return;
-
-    if (this.offlineDetected) {
-      this.clearWifiTimer();
-      this.offlineDetected = false;
-    }
-  };
-
-  private clearWifiTimer() {
-    if (this.wifiOfflineTimer) {
-      clearTimeout(this.wifiOfflineTimer);
-      this.wifiOfflineTimer = undefined;
     }
   }
 

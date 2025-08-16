@@ -124,34 +124,6 @@ let PanelCard = class PanelCard extends i {
     constructor() {
         super(...arguments);
         this.isElementLoaded = false;
-        this.offlineDetected = false;
-        this.handleOffline = () => {
-            if (typeof fully === "undefined")
-                return;
-            if (this.offlineDetected)
-                return;
-            this.offlineDetected = true;
-            this.wifiOfflineTimer = window.setTimeout(() => {
-                try {
-                    fully.disableWifi();
-                }
-                catch { }
-                window.setTimeout(() => {
-                    try {
-                        fully.enableWifi();
-                    }
-                    catch { }
-                }, 2000);
-            }, 5 * 60 * 1000);
-        };
-        this.handleOnline = () => {
-            if (typeof fully === "undefined")
-                return;
-            if (this.offlineDetected) {
-                this.clearWifiTimer();
-                this.offlineDetected = false;
-            }
-        };
     }
     getCardSize() {
         return 1;
@@ -161,11 +133,6 @@ let PanelCard = class PanelCard extends i {
         customElements.whenDefined("main-card").then(() => {
             this.isElementLoaded = true;
             this.tryCreateMainCard();
-            window.addEventListener("offline", this.handleOffline);
-            window.addEventListener("online", this.handleOnline);
-            if (typeof navigator !== "undefined" && navigator.onLine === false) {
-                this.handleOffline();
-            }
         });
     }
     setConfig(config) {
@@ -214,12 +181,9 @@ let PanelCard = class PanelCard extends i {
     disconnectedCallback() {
         super.disconnectedCallback();
         this.mainCard = undefined;
-        window.removeEventListener("offline", this.handleOffline);
-        window.removeEventListener("online", this.handleOnline);
-        this.clearWifiTimer();
     }
     tryCreateMainCard() {
-        if (!this.config || !this.hass || this.mainCard || !this.isElementLoaded)
+        if (!this.config || !this.hass || !this.isElementLoaded || this.mainCard)
             return;
         try {
             const element = document.createElement("main-card");
@@ -230,12 +194,6 @@ let PanelCard = class PanelCard extends i {
         catch (err) {
             console.error("Failed to create main-card:", err);
             this.mainCard = undefined;
-        }
-    }
-    clearWifiTimer() {
-        if (this.wifiOfflineTimer) {
-            clearTimeout(this.wifiOfflineTimer);
-            this.wifiOfflineTimer = undefined;
         }
     }
     static get styles() {
@@ -518,5 +476,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"2025.8.8"} (Built: ${"2025-08-14T20:28:11.114Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"2025.8.9"} (Built: ${"2025-08-16T21:11:17.261Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
