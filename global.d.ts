@@ -32,6 +32,7 @@ declare interface Window {
     bind: (event: string, action: string) => void;
     bringToForeground: () => void;
     clearCache: () => void;
+    getDeviceModel: () => string;
     isInForeground: () => boolean;
     reboot: () => void;
     restartApp: () => void;
@@ -41,13 +42,22 @@ declare interface Window {
     turnScreenOff: (keepAlive: boolean) => void;
     turnScreenOn: () => void;
   };
+
   smartqasa: {
-    chipsConfig?: any;
+    clearCache: () => void;
+    chipsConfig: any;
+    confirm: (data: any) => void;
+    confirmClose: () => void;
     darkModeImage: string;
+    deviceModel: string;
     lightModeImage: string;
-    menuConfig?: any;
     menuTab: number;
-    startArea?: string;
+    popup: (data: any) => void;
+    popupClose: () => void;
+    popupReset: () => void;
+    popupStack: any[];
+    startArea: string | undefined;
     service: (service: string, data?: object) => void;
+    videoSource: string;
   };
 }
