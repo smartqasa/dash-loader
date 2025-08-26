@@ -1,6 +1,7 @@
 window.smartqasa = window.smartqasa || {};
 
 import "./panel";
+import "./panel-v2";
 import "./screensaver";
 
 console.info(

@@ -120,7 +120,7 @@ window.customCards.push({
     preview: true,
     description: "A SmartQasa card for displaying the Main panel card.",
 });
-let PanelCard = class PanelCard extends i {
+let PanelCard$1 = class PanelCard extends i {
     constructor() {
         super(...arguments);
         this.isElementLoaded = false;
@@ -211,6 +211,117 @@ let PanelCard = class PanelCard extends i {
 };
 __decorate([
     n({ attribute: false })
+], PanelCard$1.prototype, "hass", void 0);
+__decorate([
+    n({ attribute: false })
+], PanelCard$1.prototype, "config", void 0);
+__decorate([
+    r()
+], PanelCard$1.prototype, "isElementLoaded", void 0);
+__decorate([
+    r()
+], PanelCard$1.prototype, "mainCard", void 0);
+PanelCard$1 = __decorate([
+    t("panel-card")
+], PanelCard$1);
+
+window.customCards.push({
+    type: "panel-card-v2",
+    name: "Panel Card V2",
+    preview: true,
+    description: "A SmartQasa card for displaying the Main panel card.",
+});
+let PanelCard = class PanelCard extends i {
+    constructor() {
+        super(...arguments);
+        this.isElementLoaded = false;
+    }
+    getCardSize() {
+        return 1;
+    }
+    connectedCallback() {
+        super.connectedCallback();
+        customElements.whenDefined("main-card").then(() => {
+            this.isElementLoaded = true;
+            this.tryCreateMainCard();
+        });
+    }
+    setConfig(config) {
+        this.config = config;
+    }
+    render() {
+        if (!this.mainCard)
+            return E;
+        const isAdmin = this.hass?.user?.is_admin || false;
+        const isAdminModeOn = this.hass?.states["input_boolean.admin_mode"]?.state === "on" || false;
+        const isAdminView = isAdmin || isAdminModeOn;
+        this.classList.toggle("admin-view", isAdminView);
+        return x `${this.mainCard}`;
+    }
+    updated(changedProps) {
+        if (changedProps.has("config") && this.config) {
+            if (this.mainCard)
+                this.mainCard.setConfig(this.config);
+        }
+        if (changedProps.has("hass") && this.hass) {
+            if (this.mainCard) {
+                this.mainCard.hass = this.hass;
+            }
+            else {
+                this.tryCreateMainCard();
+            }
+            const popups = document.querySelectorAll("popup-dialog");
+            popups.forEach((popup) => {
+                if ("hass" in popup)
+                    popup.hass = this.hass;
+            });
+            const rebootTime = this.hass.states["input_button.reboot_devices"]?.state;
+            if (this.rebootTime !== undefined) {
+                if (this.rebootTime !== rebootTime)
+                    deviceReboot();
+            }
+            this.rebootTime = rebootTime;
+            const refreshTime = this.hass.states["input_button.refresh_devices"]?.state;
+            if (this.refreshTime !== undefined) {
+                if (this.refreshTime !== refreshTime)
+                    deviceRefresh();
+            }
+            this.refreshTime = refreshTime;
+        }
+    }
+    disconnectedCallback() {
+        super.disconnectedCallback();
+        this.mainCard = undefined;
+    }
+    tryCreateMainCard() {
+        if (!this.config || !this.hass || !this.isElementLoaded || this.mainCard)
+            return;
+        try {
+            const element = document.createElement("main-card-v2");
+            element.setConfig(this.config);
+            element.hass = this.hass;
+            this.mainCard = element;
+        }
+        catch (err) {
+            console.error("Failed to create main-card:", err);
+            this.mainCard = undefined;
+        }
+    }
+    static get styles() {
+        return i$3 `
+      :host {
+        display: block;
+        width: 100%;
+        height: 100vh;
+      }
+      :host(.admin-view) {
+        height: calc(100vh - 56px);
+      }
+    `;
+    }
+};
+__decorate([
+    n({ attribute: false })
 ], PanelCard.prototype, "hass", void 0);
 __decorate([
     n({ attribute: false })
@@ -222,7 +333,7 @@ __decorate([
     r()
 ], PanelCard.prototype, "mainCard", void 0);
 PanelCard = __decorate([
-    t("panel-card")
+    t("panel-card-v2")
 ], PanelCard);
 
 const formattedDate = (date = new Date()) => {
@@ -476,5 +587,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"2025.8.10"} (Built: ${"2025-08-25T20:06:42.765Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"2025.8.12"} (Built: ${"2025-08-26T23:45:08.970Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

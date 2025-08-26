@@ -32,6 +32,20 @@ export type ActionItem =
       arguments?: any[];
     };
 
+export type ConfirmConfig = {
+  title: string;
+  message: string;
+  button1?: string;
+  action1?: ActionItem[];
+  button2?: string;
+  action2?: ActionItem[];
+};
+
+export interface ConfirmElement extends LovelaceCard {
+  config: ConfirmConfig;
+  isOpen: boolean;
+}
+
 export interface Context {
   id: string;
   parent_id?: string;
@@ -50,6 +64,16 @@ export interface CurrentUser {
   name: string;
   credentials: Credential[];
   mfa_modules: MFAModule[];
+}
+
+export interface CustomObj {
+  icon: string;
+  icon_entity?: string;
+  show_info?: boolean;
+  info_entity?: string;
+  info_entity_units?: string;
+  name?: string;
+  data: any;
 }
 
 export interface DeviceRegistryEntry {
@@ -73,21 +97,10 @@ export interface DeviceRegistryEntry {
 }
 
 export interface DialogEntry {
-  icon: string;
-  name: string;
+  icon?: string;
+  name?: string;
   entity?: string;
   color?: string;
-  data: any;
-}
-
-export interface DialogObj {
-  icon: string;
-  icon_rgb?: string;
-  entity?: string;
-  entity_type?: string;
-  active_color?: string;
-  show_state?: boolean;
-  name?: string;
   data: any;
 }
 
@@ -244,6 +257,7 @@ export type PopupConfig = {
   size?: "normal" | "fullscreen";
   dismissable?: boolean;
   timeout?: number;
+  scrollable?: boolean;
   card: LovelaceCardConfig & { type: string };
   hass?: HomeAssistant;
   button1?: string;
