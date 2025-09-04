@@ -80,9 +80,9 @@ let MySimpleView = class MySimpleView extends i {
         this.cards = [];
     }
     setConfig(config) {
-        if (!config.cards)
+        if (!config.tiles)
             return;
-        config.cards.map((cardConfig) => {
+        config.tiles.map((cardConfig) => {
             const card = oe(cardConfig);
             this.cards.push(card);
         });
@@ -519,5 +519,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"2025.9.9"} (Built: ${"2025-09-04T11:20:51.181Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"2025.9.10"} (Built: ${"2025-09-04T11:28:58.194Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

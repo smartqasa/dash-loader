@@ -18,9 +18,9 @@ export class MySimpleView extends LitElement {
   @state() private cards: LovelaceCard[] = [];
 
   public setConfig(config: any): void {
-    if (!config.cards) return;
+    if (!config.tiles) return;
 
-    config.cards.map((cardConfig: LovelaceCardConfig) => {
+    config.tiles.map((cardConfig: LovelaceCardConfig) => {
       const card = createThing(cardConfig) as LovelaceCard;
       this.cards.push(card);
     });
