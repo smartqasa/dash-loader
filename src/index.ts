@@ -1,6 +1,6 @@
 window.smartqasa = window.smartqasa || {};
 
-import "./view-test";
+//import "./view-test";
 import "./panel";
 import "./screensaver";
 
