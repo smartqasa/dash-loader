@@ -15,7 +15,7 @@ export default {
   input: "src/index.ts",
   output: {
     file: "dist/loader.js",
-    format: "es",
+    format: "esm",
     sourcemap: true,
   },
   plugins: [
