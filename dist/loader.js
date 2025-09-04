@@ -72,6 +72,48 @@ const t=t=>(e,o)=>{ void 0!==o?o.addInitializer((()=>{customElements.define(t,e)
  * SPDX-License-Identifier: BSD-3-Clause
  */function r(r){return n({...r,state:true,attribute:false})}
 
+let MySimpleView = class MySimpleView extends i {
+    constructor() {
+        super(...arguments);
+        this.cards = [];
+    }
+    setConfig(config) {
+        if (!config.cards)
+            return;
+        config.cards.map((cardConfig) => {
+            const card = document.createElement("test-card");
+            card.setConfig(cardConfig);
+            this.cards.push(card);
+        });
+    }
+    willUpdate() {
+        if (!this.cards || this.cards.length == 0)
+            return;
+        this.cards.map((card) => {
+            card.hass = this.hass;
+        });
+    }
+    render() {
+        if (!this.cards) {
+            return x `<p>Loading…</p>`;
+        }
+        return x `
+      <div class="simple-view">
+        ${this.cards.map((card) => x `<div class="card-wrapper">${card}</div>`)}
+      </div>
+    `;
+    }
+};
+__decorate([
+    n({ attribute: false })
+], MySimpleView.prototype, "hass", void 0);
+__decorate([
+    r()
+], MySimpleView.prototype, "cards", void 0);
+MySimpleView = __decorate([
+    t("my-simple-view")
+], MySimpleView);
+
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 async function executeFullyAction(action) {
     if (typeof window.fully === "undefined")
@@ -476,5 +518,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"2025.9.1"} (Built: ${"2025-09-02T15:17:11.549Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"2025.9.2"} (Built: ${"2025-09-04T10:30:30.883Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
