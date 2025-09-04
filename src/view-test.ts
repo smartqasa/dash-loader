@@ -9,6 +9,7 @@ import {
 } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import type { HomeAssistant, LovelaceCard, LovelaceCardConfig } from "./types";
+import { createThing } from "custom-card-helpers";
 
 @customElement("my-simple-view")
 export class MySimpleView extends LitElement {
@@ -20,8 +21,7 @@ export class MySimpleView extends LitElement {
     if (!config.cards) return;
 
     config.cards.map((cardConfig: LovelaceCardConfig) => {
-      const card = document.createElement("test-card") as LovelaceCard;
-      card.setConfig(cardConfig);
+      const card = createThing(cardConfig) as LovelaceCard;
       this.cards.push(card);
     });
   }
