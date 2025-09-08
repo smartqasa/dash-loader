@@ -139,8 +139,18 @@ let PanelCard = class PanelCard extends i {
         this.config = config;
     }
     render() {
-        if (!this.mainCard)
-            return E;
+        if (!this.mainCard) {
+            return x `
+        <div class="loader-container">
+          <div class="loading-text">SmartQasa is loading</div>
+          <div class="dots">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+      `;
+        }
         const isAdmin = this.hass?.user?.is_admin || false;
         const isAdminModeOn = this.hass?.states["input_boolean.admin_mode"]?.state === "on" || false;
         const isAdminView = isAdmin || isAdminModeOn;
@@ -202,9 +212,51 @@ let PanelCard = class PanelCard extends i {
         display: block;
         width: 100%;
         height: 100vh;
+        position: relative;
       }
       :host(.admin-view) {
         height: calc(100vh - 56px);
+      }
+      .loader-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        text-align: center;
+      }
+      .loading-text {
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+        color: var(--primary-text-color, #333);
+      }
+      .dots {
+        display: flex;
+        gap: 0.5rem;
+      }
+      .dots span {
+        width: 10px;
+        height: 10px;
+        background: var(--primary-color, #3f51b5);
+        border-radius: 50%;
+        display: inline-block;
+        animation: bounce 1.4s infinite ease-in-out both;
+      }
+      .dots span:nth-child(1) {
+        animation-delay: -0.32s;
+      }
+      .dots span:nth-child(2) {
+        animation-delay: -0.16s;
+      }
+      @keyframes bounce {
+        0%,
+        80%,
+        100% {
+          transform: scale(0);
+        }
+        40% {
+          transform: scale(1);
+        }
       }
     `;
     }
@@ -476,5 +528,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"2025.9.11"} (Built: ${"2025-09-04T11:34:26.519Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"2025.9.12"} (Built: ${"2025-09-08T13:33:20.332Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
