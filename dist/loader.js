@@ -131,11 +131,8 @@ let PanelCard = class PanelCard extends i {
     connectedCallback() {
         super.connectedCallback();
         customElements.whenDefined("main-card").then(() => {
-            // Delay creation for 10 seconds so you can test the loader
-            setTimeout(() => {
-                this.isElementLoaded = true;
-                this.tryCreateMainCard();
-            }, 10000); // 10,000 ms = 10s
+            this.isElementLoaded = true;
+            this.tryCreateMainCard();
         });
     }
     setConfig(config) {
@@ -531,5 +528,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"2025.9.13"} (Built: ${"2025-09-08T13:37:05.243Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"2025.9.14"} (Built: ${"2025-09-08T14:46:57.463Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
