@@ -54,8 +54,11 @@ export class PanelCard extends LitElement {
   public connectedCallback(): void {
     super.connectedCallback();
     customElements.whenDefined("main-card").then(() => {
-      this.isElementLoaded = true;
-      this.tryCreateMainCard();
+      // Delay creation for 10 seconds so you can test the loader
+      setTimeout(() => {
+        this.isElementLoaded = true;
+        this.tryCreateMainCard();
+      }, 10000); // 10,000 ms = 10s
     });
   }
 
