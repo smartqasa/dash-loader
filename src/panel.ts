@@ -158,7 +158,8 @@ export class PanelCard extends LitElement {
         text-align: center;
       }
       .loading-text {
-        font-size: 1.2rem;
+        font-size: 1.5rem;
+        font-weight: 300;
         margin-bottom: 1rem;
         color: var(--primary-text-color, #333);
       }

@@ -226,7 +226,8 @@ let PanelCard = class PanelCard extends i {
         text-align: center;
       }
       .loading-text {
-        font-size: 1.2rem;
+        font-size: 1.5rem;
+        font-weight: 300;
         margin-bottom: 1rem;
         color: var(--primary-text-color, #333);
       }
@@ -528,5 +529,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"2025.9.14"} (Built: ${"2025-09-08T14:46:57.463Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"2025.9.15"} (Built: ${"2025-09-10T09:40:41.716Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
