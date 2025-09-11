@@ -4,22 +4,6 @@ set -e
 # Ensure we're on main
 git checkout main
 
-# Abort if main has uncommitted changes (other than version bumps)
-#if ! git diff --quiet || ! git diff --cached --quiet; then
-#  echo "❌ Main has local changes. Commit or stash them first."
-#  git checkout beta
-#  exit 1
-#fi
-
-# Abort if remote main has commits not in beta
-#git fetch origin
-#if ! git diff --quiet origin/beta origin/main -- . ':(exclude)package.json' ':(exclude)package-lock.json'; then
-#  echo "❌ Main has changes that are not in beta (outside version files)."
-#  echo "Merge or resolve these before promoting."
-#  git checkout beta
-#  exit 1
-#fi
-
 # Force main to match beta
 git fetch origin
 git reset --hard origin/beta
@@ -34,11 +18,13 @@ fi
 # Strip -beta.# → stable version
 STABLE_VERSION=$(echo "$CURRENT_VERSION" | sed -E 's/-beta\.[0-9]+//')
 npm version "$STABLE_VERSION" --no-git-tag-version
-git add -A
 
 # Build prod bundle 
 rm -rf dist 
 rollup -c --environment NODE_ENV=production
+
+# Stage everything (src, config, dist) for commit
+git add -A
 
 # Defaults
 COMMIT_MSG="🔖 Release $STABLE_VERSION"
