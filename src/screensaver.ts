@@ -1,209 +1,34 @@
-import {
-  css,
-  CSSResultGroup,
-  html,
-  LitElement,
-  nothing,
-  PropertyValues,
-  TemplateResult,
-} from "lit";
-import { customElement, property, state } from "lit/decorators.js";
-import { HomeAssistant, LovelaceCard, LovelaceCardConfig } from "./types";
-import { formattedDate, formattedTime } from "./format-date-time";
-import { deviceRefresh, deviceReboot } from "./device-actions";
-import logoImage from "./logo.png";
-
-interface Config extends LovelaceCardConfig {
-  move_timer?: number;
-  display: "time" | "logo";
-  name?: string;
-}
+import { css, CSSResultGroup, html, LitElement, TemplateResult } from "lit";
+import { customElement } from "lit/decorators.js";
+import { LovelaceCard, LovelaceCardConfig } from "./types";
 
 window.customCards.push({
-  type: "screensaver-card",
-  name: "Screen Saver Card",
+  type: "screensaver-test-card",
+  name: "Screen Saver Test Card",
   preview: true,
-  description: "A SmartQasa card for displaying a screen saver.",
+  description: "A super simple test card with static text.",
 });
 
-@customElement("screensaver-card")
-export class ScreenSaver extends LitElement implements LovelaceCard {
+@customElement("screensaver-test-card")
+export class ScreenSaverTest extends LitElement implements LovelaceCard {
   public getCardSize(): number | Promise<number> {
-    return 100;
+    return 1;
   }
 
-  @property({ attribute: false }) public hass: HomeAssistant | undefined;
-  @property({ attribute: false }) private config: Config | undefined;
-
-  @state() private time: string = "Loading...";
-  @state() private date: string = "Loading...";
-
-  private rebootTime: string | undefined;
-  private refreshTime: string | undefined;
-  private cycleIntervalId: number | undefined;
-  private clockFrameId: number | undefined;
-
-  public setConfig(config: Config): void {
-    if (!config) throw new Error("Invalid configuration provided");
-    this.config = config;
-    console.log("[ScreenSaver] setConfig →", config);
+  public setConfig(config: LovelaceCardConfig): void {
+    // No config needed for test
   }
 
-  protected render(): TemplateResult | typeof nothing {
-    if (!this.config) return nothing;
-
-    console.log("[ScreenSaver] render → display =", this.config.display);
-
+  protected render(): TemplateResult {
     return html`
       <div class="container">
-        <div class="element">
-          ${this.config.display === "logo"
-            ? html`
-                <div class="logo">
-                  <img
-                    src=${logoImage}
-                    alt="Logo"
-                    @error=${() => this.handleImageError()}
-                  />
-                  ${this.config.name
-                    ? html`<div class="name">${this.config.name}</div>`
-                    : ""}
-                </div>
-              `
-            : html`
-                <div class="time">${this.time}</div>
-                <div class="date">${this.date}</div>
-              `}
+        <div class="message">
+          🚀 SmartQasa Test Card<br />
+          This is static text.<br />
+          If you can see this, rendering works in Fully.
         </div>
       </div>
     `;
-  }
-
-  protected firstUpdated(changedProps: PropertyValues): void {
-    console.log("[ScreenSaver] firstUpdated");
-    this.updateElement();
-    this.startClock();
-    this.startCycle();
-  }
-
-  protected updated(changedProps: PropertyValues): void {
-    if (changedProps.has("hass") && this.hass) {
-      const rebootTime = this.hass.states["input_button.reboot_devices"]?.state;
-      if (this.rebootTime !== undefined && this.rebootTime !== rebootTime) {
-        console.log("[ScreenSaver] reboot trigger");
-        deviceReboot();
-      }
-      this.rebootTime = rebootTime;
-
-      const refreshTime =
-        this.hass.states["input_button.refresh_devices"]?.state;
-      if (this.refreshTime !== undefined && this.refreshTime !== refreshTime) {
-        console.log("[ScreenSaver] refresh trigger");
-        deviceRefresh();
-      }
-      this.refreshTime = refreshTime;
-    }
-  }
-
-  public disconnectedCallback(): void {
-    super.disconnectedCallback();
-    console.log("[ScreenSaver] disconnectedCallback");
-    if (this.clockFrameId !== undefined) {
-      cancelAnimationFrame(this.clockFrameId);
-    }
-    if (this.cycleIntervalId !== undefined) {
-      clearInterval(this.cycleIntervalId);
-    }
-  }
-
-  private startClock(): void {
-    console.log("[ScreenSaver] startClock");
-    const tick = () => {
-      this.updateElement();
-      this.clockFrameId = requestAnimationFrame(() => {
-        setTimeout(tick, 1000); // aim for ~1s updates
-      });
-    };
-    tick();
-  }
-
-  private startCycle(): void {
-    const moveTimer = (this.config?.move_timer ?? 30) * 1000;
-    console.log("[ScreenSaver] startCycle → every", moveTimer, "ms");
-
-    if (this.cycleIntervalId !== undefined) {
-      clearInterval(this.cycleIntervalId);
-    }
-
-    this.cycleIntervalId = window.setInterval(() => {
-      const element = this.shadowRoot?.querySelector(".element") as HTMLElement;
-      if (!element) {
-        console.warn("[ScreenSaver] cycle → element not found");
-        return;
-      }
-
-      console.log("[ScreenSaver] cycle → fade-out");
-      element.style.animation = "fade-out 1s forwards";
-
-      setTimeout(() => {
-        this.moveElement();
-        element.style.animation = "fade-in 1s forwards";
-        element.style.opacity = "1";
-        element.style.visibility = "visible";
-        console.log("[ScreenSaver] cycle → move + fade-in", {
-          left: element.style.left,
-          top: element.style.top,
-          opacity: element.style.opacity,
-          visibility: element.style.visibility,
-        });
-      }, 1000);
-    }, moveTimer);
-  }
-
-  private updateElement(): void {
-    const now = new Date();
-    this.time = formattedTime(now);
-    this.date = formattedDate(now);
-
-    console.log("[ScreenSaver] updateElement →", this.time, this.date);
-  }
-
-  private moveElement(): void {
-    const container = this.shadowRoot?.querySelector(
-      ".container"
-    ) as HTMLElement;
-    const element = this.shadowRoot?.querySelector(".element") as HTMLElement;
-
-    if (!container || !element) {
-      console.warn("[ScreenSaver] moveElement → missing container/element");
-      return;
-    }
-
-    const maxWidth = container.clientWidth - element.clientWidth;
-    const maxHeight = container.clientHeight - element.clientHeight;
-
-    const randomX = Math.floor(Math.random() * maxWidth);
-    const randomY = Math.floor(Math.random() * maxHeight);
-
-    element.style.left = `${randomX}px`;
-    element.style.top = `${randomY}px`;
-
-    console.log("[ScreenSaver] moveElement →", {
-      containerW: container.clientWidth,
-      containerH: container.clientHeight,
-      elementW: element.clientWidth,
-      elementH: element.clientHeight,
-      maxWidth,
-      maxHeight,
-      randomX,
-      randomY,
-      appliedLeft: element.style.left,
-      appliedTop: element.style.top,
-    });
-  }
-
-  private handleImageError(): void {
-    console.error("[ScreenSaver] Failed to load image.");
   }
 
   static get styles(): CSSResultGroup {
@@ -211,92 +36,24 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
       :host {
         display: block;
         width: 100vw;
+        height: 100vh;
         background-color: black;
       }
 
       .container {
-        height: 100vh;
-        position: relative;
-      }
-
-      .element {
+        height: 100%;
+        width: 100%;
         display: flex;
-        flex-direction: column;
-        position: absolute;
-        padding: 2rem;
-        background-color: transparent;
-        opacity: 0;
-        animation: fade-in 1.5s forwards;
         align-items: center;
         justify-content: center;
-        max-width: 100%;
-        box-sizing: border-box;
-        overflow: hidden;
       }
 
-      .time,
-      .date {
+      .message {
+        color: white;
+        font-size: 2rem;
+        font-weight: bold;
         text-align: center;
-        line-height: normal;
-        white-space: nowrap;
-        transition: all 0.5s ease-in-out;
-        max-width: 100vw;
-      }
-
-      .time {
-        font-size: 7rem;
-        font-weight: 300;
-        color: rgb(140, 140, 140);
-      }
-
-      .date {
-        font-size: 2.5rem;
-        font-weight: 200;
-        color: rgb(140, 140, 140);
-      }
-
-      .logo {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        background-color: transparent;
-      }
-
-      .logo img {
-        object-fit: contain;
-        width: 150px;
-        opacity: 0.5;
-      }
-
-      .name {
-        margin-top: 10px;
-        padding: 0.5rem 1rem;
-        background-color: rgba(200, 200, 200, 0.5);
-        color: rgba(0, 0, 0, 1);
-        font-size: 1.5rem;
-        font-weight: 400;
-        text-align: center;
-        border-radius: 0.25rem;
-        word-wrap: break-word;
-        width: 100%;
-      }
-
-      @keyframes fade-in {
-        0% {
-          opacity: 0;
-        }
-        100% {
-          opacity: 1;
-        }
-      }
-
-      @keyframes fade-out {
-        0% {
-          opacity: 1;
-        }
-        100% {
-          opacity: 0;
-        }
+        padding: 1rem;
       }
     `;
   }
