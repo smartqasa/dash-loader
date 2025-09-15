@@ -295,12 +295,12 @@ PanelCard = __decorate([
 ], PanelCard);
 
 window.customCards.push({
-    type: "screensaver-test-card",
+    type: "screensaver-card",
     name: "Screen Saver Test Card",
     preview: true,
     description: "A super simple test card with static text.",
 });
-let ScreenSaverTest = class ScreenSaverTest extends i {
+let ScreenSaverCard = class ScreenSaverCard extends i {
     getCardSize() {
         return 1;
     }
@@ -345,10 +345,10 @@ let ScreenSaverTest = class ScreenSaverTest extends i {
     `;
     }
 };
-ScreenSaverTest = __decorate([
-    t("screensaver-test-card")
-], ScreenSaverTest);
+ScreenSaverCard = __decorate([
+    t("screensaver-card")
+], ScreenSaverCard);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.4-beta.5"} (Built: ${"2025-09-15T13:06:57.469Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.4-beta.6"} (Built: ${"2025-09-15T13:09:49.590Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

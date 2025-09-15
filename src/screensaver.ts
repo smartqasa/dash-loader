@@ -3,14 +3,14 @@ import { customElement } from "lit/decorators.js";
 import { LovelaceCard, LovelaceCardConfig } from "./types";
 
 window.customCards.push({
-  type: "screensaver-test-card",
+  type: "screensaver-card",
   name: "Screen Saver Test Card",
   preview: true,
   description: "A super simple test card with static text.",
 });
 
-@customElement("screensaver-test-card")
-export class ScreenSaverTest extends LitElement implements LovelaceCard {
+@customElement("screensaver-card")
+export class ScreenSaverCard extends LitElement implements LovelaceCard {
   public getCardSize(): number | Promise<number> {
     return 1;
   }
