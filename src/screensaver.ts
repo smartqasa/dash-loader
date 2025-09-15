@@ -13,6 +13,15 @@ import { formattedDate, formattedTime } from "./format-date-time";
 import { deviceRefresh, deviceReboot } from "./device-actions";
 import logoImage from "./logo.png";
 
+const DEBUG = true; // 🔧 toggle to false to silence logs
+
+function logDebug(...args: any[]) {
+  if (DEBUG) console.log("[ScreenSaver]", ...args);
+}
+function logWarn(...args: any[]) {
+  if (DEBUG) console.warn("[ScreenSaver]", ...args);
+}
+
 interface Config extends LovelaceCardConfig {
   move_timer?: number;
   display: "time" | "logo";
@@ -86,6 +95,7 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
     if (changedProps.has("hass") && this.hass) {
       const rebootTime = this.hass.states["input_button.reboot_devices"]?.state;
       if (this.rebootTime !== undefined && this.rebootTime !== rebootTime) {
+        logDebug("Trigger → deviceReboot()");
         deviceReboot();
       }
       this.rebootTime = rebootTime;
@@ -93,6 +103,7 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
       const refreshTime =
         this.hass.states["input_button.refresh_devices"]?.state;
       if (this.refreshTime !== undefined && this.refreshTime !== refreshTime) {
+        logDebug("Trigger → deviceRefresh()");
         deviceRefresh();
       }
       this.refreshTime = refreshTime;
@@ -109,10 +120,11 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
     }
   }
 
-  /** Robust clock */
+  /** Robust clock with debug logs */
   private startClock(): void {
     const tick = () => {
       this.updateElement();
+      logDebug("tick:", this.time, this.date);
       this.clockFrameId = requestAnimationFrame(() => {
         setTimeout(tick, 1000); // aim for ~1s updates
       });
@@ -120,7 +132,7 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
     tick();
   }
 
-  /** Robust element cycle */
+  /** Robust element cycle with debug logs */
   private startCycle(): void {
     const moveTimer = (this.config?.move_timer ?? 30) * 1000;
 
@@ -130,16 +142,26 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
 
     this.cycleIntervalId = window.setInterval(() => {
       const element = this.shadowRoot?.querySelector(".element") as HTMLElement;
-      if (!element) return;
+      if (!element) {
+        logWarn("element not found in startCycle");
+        return;
+      }
 
-      // Fade out
+      logDebug("cycle → fade-out");
       element.style.animation = "fade-out 1s forwards";
+      element.style.opacity = "0";
 
       setTimeout(() => {
+        logDebug("cycle → move + fade-in");
         this.moveElement();
         element.style.animation = "fade-in 1s forwards";
-        element.style.opacity = "1";
+        element.style.opacity = "1"; // force visible
         element.style.visibility = "visible";
+
+        logDebug("after fade-in", {
+          opacity: element.style.opacity,
+          animation: element.style.animation,
+        });
       }, 1000);
     }, moveTimer);
   }
@@ -148,6 +170,7 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
     const now = new Date();
     this.time = formattedTime(now);
     this.date = formattedDate(now);
+    logDebug("updateElement →", this.time, this.date);
   }
 
   private moveElement(): void {
@@ -163,13 +186,17 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
       const randomX = Math.floor(Math.random() * maxWidth);
       const randomY = Math.floor(Math.random() * maxHeight);
 
+      logDebug("moveElement", { maxWidth, maxHeight, randomX, randomY });
+
       element.style.left = `${randomX}px`;
       element.style.top = `${randomY}px`;
+    } else {
+      logWarn("moveElement failed: no container/element");
     }
   }
 
   private handleImageError(): void {
-    console.error("Failed to load image.");
+    logWarn("Failed to load image.");
   }
 
   static get styles(): CSSResultGroup {
@@ -179,10 +206,12 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
         width: 100vw;
         background-color: black;
       }
+
       .container {
         height: 100vh;
         position: relative;
       }
+
       .element {
         display: flex;
         flex-direction: column;
@@ -197,6 +226,7 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
         box-sizing: border-box;
         overflow: hidden;
       }
+
       .time,
       .date {
         text-align: center;
@@ -205,27 +235,32 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
         transition: all 0.5s ease-in-out;
         max-width: 100vw;
       }
+
       .time {
         font-size: 7rem;
         font-weight: 300;
         color: rgb(140, 140, 140);
       }
+
       .date {
         font-size: 2.5rem;
         font-weight: 200;
         color: rgb(140, 140, 140);
       }
+
       .logo {
         display: flex;
         flex-direction: column;
         align-items: center;
         background-color: transparent;
       }
+
       .logo img {
         object-fit: contain;
         width: 150px;
         opacity: 0.5;
       }
+
       .name {
         margin-top: 10px;
         padding: 0.5rem 1rem;
@@ -238,6 +273,7 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
         word-wrap: break-word;
         width: 100%;
       }
+
       @keyframes fade-in {
         0% {
           opacity: 0;
@@ -246,6 +282,7 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
           opacity: 1;
         }
       }
+
       @keyframes fade-out {
         0% {
           opacity: 1;
