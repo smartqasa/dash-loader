@@ -366,7 +366,7 @@ let ScreenSaver = class ScreenSaver extends i {
       </div>
     `;
     }
-    firstUpdated(changedProps) {
+    firstUpdated(_changedProps) {
         this.updateElement();
         this.startClock();
         this.cycleElement();
@@ -374,15 +374,13 @@ let ScreenSaver = class ScreenSaver extends i {
     updated(changedProps) {
         if (changedProps.has("hass") && this.hass) {
             const rebootTime = this.hass.states["input_button.reboot_devices"]?.state;
-            if (this.rebootTime !== undefined) {
-                if (this.rebootTime !== rebootTime)
-                    deviceReboot();
+            if (this.rebootTime !== undefined && this.rebootTime !== rebootTime) {
+                deviceReboot();
             }
             this.rebootTime = rebootTime;
             const refreshTime = this.hass.states["input_button.refresh_devices"]?.state;
-            if (this.refreshTime !== undefined) {
-                if (this.refreshTime !== refreshTime)
-                    deviceRefresh();
+            if (this.refreshTime !== undefined && this.refreshTime !== refreshTime) {
+                deviceRefresh();
             }
             this.refreshTime = refreshTime;
         }
@@ -393,7 +391,7 @@ let ScreenSaver = class ScreenSaver extends i {
             window.clearInterval(this.timeIntervalId);
         }
         if (this.moveTimerId !== undefined) {
-            window.clearTimeout(this.moveTimerId);
+            window.clearInterval(this.moveTimerId);
         }
     }
     startClock() {
@@ -408,20 +406,18 @@ let ScreenSaver = class ScreenSaver extends i {
             return;
         }
         const moveTimer = (this.config?.move_timer ?? 30) * 1000;
-        if (element) {
-            element.style.animation = "fade-in 1.5s forwards";
+        const runCycle = () => {
+            // fade out
+            element.style.opacity = "0";
             setTimeout(() => {
-                element.style.animation = "";
-                setTimeout(() => {
-                    element.style.animation = "fade-out 1s forwards";
-                    setTimeout(() => {
-                        this.moveElement();
-                        element.style.animation = "fade-in 1s forwards";
-                        this.cycleElement();
-                    }, 1500);
-                }, moveTimer);
-            }, 1500);
-        }
+                this.moveElement();
+                // fade back in
+                element.style.opacity = "1";
+            }, 1000); // matches CSS transition duration
+        };
+        // run once immediately, then repeat
+        runCycle();
+        this.moveTimerId = window.setInterval(runCycle, moveTimer);
     }
     updateElement() {
         const now = new Date();
@@ -434,8 +430,8 @@ let ScreenSaver = class ScreenSaver extends i {
         if (container && element) {
             const maxWidth = container.clientWidth - element.clientWidth;
             const maxHeight = container.clientHeight - element.clientHeight;
-            const randomX = Math.min(Math.max(0, Math.floor(Math.random() * maxWidth)), maxWidth);
-            const randomY = Math.min(Math.max(0, Math.floor(Math.random() * maxHeight)), maxHeight);
+            const randomX = Math.floor(Math.random() * maxWidth);
+            const randomY = Math.floor(Math.random() * maxHeight);
             element.style.left = `${randomX}px`;
             element.style.top = `${randomY}px`;
         }
@@ -463,7 +459,7 @@ let ScreenSaver = class ScreenSaver extends i {
         padding: 2rem;
         background-color: transparent;
         opacity: 1;
-        animation: none;
+        transition: opacity 1s ease-in-out;
         align-items: center;
         justify-content: center;
         max-width: 100%;
@@ -517,24 +513,6 @@ let ScreenSaver = class ScreenSaver extends i {
         word-wrap: break-word;
         width: 100%;
       }
-
-      @keyframes fade-in {
-        0% {
-          opacity: 0;
-        }
-        100% {
-          opacity: 1;
-        }
-      }
-
-      @keyframes fade-out {
-        0% {
-          opacity: 1;
-        }
-        100% {
-          opacity: 0;
-        }
-      }
     `;
     }
 };
@@ -555,5 +533,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.4-beta.7"} (Built: ${"2025-09-15T13:18:01.361Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.4-beta.8"} (Built: ${"2025-09-15T13:30:23.397Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
