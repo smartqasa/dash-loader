@@ -13,15 +13,6 @@ import { formattedDate, formattedTime } from "./format-date-time";
 import { deviceRefresh, deviceReboot } from "./device-actions";
 import logoImage from "./logo.png";
 
-const DEBUG = true; // 🔧 toggle to false to silence logs
-
-function logDebug(...args: any[]) {
-  if (DEBUG) console.log("[ScreenSaver]", ...args);
-}
-function logWarn(...args: any[]) {
-  if (DEBUG) console.warn("[ScreenSaver]", ...args);
-}
-
 interface Config extends LovelaceCardConfig {
   move_timer?: number;
   display: "time" | "logo";
@@ -55,10 +46,13 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
   public setConfig(config: Config): void {
     if (!config) throw new Error("Invalid configuration provided");
     this.config = config;
+    console.log("[ScreenSaver] setConfig →", config);
   }
 
   protected render(): TemplateResult | typeof nothing {
     if (!this.config) return nothing;
+
+    console.log("[ScreenSaver] render → display =", this.config.display);
 
     return html`
       <div class="container">
@@ -86,6 +80,7 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
   }
 
   protected firstUpdated(changedProps: PropertyValues): void {
+    console.log("[ScreenSaver] firstUpdated");
     this.updateElement();
     this.startClock();
     this.startCycle();
@@ -95,7 +90,7 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
     if (changedProps.has("hass") && this.hass) {
       const rebootTime = this.hass.states["input_button.reboot_devices"]?.state;
       if (this.rebootTime !== undefined && this.rebootTime !== rebootTime) {
-        logDebug("Trigger → deviceReboot()");
+        console.log("[ScreenSaver] reboot trigger");
         deviceReboot();
       }
       this.rebootTime = rebootTime;
@@ -103,7 +98,7 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
       const refreshTime =
         this.hass.states["input_button.refresh_devices"]?.state;
       if (this.refreshTime !== undefined && this.refreshTime !== refreshTime) {
-        logDebug("Trigger → deviceRefresh()");
+        console.log("[ScreenSaver] refresh trigger");
         deviceRefresh();
       }
       this.refreshTime = refreshTime;
@@ -112,6 +107,7 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
 
   public disconnectedCallback(): void {
     super.disconnectedCallback();
+    console.log("[ScreenSaver] disconnectedCallback");
     if (this.clockFrameId !== undefined) {
       cancelAnimationFrame(this.clockFrameId);
     }
@@ -120,11 +116,10 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
     }
   }
 
-  /** Robust clock with debug logs */
   private startClock(): void {
+    console.log("[ScreenSaver] startClock");
     const tick = () => {
       this.updateElement();
-      logDebug("tick:", this.time, this.date);
       this.clockFrameId = requestAnimationFrame(() => {
         setTimeout(tick, 1000); // aim for ~1s updates
       });
@@ -132,9 +127,9 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
     tick();
   }
 
-  /** Robust element cycle with debug logs */
   private startCycle(): void {
     const moveTimer = (this.config?.move_timer ?? 30) * 1000;
+    console.log("[ScreenSaver] startCycle → every", moveTimer, "ms");
 
     if (this.cycleIntervalId !== undefined) {
       clearInterval(this.cycleIntervalId);
@@ -143,24 +138,23 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
     this.cycleIntervalId = window.setInterval(() => {
       const element = this.shadowRoot?.querySelector(".element") as HTMLElement;
       if (!element) {
-        logWarn("element not found in startCycle");
+        console.warn("[ScreenSaver] cycle → element not found");
         return;
       }
 
-      logDebug("cycle → fade-out");
+      console.log("[ScreenSaver] cycle → fade-out");
       element.style.animation = "fade-out 1s forwards";
-      element.style.opacity = "0";
 
       setTimeout(() => {
-        logDebug("cycle → move + fade-in");
         this.moveElement();
         element.style.animation = "fade-in 1s forwards";
-        element.style.opacity = "1"; // force visible
+        element.style.opacity = "1";
         element.style.visibility = "visible";
-
-        logDebug("after fade-in", {
+        console.log("[ScreenSaver] cycle → move + fade-in", {
+          left: element.style.left,
+          top: element.style.top,
           opacity: element.style.opacity,
-          animation: element.style.animation,
+          visibility: element.style.visibility,
         });
       }, 1000);
     }, moveTimer);
@@ -170,7 +164,8 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
     const now = new Date();
     this.time = formattedTime(now);
     this.date = formattedDate(now);
-    logDebug("updateElement →", this.time, this.date);
+
+    console.log("[ScreenSaver] updateElement →", this.time, this.date);
   }
 
   private moveElement(): void {
@@ -179,24 +174,36 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
     ) as HTMLElement;
     const element = this.shadowRoot?.querySelector(".element") as HTMLElement;
 
-    if (container && element) {
-      const maxWidth = container.clientWidth - element.clientWidth;
-      const maxHeight = container.clientHeight - element.clientHeight;
-
-      const randomX = Math.floor(Math.random() * maxWidth);
-      const randomY = Math.floor(Math.random() * maxHeight);
-
-      logDebug("moveElement", { maxWidth, maxHeight, randomX, randomY });
-
-      element.style.left = `${randomX}px`;
-      element.style.top = `${randomY}px`;
-    } else {
-      logWarn("moveElement failed: no container/element");
+    if (!container || !element) {
+      console.warn("[ScreenSaver] moveElement → missing container/element");
+      return;
     }
+
+    const maxWidth = container.clientWidth - element.clientWidth;
+    const maxHeight = container.clientHeight - element.clientHeight;
+
+    const randomX = Math.floor(Math.random() * maxWidth);
+    const randomY = Math.floor(Math.random() * maxHeight);
+
+    element.style.left = `${randomX}px`;
+    element.style.top = `${randomY}px`;
+
+    console.log("[ScreenSaver] moveElement →", {
+      containerW: container.clientWidth,
+      containerH: container.clientHeight,
+      elementW: element.clientWidth,
+      elementH: element.clientHeight,
+      maxWidth,
+      maxHeight,
+      randomX,
+      randomY,
+      appliedLeft: element.style.left,
+      appliedTop: element.style.top,
+    });
   }
 
   private handleImageError(): void {
-    logWarn("Failed to load image.");
+    console.error("[ScreenSaver] Failed to load image.");
   }
 
   static get styles(): CSSResultGroup {
