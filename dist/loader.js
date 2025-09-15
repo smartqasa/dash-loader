@@ -157,11 +157,14 @@ let PanelCard = class PanelCard extends i {
     `;
     }
     updated(changedProps) {
-        this.tryCreateMainCard();
+        if (customElements.get("main-card")) {
+            this.tryCreateMainCard();
+        }
         if (!this.mainCard)
             return;
-        if (changedProps.has("config") && this.config)
+        if (changedProps.has("config") && this.config) {
             this.mainCard.setConfig(this.config);
+        }
         if (changedProps.has("hass") && this.hass) {
             this.mainCard.hass = this.hass;
             const popups = document.querySelectorAll("popup-dialog") ?? [];
@@ -170,33 +173,36 @@ let PanelCard = class PanelCard extends i {
                     popup.hass = this.hass;
             });
             const rebootTime = this.hass.states["input_button.reboot_devices"]?.state;
-            if (this.rebootTime !== undefined) {
-                if (this.rebootTime !== rebootTime)
-                    deviceReboot();
+            if (this.rebootTime !== undefined && this.rebootTime !== rebootTime) {
+                deviceReboot();
             }
             this.rebootTime = rebootTime;
             const refreshTime = this.hass.states["input_button.refresh_devices"]?.state;
-            if (this.refreshTime !== undefined) {
-                if (this.refreshTime !== refreshTime)
-                    deviceRefresh();
+            if (this.refreshTime !== undefined && this.refreshTime !== refreshTime) {
+                deviceRefresh();
             }
             this.refreshTime = refreshTime;
         }
     }
-    /*
-    public disconnectedCallback(): void {
-      super.disconnectedCallback();
-      this.mainCard = undefined;
-    }
-    */
     tryCreateMainCard() {
         if (this.mainCard)
             return;
         if (!this.config || !this.hass)
             return;
+        const ctor = customElements.get("main-card");
+        if (!ctor) {
+            console.warn("[PanelCard] main-card not defined yet");
+            return;
+        }
         try {
             const element = document.createElement("main-card");
-            element.setConfig(this.config);
+            if (typeof element.setConfig === "function") {
+                element.setConfig(this.config);
+            }
+            else {
+                console.error("[PanelCard] main-card exists but has no setConfig()");
+                return;
+            }
             element.hass = this.hass;
             this.mainCard = element;
         }
@@ -572,5 +578,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.4-beta.2"} (Built: ${"2025-09-15T12:44:57.659Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.4-beta.3"} (Built: ${"2025-09-15T12:52:03.095Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

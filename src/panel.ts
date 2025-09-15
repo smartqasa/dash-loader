@@ -14,11 +14,6 @@ import {
 } from "custom-card-helpers";
 import { deviceRefresh, deviceReboot } from "./device-actions";
 
-declare const fully: {
-  disableWifi: () => void;
-  enableWifi: () => void;
-};
-
 window.customCards.push({
   type: "panel-card",
   name: "Panel Card",
@@ -79,11 +74,15 @@ export class PanelCard extends LitElement {
   }
 
   protected updated(changedProps: PropertyValues): void {
-    this.tryCreateMainCard();
+    if (customElements.get("main-card")) {
+      this.tryCreateMainCard();
+    }
+
     if (!this.mainCard) return;
 
-    if (changedProps.has("config") && this.config)
+    if (changedProps.has("config") && this.config) {
       this.mainCard.setConfig(this.config);
+    }
 
     if (changedProps.has("hass") && this.hass) {
       this.mainCard.hass = this.hass;
@@ -94,35 +93,38 @@ export class PanelCard extends LitElement {
       });
 
       const rebootTime = this.hass.states["input_button.reboot_devices"]?.state;
-      if (this.rebootTime !== undefined) {
-        if (this.rebootTime !== rebootTime) deviceReboot();
+      if (this.rebootTime !== undefined && this.rebootTime !== rebootTime) {
+        deviceReboot();
       }
       this.rebootTime = rebootTime;
 
       const refreshTime =
         this.hass.states["input_button.refresh_devices"]?.state;
-      if (this.refreshTime !== undefined) {
-        if (this.refreshTime !== refreshTime) deviceRefresh();
+      if (this.refreshTime !== undefined && this.refreshTime !== refreshTime) {
+        deviceRefresh();
       }
       this.refreshTime = refreshTime;
     }
   }
 
-  /*
-  public disconnectedCallback(): void {
-    super.disconnectedCallback();
-    this.mainCard = undefined;
-  }
-  */
-
   private tryCreateMainCard(): void {
     if (this.mainCard) return;
-
     if (!this.config || !this.hass) return;
+
+    const ctor = customElements.get("main-card");
+    if (!ctor) {
+      console.warn("[PanelCard] main-card not defined yet");
+      return;
+    }
 
     try {
       const element = document.createElement("main-card") as LovelaceCard;
-      element.setConfig(this.config);
+      if (typeof (element as any).setConfig === "function") {
+        element.setConfig(this.config);
+      } else {
+        console.error("[PanelCard] main-card exists but has no setConfig()");
+        return;
+      }
       element.hass = this.hass;
       this.mainCard = element;
     } catch (err) {
