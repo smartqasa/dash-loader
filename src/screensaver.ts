@@ -172,8 +172,11 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
     return css`
       :host {
         display: block;
-        width: 100%;
+        width: 100vw;
         height: 100vh;
+        position: fixed;
+        top: 0;
+        left: 0;
         background-color: black;
       }
 
