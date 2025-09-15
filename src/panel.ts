@@ -3,7 +3,6 @@ import {
   CSSResult,
   html,
   LitElement,
-  nothing,
   PropertyValues,
   TemplateResult,
 } from "lit";
@@ -20,15 +19,6 @@ declare const fully: {
   enableWifi: () => void;
 };
 
-interface Config extends LovelaceCardConfig {
-  area: string;
-  name?: string;
-  picture?: string;
-  headerchips?: LovelaceCardConfig[];
-  areachips?: LovelaceCardConfig[];
-  tiles?: LovelaceCardConfig[];
-}
-
 window.customCards.push({
   type: "panel-card",
   name: "Panel Card",
@@ -42,11 +32,10 @@ export class PanelCard extends LitElement {
     return 1;
   }
 
-  @property({ attribute: false }) public hass: HomeAssistant | undefined;
-  @property({ attribute: false }) private config: Config | undefined;
+  @property({ attribute: false }) config?: LovelaceCardConfig;
+  @property({ attribute: false }) hass?: HomeAssistant;
 
-  @state() private isElementLoaded = false;
-  @state() private mainCard: LovelaceCard | undefined;
+  @state() private mainCard?: LovelaceCard;
 
   private rebootTime: string | undefined;
   private refreshTime: string | undefined;
@@ -54,29 +43,16 @@ export class PanelCard extends LitElement {
   public connectedCallback(): void {
     super.connectedCallback();
     customElements.whenDefined("main-card").then(() => {
-      this.isElementLoaded = true;
       this.tryCreateMainCard();
     });
   }
 
-  public setConfig(config: Config) {
+  public setConfig(config: LovelaceCardConfig) {
     this.config = config;
+    this.tryCreateMainCard();
   }
 
-  protected render(): TemplateResult | typeof nothing {
-    if (!this.mainCard) {
-      return html`
-        <div class="loader-container">
-          <div class="loading-text">SmartQasa is loading</div>
-          <div class="dots">
-            <span></span>
-            <span></span>
-            <span></span>
-          </div>
-        </div>
-      `;
-    }
-
+  protected render(): TemplateResult {
     const isAdmin = this.hass?.user?.is_admin || false;
     const isAdminModeOn =
       this.hass?.states["input_boolean.admin_mode"]?.state === "on" || false;
@@ -84,22 +60,35 @@ export class PanelCard extends LitElement {
 
     this.classList.toggle("admin-view", isAdminView);
 
-    return html`${this.mainCard}`;
+    return html`
+      <div id="main-wrapper">
+        ${this.mainCard
+          ? this.mainCard
+          : html`
+              <div class="loader-container">
+                <div class="loading-text">SmartQasa is loading</div>
+                <div class="dots">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              </div>
+            `}
+      </div>
+    `;
   }
 
   protected updated(changedProps: PropertyValues): void {
-    if (changedProps.has("config") && this.config) {
-      if (this.mainCard) this.mainCard.setConfig(this.config);
-    }
+    this.tryCreateMainCard();
+    if (!this.mainCard) return;
+
+    if (changedProps.has("config") && this.config)
+      this.mainCard.setConfig(this.config);
 
     if (changedProps.has("hass") && this.hass) {
-      if (this.mainCard) {
-        this.mainCard.hass = this.hass;
-      } else {
-        this.tryCreateMainCard();
-      }
+      this.mainCard.hass = this.hass;
 
-      const popups = document.querySelectorAll("popup-dialog");
+      const popups = this.shadowRoot?.querySelectorAll("popup-dialog") ?? [];
       popups.forEach((popup: Element) => {
         if ("hass" in (popup as any)) (popup as any).hass = this.hass;
       });
@@ -119,14 +108,18 @@ export class PanelCard extends LitElement {
     }
   }
 
+  /*
   public disconnectedCallback(): void {
     super.disconnectedCallback();
     this.mainCard = undefined;
   }
+  */
 
   private tryCreateMainCard(): void {
-    if (!this.config || !this.hass || !this.isElementLoaded || this.mainCard)
-      return;
+    if (this.mainCard) return;
+
+    if (!this.config || !this.hass) return;
+
     try {
       const element = document.createElement("main-card") as LovelaceCard;
       element.setConfig(this.config);
@@ -146,9 +139,11 @@ export class PanelCard extends LitElement {
         height: 100vh;
         position: relative;
       }
+
       :host(.admin-view) {
         height: calc(100vh - 56px);
       }
+
       .loader-container {
         display: flex;
         flex-direction: column;
@@ -157,16 +152,19 @@ export class PanelCard extends LitElement {
         height: 100%;
         text-align: center;
       }
+
       .loading-text {
         font-size: 1.5rem;
         font-weight: 300;
         margin-bottom: 1rem;
         color: var(--primary-text-color, #333);
       }
+
       .dots {
         display: flex;
         gap: 0.5rem;
       }
+
       .dots span {
         width: 10px;
         height: 10px;
@@ -175,12 +173,15 @@ export class PanelCard extends LitElement {
         display: inline-block;
         animation: bounce 1.4s infinite ease-in-out both;
       }
+
       .dots span:nth-child(1) {
         animation-delay: -0.32s;
       }
+
       .dots span:nth-child(2) {
         animation-delay: -0.16s;
       }
+
       @keyframes bounce {
         0%,
         80%,

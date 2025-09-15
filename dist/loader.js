@@ -121,55 +121,50 @@ window.customCards.push({
     description: "A SmartQasa card for displaying the Main panel card.",
 });
 let PanelCard = class PanelCard extends i {
-    constructor() {
-        super(...arguments);
-        this.isElementLoaded = false;
-    }
     getCardSize() {
         return 1;
     }
     connectedCallback() {
         super.connectedCallback();
         customElements.whenDefined("main-card").then(() => {
-            this.isElementLoaded = true;
             this.tryCreateMainCard();
         });
     }
     setConfig(config) {
         this.config = config;
+        this.tryCreateMainCard();
     }
     render() {
-        if (!this.mainCard) {
-            return x `
-        <div class="loader-container">
-          <div class="loading-text">SmartQasa is loading</div>
-          <div class="dots">
-            <span></span>
-            <span></span>
-            <span></span>
-          </div>
-        </div>
-      `;
-        }
         const isAdmin = this.hass?.user?.is_admin || false;
         const isAdminModeOn = this.hass?.states["input_boolean.admin_mode"]?.state === "on" || false;
         const isAdminView = isAdmin || isAdminModeOn;
         this.classList.toggle("admin-view", isAdminView);
-        return x `${this.mainCard}`;
+        return x `
+      <div id="main-wrapper">
+        ${this.mainCard
+            ? this.mainCard
+            : x `
+              <div class="loader-container">
+                <div class="loading-text">SmartQasa is loading</div>
+                <div class="dots">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              </div>
+            `}
+      </div>
+    `;
     }
     updated(changedProps) {
-        if (changedProps.has("config") && this.config) {
-            if (this.mainCard)
-                this.mainCard.setConfig(this.config);
-        }
+        this.tryCreateMainCard();
+        if (!this.mainCard)
+            return;
+        if (changedProps.has("config") && this.config)
+            this.mainCard.setConfig(this.config);
         if (changedProps.has("hass") && this.hass) {
-            if (this.mainCard) {
-                this.mainCard.hass = this.hass;
-            }
-            else {
-                this.tryCreateMainCard();
-            }
-            const popups = document.querySelectorAll("popup-dialog");
+            this.mainCard.hass = this.hass;
+            const popups = this.shadowRoot?.querySelectorAll("popup-dialog") ?? [];
             popups.forEach((popup) => {
                 if ("hass" in popup)
                     popup.hass = this.hass;
@@ -188,12 +183,16 @@ let PanelCard = class PanelCard extends i {
             this.refreshTime = refreshTime;
         }
     }
-    disconnectedCallback() {
-        super.disconnectedCallback();
-        this.mainCard = undefined;
+    /*
+    public disconnectedCallback(): void {
+      super.disconnectedCallback();
+      this.mainCard = undefined;
     }
+    */
     tryCreateMainCard() {
-        if (!this.config || !this.hass || !this.isElementLoaded || this.mainCard)
+        if (this.mainCard)
+            return;
+        if (!this.config || !this.hass)
             return;
         try {
             const element = document.createElement("main-card");
@@ -214,9 +213,11 @@ let PanelCard = class PanelCard extends i {
         height: 100vh;
         position: relative;
       }
+
       :host(.admin-view) {
         height: calc(100vh - 56px);
       }
+
       .loader-container {
         display: flex;
         flex-direction: column;
@@ -225,16 +226,19 @@ let PanelCard = class PanelCard extends i {
         height: 100%;
         text-align: center;
       }
+
       .loading-text {
         font-size: 1.5rem;
         font-weight: 300;
         margin-bottom: 1rem;
         color: var(--primary-text-color, #333);
       }
+
       .dots {
         display: flex;
         gap: 0.5rem;
       }
+
       .dots span {
         width: 10px;
         height: 10px;
@@ -243,12 +247,15 @@ let PanelCard = class PanelCard extends i {
         display: inline-block;
         animation: bounce 1.4s infinite ease-in-out both;
       }
+
       .dots span:nth-child(1) {
         animation-delay: -0.32s;
       }
+
       .dots span:nth-child(2) {
         animation-delay: -0.16s;
       }
+
       @keyframes bounce {
         0%,
         80%,
@@ -264,13 +271,10 @@ let PanelCard = class PanelCard extends i {
 };
 __decorate([
     n({ attribute: false })
-], PanelCard.prototype, "hass", void 0);
-__decorate([
-    n({ attribute: false })
 ], PanelCard.prototype, "config", void 0);
 __decorate([
-    r()
-], PanelCard.prototype, "isElementLoaded", void 0);
+    n({ attribute: false })
+], PanelCard.prototype, "hass", void 0);
 __decorate([
     r()
 ], PanelCard.prototype, "mainCard", void 0);
@@ -529,5 +533,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.2-beta.1"} (Built: ${"2025-09-11T11:32:54.248Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.3-beta.1"} (Built: ${"2025-09-15T11:48:12.141Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
