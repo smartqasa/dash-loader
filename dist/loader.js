@@ -443,12 +443,14 @@ let ScreenSaver = class ScreenSaver extends i {
         return i$3 `
       :host {
         display: block;
-        width: 100vw;
+        width: 100%;
+        height: 100vh;
         background-color: black;
       }
 
       .container {
-        height: 100vh;
+        width: 100%;
+        height: 100%;
         position: relative;
       }
 
@@ -533,5 +535,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.4-beta.8"} (Built: ${"2025-09-15T13:30:23.397Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.5-beta.1"} (Built: ${"2025-09-15T16:13:14.087Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
