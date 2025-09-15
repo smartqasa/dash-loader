@@ -140,18 +140,20 @@ let PanelCard = class PanelCard extends i {
         const isAdminView = isAdmin || isAdminModeOn;
         this.classList.toggle("admin-view", isAdminView);
         return x `
-      ${this.mainCard
+      <div class="panel-wrapper">
+        ${this.mainCard
             ? this.mainCard
             : x `
-            <div class="loader-container">
-              <div class="loading-text">SmartQasa is loading</div>
-              <div class="dots">
-                <span></span>
-                <span></span>
-                <span></span>
+              <div class="loader-container">
+                <div class="loading-text">SmartQasa is loading</div>
+                <div class="dots">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
               </div>
-            </div>
-          `}
+            `}
+      </div>
     `;
     }
     updated(changedProps) {
@@ -209,11 +211,17 @@ let PanelCard = class PanelCard extends i {
         display: block;
         width: 100%;
         height: 100vh;
-        position: relative;
       }
 
       :host(.admin-view) {
         height: calc(100vh - 56px);
+      }
+
+      .panel-wrapper {
+        display: block;
+        width: 100%;
+        height: 100%;
+        position: relative;
       }
 
       .loader-container {
@@ -531,5 +539,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.3-beta.2"} (Built: ${"2025-09-15T12:04:12.386Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.3-beta.3"} (Built: ${"2025-09-15T12:11:35.709Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

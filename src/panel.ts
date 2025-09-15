@@ -61,18 +61,20 @@ export class PanelCard extends LitElement {
     this.classList.toggle("admin-view", isAdminView);
 
     return html`
-      ${this.mainCard
-        ? this.mainCard
-        : html`
-            <div class="loader-container">
-              <div class="loading-text">SmartQasa is loading</div>
-              <div class="dots">
-                <span></span>
-                <span></span>
-                <span></span>
+      <div class="panel-wrapper">
+        ${this.mainCard
+          ? this.mainCard
+          : html`
+              <div class="loader-container">
+                <div class="loading-text">SmartQasa is loading</div>
+                <div class="dots">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
               </div>
-            </div>
-          `}
+            `}
+      </div>
     `;
   }
 
@@ -135,11 +137,17 @@ export class PanelCard extends LitElement {
         display: block;
         width: 100%;
         height: 100vh;
-        position: relative;
       }
 
       :host(.admin-view) {
         height: calc(100vh - 56px);
+      }
+
+      .panel-wrapper {
+        display: block;
+        width: 100%;
+        height: 100%;
+        position: relative;
       }
 
       .loader-container {
