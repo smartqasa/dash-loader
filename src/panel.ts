@@ -61,20 +61,18 @@ export class PanelCard extends LitElement {
     this.classList.toggle("admin-view", isAdminView);
 
     return html`
-      <div id="main-wrapper">
-        ${this.mainCard
-          ? this.mainCard
-          : html`
-              <div class="loader-container">
-                <div class="loading-text">SmartQasa is loading</div>
-                <div class="dots">
-                  <span></span>
-                  <span></span>
-                  <span></span>
-                </div>
+      ${this.mainCard
+        ? this.mainCard
+        : html`
+            <div class="loader-container">
+              <div class="loading-text">SmartQasa is loading</div>
+              <div class="dots">
+                <span></span>
+                <span></span>
+                <span></span>
               </div>
-            `}
-      </div>
+            </div>
+          `}
     `;
   }
 

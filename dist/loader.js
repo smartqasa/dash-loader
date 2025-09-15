@@ -140,20 +140,18 @@ let PanelCard = class PanelCard extends i {
         const isAdminView = isAdmin || isAdminModeOn;
         this.classList.toggle("admin-view", isAdminView);
         return x `
-      <div id="main-wrapper">
-        ${this.mainCard
+      ${this.mainCard
             ? this.mainCard
             : x `
-              <div class="loader-container">
-                <div class="loading-text">SmartQasa is loading</div>
-                <div class="dots">
-                  <span></span>
-                  <span></span>
-                  <span></span>
-                </div>
+            <div class="loader-container">
+              <div class="loading-text">SmartQasa is loading</div>
+              <div class="dots">
+                <span></span>
+                <span></span>
+                <span></span>
               </div>
-            `}
-      </div>
+            </div>
+          `}
     `;
     }
     updated(changedProps) {
@@ -533,5 +531,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.3-beta.1"} (Built: ${"2025-09-15T11:48:12.141Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.3-beta.2"} (Built: ${"2025-09-15T12:04:12.386Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
