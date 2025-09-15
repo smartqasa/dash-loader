@@ -88,7 +88,7 @@ export class PanelCard extends LitElement {
     if (changedProps.has("hass") && this.hass) {
       this.mainCard.hass = this.hass;
 
-      const popups = this.shadowRoot?.querySelectorAll("popup-dialog") ?? [];
+      const popups = document.querySelectorAll("popup-dialog") ?? [];
       popups.forEach((popup: Element) => {
         if ("hass" in (popup as any)) (popup as any).hass = this.hass;
       });

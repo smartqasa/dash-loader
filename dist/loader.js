@@ -164,7 +164,7 @@ let PanelCard = class PanelCard extends i {
             this.mainCard.setConfig(this.config);
         if (changedProps.has("hass") && this.hass) {
             this.mainCard.hass = this.hass;
-            const popups = this.shadowRoot?.querySelectorAll("popup-dialog") ?? [];
+            const popups = document.querySelectorAll("popup-dialog") ?? [];
             popups.forEach((popup) => {
                 if ("hass" in popup)
                     popup.hass = this.hass;
@@ -539,5 +539,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.3-beta.3"} (Built: ${"2025-09-15T12:11:35.709Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.3-beta.4"} (Built: ${"2025-09-15T12:16:14.588Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
