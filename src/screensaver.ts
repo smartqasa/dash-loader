@@ -40,8 +40,137 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
 
   private rebootTime: string | undefined;
   private refreshTime: string | undefined;
-  private moveTimerId: number | undefined;
-  private timeIntervalId: number | undefined;
+  private cycleIntervalId: number | undefined;
+  private clockFrameId: number | undefined;
+
+  public setConfig(config: Config): void {
+    if (!config) throw new Error("Invalid configuration provided");
+    this.config = config;
+  }
+
+  protected render(): TemplateResult | typeof nothing {
+    if (!this.config) return nothing;
+
+    return html`
+      <div class="container">
+        <div class="element">
+          ${this.config.display === "logo"
+            ? html`
+                <div class="logo">
+                  <img
+                    src=${logoImage}
+                    alt="Logo"
+                    @error=${() => this.handleImageError()}
+                  />
+                  ${this.config.name
+                    ? html`<div class="name">${this.config.name}</div>`
+                    : ""}
+                </div>
+              `
+            : html`
+                <div class="time">${this.time}</div>
+                <div class="date">${this.date}</div>
+              `}
+        </div>
+      </div>
+    `;
+  }
+
+  protected firstUpdated(changedProps: PropertyValues): void {
+    this.updateElement();
+    this.startClock();
+    this.startCycle();
+  }
+
+  protected updated(changedProps: PropertyValues): void {
+    if (changedProps.has("hass") && this.hass) {
+      const rebootTime = this.hass.states["input_button.reboot_devices"]?.state;
+      if (this.rebootTime !== undefined && this.rebootTime !== rebootTime) {
+        deviceReboot();
+      }
+      this.rebootTime = rebootTime;
+
+      const refreshTime =
+        this.hass.states["input_button.refresh_devices"]?.state;
+      if (this.refreshTime !== undefined && this.refreshTime !== refreshTime) {
+        deviceRefresh();
+      }
+      this.refreshTime = refreshTime;
+    }
+  }
+
+  public disconnectedCallback(): void {
+    super.disconnectedCallback();
+    if (this.clockFrameId !== undefined) {
+      cancelAnimationFrame(this.clockFrameId);
+    }
+    if (this.cycleIntervalId !== undefined) {
+      clearInterval(this.cycleIntervalId);
+    }
+  }
+
+  /** Robust clock */
+  private startClock(): void {
+    const tick = () => {
+      this.updateElement();
+      this.clockFrameId = requestAnimationFrame(() => {
+        setTimeout(tick, 1000); // aim for ~1s updates
+      });
+    };
+    tick();
+  }
+
+  /** Robust element cycle */
+  private startCycle(): void {
+    const moveTimer = (this.config?.move_timer ?? 30) * 1000;
+
+    if (this.cycleIntervalId !== undefined) {
+      clearInterval(this.cycleIntervalId);
+    }
+
+    this.cycleIntervalId = window.setInterval(() => {
+      const element = this.shadowRoot?.querySelector(".element") as HTMLElement;
+      if (!element) return;
+
+      // Fade out
+      element.style.animation = "fade-out 1s forwards";
+
+      setTimeout(() => {
+        this.moveElement();
+        element.style.animation = "fade-in 1s forwards";
+        element.style.opacity = "1";
+        element.style.visibility = "visible";
+      }, 1000);
+    }, moveTimer);
+  }
+
+  private updateElement(): void {
+    const now = new Date();
+    this.time = formattedTime(now);
+    this.date = formattedDate(now);
+  }
+
+  private moveElement(): void {
+    const container = this.shadowRoot?.querySelector(
+      ".container"
+    ) as HTMLElement;
+    const element = this.shadowRoot?.querySelector(".element") as HTMLElement;
+
+    if (container && element) {
+      const maxWidth = container.clientWidth - element.clientWidth;
+      const maxHeight = container.clientHeight - element.clientHeight;
+
+      const randomX = Math.floor(Math.random() * maxWidth);
+      const randomY = Math.floor(Math.random() * maxHeight);
+
+      element.style.left = `${randomX}px`;
+      element.style.top = `${randomY}px`;
+    }
+  }
+
+  private handleImageError(): void {
+    console.error("Failed to load image.");
+  }
 
   static get styles(): CSSResultGroup {
     return css`
@@ -126,137 +255,5 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
         }
       }
     `;
-  }
-
-  public setConfig(config: Config): void {
-    if (!config) throw new Error("Invalid configuration provided");
-    this.config = config;
-  }
-
-  protected render(): TemplateResult | typeof nothing {
-    if (!this.config) return nothing;
-
-    return html`
-      <div class="container">
-        <div class="element">
-          ${this.config?.display === "logo"
-            ? html`
-                <div class="logo">
-                  <img
-                    src=${logoImage}
-                    alt="Logo"
-                    @error=${() => this.handleImageError()}
-                  />
-                  ${this.config.name
-                    ? html` <div class="name">${this.config.name}</div> `
-                    : ""}
-                </div>
-              `
-            : html`
-                <div class="time">${this.time}</div>
-                <div class="date">${this.date}</div>
-              `}
-        </div>
-      </div>
-    `;
-  }
-
-  protected firstUpdated(changedProps: PropertyValues): void {
-    this.updateElement();
-    this.startClock();
-    this.cycleElement();
-  }
-
-  protected updated(changedProps: PropertyValues): void {
-    if (changedProps.has("hass") && this.hass) {
-      const rebootTime = this.hass.states["input_button.reboot_devices"]?.state;
-      if (this.rebootTime !== undefined) {
-        if (this.rebootTime !== rebootTime) deviceReboot();
-      }
-      this.rebootTime = rebootTime;
-
-      const refreshTime =
-        this.hass.states["input_button.refresh_devices"]?.state;
-      if (this.refreshTime !== undefined) {
-        if (this.refreshTime !== refreshTime) deviceRefresh();
-      }
-      this.refreshTime = refreshTime;
-    }
-  }
-
-  public disconnectedCallback(): void {
-    super.disconnectedCallback();
-    if (this.timeIntervalId !== undefined) {
-      window.clearInterval(this.timeIntervalId);
-    }
-    if (this.moveTimerId !== undefined) {
-      window.clearTimeout(this.moveTimerId);
-    }
-  }
-
-  private startClock(): void {
-    this.timeIntervalId = window.setInterval(() => {
-      this.updateElement();
-    }, 1000);
-  }
-
-  private cycleElement(): void {
-    const element = this.shadowRoot?.querySelector(".element") as HTMLElement;
-    if (!element) {
-      console.error("Element not found in shadow DOM.");
-      return;
-    }
-
-    const moveTimer = (this.config?.move_timer ?? 30) * 1000;
-
-    if (element) {
-      element.style.animation = "fade-in 1.5s forwards";
-
-      setTimeout(() => {
-        element.style.animation = "";
-        setTimeout(() => {
-          element.style.animation = "fade-out 1s forwards";
-          setTimeout(() => {
-            this.moveElement();
-            element.style.animation = "fade-in 1s forwards";
-            this.cycleElement();
-          }, 1500);
-        }, moveTimer);
-      }, 1500);
-    }
-  }
-
-  private updateElement(): void {
-    const now = new Date();
-    this.time = formattedTime(now);
-    this.date = formattedDate(now);
-  }
-
-  private moveElement(): void {
-    const container = this.shadowRoot?.querySelector(
-      ".container"
-    ) as HTMLElement;
-    const element = this.shadowRoot?.querySelector(".element") as HTMLElement;
-
-    if (container && element) {
-      const maxWidth = container.clientWidth - element.clientWidth;
-      const maxHeight = container.clientHeight - element.clientHeight;
-
-      const randomX = Math.min(
-        Math.max(0, Math.floor(Math.random() * maxWidth)),
-        maxWidth
-      );
-      const randomY = Math.min(
-        Math.max(0, Math.floor(Math.random() * maxHeight)),
-        maxHeight
-      );
-
-      element.style.left = `${randomX}px`;
-      element.style.top = `${randomY}px`;
-    }
-  }
-
-  private handleImageError(): void {
-    console.error("Failed to load image.");
   }
 }

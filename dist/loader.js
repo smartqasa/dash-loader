@@ -328,6 +328,116 @@ let ScreenSaver = class ScreenSaver extends i {
     getCardSize() {
         return 100;
     }
+    setConfig(config) {
+        if (!config)
+            throw new Error("Invalid configuration provided");
+        this.config = config;
+    }
+    render() {
+        if (!this.config)
+            return E;
+        return x `
+      <div class="container">
+        <div class="element">
+          ${this.config.display === "logo"
+            ? x `
+                <div class="logo">
+                  <img
+                    src=${img}
+                    alt="Logo"
+                    @error=${() => this.handleImageError()}
+                  />
+                  ${this.config.name
+                ? x `<div class="name">${this.config.name}</div>`
+                : ""}
+                </div>
+              `
+            : x `
+                <div class="time">${this.time}</div>
+                <div class="date">${this.date}</div>
+              `}
+        </div>
+      </div>
+    `;
+    }
+    firstUpdated(changedProps) {
+        this.updateElement();
+        this.startClock();
+        this.startCycle();
+    }
+    updated(changedProps) {
+        if (changedProps.has("hass") && this.hass) {
+            const rebootTime = this.hass.states["input_button.reboot_devices"]?.state;
+            if (this.rebootTime !== undefined && this.rebootTime !== rebootTime) {
+                deviceReboot();
+            }
+            this.rebootTime = rebootTime;
+            const refreshTime = this.hass.states["input_button.refresh_devices"]?.state;
+            if (this.refreshTime !== undefined && this.refreshTime !== refreshTime) {
+                deviceRefresh();
+            }
+            this.refreshTime = refreshTime;
+        }
+    }
+    disconnectedCallback() {
+        super.disconnectedCallback();
+        if (this.clockFrameId !== undefined) {
+            cancelAnimationFrame(this.clockFrameId);
+        }
+        if (this.cycleIntervalId !== undefined) {
+            clearInterval(this.cycleIntervalId);
+        }
+    }
+    /** Robust clock */
+    startClock() {
+        const tick = () => {
+            this.updateElement();
+            this.clockFrameId = requestAnimationFrame(() => {
+                setTimeout(tick, 1000); // aim for ~1s updates
+            });
+        };
+        tick();
+    }
+    /** Robust element cycle */
+    startCycle() {
+        const moveTimer = (this.config?.move_timer ?? 30) * 1000;
+        if (this.cycleIntervalId !== undefined) {
+            clearInterval(this.cycleIntervalId);
+        }
+        this.cycleIntervalId = window.setInterval(() => {
+            const element = this.shadowRoot?.querySelector(".element");
+            if (!element)
+                return;
+            // Fade out
+            element.style.animation = "fade-out 1s forwards";
+            setTimeout(() => {
+                this.moveElement();
+                element.style.animation = "fade-in 1s forwards";
+                element.style.opacity = "1";
+                element.style.visibility = "visible";
+            }, 1000);
+        }, moveTimer);
+    }
+    updateElement() {
+        const now = new Date();
+        this.time = formattedTime(now);
+        this.date = formattedDate(now);
+    }
+    moveElement() {
+        const container = this.shadowRoot?.querySelector(".container");
+        const element = this.shadowRoot?.querySelector(".element");
+        if (container && element) {
+            const maxWidth = container.clientWidth - element.clientWidth;
+            const maxHeight = container.clientHeight - element.clientHeight;
+            const randomX = Math.floor(Math.random() * maxWidth);
+            const randomY = Math.floor(Math.random() * maxHeight);
+            element.style.left = `${randomX}px`;
+            element.style.top = `${randomY}px`;
+        }
+    }
+    handleImageError() {
+        console.error("Failed to load image.");
+    }
     static get styles() {
         return i$3 `
       :host {
@@ -412,115 +522,6 @@ let ScreenSaver = class ScreenSaver extends i {
       }
     `;
     }
-    setConfig(config) {
-        if (!config)
-            throw new Error("Invalid configuration provided");
-        this.config = config;
-    }
-    render() {
-        if (!this.config)
-            return E;
-        return x `
-      <div class="container">
-        <div class="element">
-          ${this.config?.display === "logo"
-            ? x `
-                <div class="logo">
-                  <img
-                    src=${img}
-                    alt="Logo"
-                    @error=${() => this.handleImageError()}
-                  />
-                  ${this.config.name
-                ? x ` <div class="name">${this.config.name}</div> `
-                : ""}
-                </div>
-              `
-            : x `
-                <div class="time">${this.time}</div>
-                <div class="date">${this.date}</div>
-              `}
-        </div>
-      </div>
-    `;
-    }
-    firstUpdated(changedProps) {
-        this.updateElement();
-        this.startClock();
-        this.cycleElement();
-    }
-    updated(changedProps) {
-        if (changedProps.has("hass") && this.hass) {
-            const rebootTime = this.hass.states["input_button.reboot_devices"]?.state;
-            if (this.rebootTime !== undefined) {
-                if (this.rebootTime !== rebootTime)
-                    deviceReboot();
-            }
-            this.rebootTime = rebootTime;
-            const refreshTime = this.hass.states["input_button.refresh_devices"]?.state;
-            if (this.refreshTime !== undefined) {
-                if (this.refreshTime !== refreshTime)
-                    deviceRefresh();
-            }
-            this.refreshTime = refreshTime;
-        }
-    }
-    disconnectedCallback() {
-        super.disconnectedCallback();
-        if (this.timeIntervalId !== undefined) {
-            window.clearInterval(this.timeIntervalId);
-        }
-        if (this.moveTimerId !== undefined) {
-            window.clearTimeout(this.moveTimerId);
-        }
-    }
-    startClock() {
-        this.timeIntervalId = window.setInterval(() => {
-            this.updateElement();
-        }, 1000);
-    }
-    cycleElement() {
-        const element = this.shadowRoot?.querySelector(".element");
-        if (!element) {
-            console.error("Element not found in shadow DOM.");
-            return;
-        }
-        const moveTimer = (this.config?.move_timer ?? 30) * 1000;
-        if (element) {
-            element.style.animation = "fade-in 1.5s forwards";
-            setTimeout(() => {
-                element.style.animation = "";
-                setTimeout(() => {
-                    element.style.animation = "fade-out 1s forwards";
-                    setTimeout(() => {
-                        this.moveElement();
-                        element.style.animation = "fade-in 1s forwards";
-                        this.cycleElement();
-                    }, 1500);
-                }, moveTimer);
-            }, 1500);
-        }
-    }
-    updateElement() {
-        const now = new Date();
-        this.time = formattedTime(now);
-        this.date = formattedDate(now);
-    }
-    moveElement() {
-        const container = this.shadowRoot?.querySelector(".container");
-        const element = this.shadowRoot?.querySelector(".element");
-        if (container && element) {
-            const maxWidth = container.clientWidth - element.clientWidth;
-            const maxHeight = container.clientHeight - element.clientHeight;
-            const randomX = Math.min(Math.max(0, Math.floor(Math.random() * maxWidth)), maxWidth);
-            const randomY = Math.min(Math.max(0, Math.floor(Math.random() * maxHeight)), maxHeight);
-            element.style.left = `${randomX}px`;
-            element.style.top = `${randomY}px`;
-        }
-    }
-    handleImageError() {
-        console.error("Failed to load image.");
-    }
 };
 __decorate([
     n({ attribute: false })
@@ -539,5 +540,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.3-beta.4"} (Built: ${"2025-09-15T12:16:14.588Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.4-beta.1"} (Built: ${"2025-09-15T12:28:39.134Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
