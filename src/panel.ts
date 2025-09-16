@@ -27,12 +27,11 @@ export class PanelCard extends LitElement {
   @property({ attribute: false }) hass?: HomeAssistant;
 
   @state() private isMainLoaded = false;
-  @state() private isMainCreated = false;
   @state() private mainCard?: LovelaceCard;
 
   private handleVisibilityChange = () => {
     if (document.visibilityState === "visible") {
-      this.isMainCreated = false;
+      this.mainCard = undefined;
     }
   };
 
@@ -63,32 +62,28 @@ export class PanelCard extends LitElement {
       this.hass?.states["input_boolean.admin_mode"]?.state === "on" || false;
     this.classList.toggle("admin-view", isAdmin || isAdminMode);
 
-    const card = this.ensureMainCard();
-
     return html`
       <div class="panel-wrapper">
-        ${this.isMainCreated
-          ? card
-          : html`
-              <div class="loader-container">
-                <div class="loading-text">SmartQasa is loading</div>
-                <div class="dots"><span></span><span></span><span></span></div>
-              </div>
-            `}
+        ${this.mainCard ??
+        html`
+          <div class="loader-container">
+            <div class="loading-text">SmartQasa is loading</div>
+            <div class="dots"><span></span><span></span><span></span></div>
+          </div>
+        `}
       </div>
     `;
   }
 
   protected updated(changedProps: PropertyValues): void {
     this.ensureMainCard();
-    if (!this.mainCard) return;
 
-    if (changedProps.has("config") && this.config) {
+    if (changedProps.has("config") && this.config && this.mainCard) {
       this.mainCard.setConfig(this.config);
     }
 
     if (changedProps.has("hass") && this.hass) {
-      this.syncHass();
+      if (this.mainCard) this.syncHass();
       this.checkDeviceTriggers();
     }
   }
@@ -104,7 +99,7 @@ export class PanelCard extends LitElement {
   private ensureMainCard(): void {
     if (this.mainCard?.isConnected) return;
 
-    this.isMainCreated = false;
+    this.mainCard = undefined;
     if (!this.config || !this.hass || !this.isMainLoaded) return;
 
     try {
@@ -112,11 +107,9 @@ export class PanelCard extends LitElement {
       element.setConfig?.(this.config);
       element.hass = this.hass;
       this.mainCard = element;
-      this.isMainCreated = true;
     } catch (err) {
       console.error("[PanelCard] Failed to create main-card:", err);
       this.mainCard = undefined;
-      this.isMainCreated = false;
     }
   }
 
@@ -179,7 +172,7 @@ export class PanelCard extends LitElement {
         font-size: 1.5rem;
         font-weight: 300;
         margin-bottom: 1rem;
-        color: var(--primary-text-color, #333);
+        color: white;
       }
 
       .dots {
@@ -188,11 +181,11 @@ export class PanelCard extends LitElement {
       }
 
       .dots span {
+        display: inline-block;
         width: 10px;
         height: 10px;
-        background: var(--primary-color, #3f51b5);
         border-radius: 50%;
-        display: inline-block;
+        background: white;
         animation: bounce 1.4s infinite ease-in-out both;
       }
 

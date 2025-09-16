@@ -124,10 +124,9 @@ let PanelCard = class PanelCard extends i {
     constructor() {
         super(...arguments);
         this.isMainLoaded = false;
-        this.isMainCreated = false;
         this.handleVisibilityChange = () => {
             if (document.visibilityState === "visible") {
-                this.isMainCreated = false;
+                this.mainCard = undefined;
             }
         };
     }
@@ -148,29 +147,26 @@ let PanelCard = class PanelCard extends i {
         const isAdmin = this.hass?.user?.is_admin || false;
         const isAdminMode = this.hass?.states["input_boolean.admin_mode"]?.state === "on" || false;
         this.classList.toggle("admin-view", isAdmin || isAdminMode);
-        const card = this.ensureMainCard();
         return x `
       <div class="panel-wrapper">
-        ${this.isMainCreated
-            ? card
-            : x `
-              <div class="loader-container">
-                <div class="loading-text">SmartQasa is loading</div>
-                <div class="dots"><span></span><span></span><span></span></div>
-              </div>
-            `}
+        ${this.mainCard ??
+            x `
+          <div class="loader-container">
+            <div class="loading-text">SmartQasa is loading</div>
+            <div class="dots"><span></span><span></span><span></span></div>
+          </div>
+        `}
       </div>
     `;
     }
     updated(changedProps) {
         this.ensureMainCard();
-        if (!this.mainCard)
-            return;
-        if (changedProps.has("config") && this.config) {
+        if (changedProps.has("config") && this.config && this.mainCard) {
             this.mainCard.setConfig(this.config);
         }
         if (changedProps.has("hass") && this.hass) {
-            this.syncHass();
+            if (this.mainCard)
+                this.syncHass();
             this.checkDeviceTriggers();
         }
     }
@@ -181,7 +177,7 @@ let PanelCard = class PanelCard extends i {
     ensureMainCard() {
         if (this.mainCard?.isConnected)
             return;
-        this.isMainCreated = false;
+        this.mainCard = undefined;
         if (!this.config || !this.hass || !this.isMainLoaded)
             return;
         try {
@@ -189,12 +185,10 @@ let PanelCard = class PanelCard extends i {
             element.setConfig?.(this.config);
             element.hass = this.hass;
             this.mainCard = element;
-            this.isMainCreated = true;
         }
         catch (err) {
             console.error("[PanelCard] Failed to create main-card:", err);
             this.mainCard = undefined;
-            this.isMainCreated = false;
         }
     }
     syncHass() {
@@ -252,7 +246,7 @@ let PanelCard = class PanelCard extends i {
         font-size: 1.5rem;
         font-weight: 300;
         margin-bottom: 1rem;
-        color: var(--primary-text-color, #333);
+        color: white;
       }
 
       .dots {
@@ -261,11 +255,11 @@ let PanelCard = class PanelCard extends i {
       }
 
       .dots span {
+        display: inline-block;
         width: 10px;
         height: 10px;
-        background: var(--primary-color, #3f51b5);
         border-radius: 50%;
-        display: inline-block;
+        background: white;
         animation: bounce 1.4s infinite ease-in-out both;
       }
 
@@ -298,9 +292,6 @@ __decorate([
 __decorate([
     r()
 ], PanelCard.prototype, "isMainLoaded", void 0);
-__decorate([
-    r()
-], PanelCard.prototype, "isMainCreated", void 0);
 __decorate([
     r()
 ], PanelCard.prototype, "mainCard", void 0);
@@ -552,5 +543,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.6-beta.1"} (Built: ${"2025-09-16T15:36:21.365Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.6-beta.2"} (Built: ${"2025-09-16T15:47:32.137Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
