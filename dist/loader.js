@@ -196,7 +196,7 @@ let PanelCard = class PanelCard extends i {
             if (this.mainCard)
                 this.mainCard.hass = this.hass;
             document.querySelectorAll("popup-dialog").forEach((popup) => {
-                if ("hass" in popup) {
+                if (popup.hass !== undefined) {
                     popup.hass = this.hass;
                 }
             });
@@ -543,5 +543,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.6-beta.2"} (Built: ${"2025-09-16T15:47:32.137Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.6-beta.3"} (Built: ${"2025-09-16T17:37:18.142Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

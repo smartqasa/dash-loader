@@ -10,28 +10,44 @@ import type {
 } from "home-assistant-js-websocket";
 
 declare global {
-  // for fire event
+  // For fire event compatibility
   interface HASSDomEvents {
+    /** Fired when a value changes */
     "value-changed": {
       value: unknown;
     };
+    /** Fired when a change event occurs */
     change: undefined;
   }
 }
 
+/**
+ * Defines an action that can be executed.
+ * Supports Home Assistant service calls or custom functions.
+ */
 export type ActionItem =
   | {
-      type: "service";
+      /** Service call (legacy: "action" is also accepted in automations/scripts) */
+      type: "service" | "action";
+      /** e.g., "light.turn_on" */
       service: string;
+      /** Data payload for the service */
       data?: Record<string, any>;
+      /** Optional target selector */
       target?: Record<string, any>;
     }
   | {
+      /** Custom function reference */
       type: "function";
+      /** Function name */
       function: string;
+      /** Arguments to pass to the function */
       arguments?: any[];
     };
 
+/**
+ * Configuration for confirmation dialogs.
+ */
 export type ConfirmConfig = {
   title: string;
   message: string;
@@ -41,22 +57,30 @@ export type ConfirmConfig = {
   action2?: ActionItem[];
 };
 
+/**
+ * Custom confirm dialog element.
+ */
 export interface ConfirmElement extends LovelaceCard {
   config: ConfirmConfig;
   isOpen: boolean;
 }
 
+/**
+ * Context object used in events and service calls.
+ */
 export interface Context {
   id: string;
   parent_id?: string;
   user_id?: string | null;
 }
 
+/** Credential for current user. */
 export interface Credential {
   auth_provider_type: string;
   auth_provider_id: string;
 }
 
+/** Current user information. */
 export interface CurrentUser {
   id: string;
   is_owner: boolean;
@@ -66,6 +90,7 @@ export interface CurrentUser {
   mfa_modules: MFAModule[];
 }
 
+/** Custom object schema for card configs. */
 export interface CustomObj {
   icon: string;
   icon_entity?: string;
@@ -76,6 +101,7 @@ export interface CustomObj {
   data: any;
 }
 
+/** Device registry entry definition. */
 export interface DeviceRegistryEntry {
   id: string;
   config_entries: string[];
@@ -91,11 +117,13 @@ export interface DeviceRegistryEntry {
   via_device_id: string | null;
   area_id: string | null;
   name_by_user: string | null;
-  entry_type: "service" | null;
+  /** Device type */
+  entry_type: "service" | "device" | null;
   disabled_by: "user" | "integration" | "config_entry" | null;
   configuration_url: string | null;
 }
 
+/** Dialog entry for UI rendering. */
 export interface DialogEntry {
   icon?: string;
   name?: string;
@@ -110,6 +138,7 @@ export interface DialogTable {
 
 type EntityCategory = "config" | "diagnostic";
 
+/** Entity registry entry used for display in UI. */
 export interface EntityRegistryDisplayEntry {
   entity_id: string;
   name?: string;
@@ -117,6 +146,8 @@ export interface EntityRegistryDisplayEntry {
   device_id?: string;
   area_id?: string;
   labels: string[];
+  /** Optional aliases */
+  aliases?: string[];
   hidden?: boolean;
   entity_category?: EntityCategory;
   translation_key?: string;
@@ -124,6 +155,7 @@ export interface EntityRegistryDisplayEntry {
   display_precision?: number;
 }
 
+/** Area definition from backend. */
 export interface HassArea {
   area_id: string;
   floor_id: string | null;
@@ -136,35 +168,55 @@ export interface HassArea {
 
 export type { HassEntity };
 
+/**
+ * The main Home Assistant object available in Lovelace.
+ */
 export interface HomeAssistant {
+  /** Authentication */
   auth: Auth;
+  /** WebSocket connection */
   connection: Connection;
+  /** Connection state */
   connected: boolean;
+  /** Entity states */
   states: HassEntities;
+  /** Entity registry cache */
   entities: { [id: string]: EntityRegistryDisplayEntry };
+  /** Device registry cache */
   devices: { [id: string]: DeviceRegistryEntry };
+  /** Area registry cache */
   areas: { [id: string]: HassArea };
+  /** Available services */
   services: HassServices;
+  /** Core configuration */
   config: HassConfig;
+  /** Current panel URL */
   panelUrl: string;
+  /** Selected language */
   language: string;
   selectedLanguage: string | null;
+  /** Translation resources */
   resources: Resources;
   suspendWhenHidden: boolean;
   enableShortcuts: boolean;
   vibrate: boolean;
   dockedSidebar: "docked" | "always_hidden" | "auto";
   defaultPanel: string;
+  /** Currently open "more info" entity */
   moreInfoEntityId: string | null;
+  /** Current user */
   user?: CurrentUser;
-  /*
-  callService(
-    domain: ServiceCallRequest['domain'],
-    service: ServiceCallRequest['service'],
-    serviceData?: ServiceCallRequest['serviceData'],
-    target?: ServiceCallRequest['target']
-  ): Promise<ServiceCallResponse>;
-  */
+  /** Locale and formatting information */
+  locale?: {
+    language: string;
+    number_format: "comma_decimal" | "decimal_comma" | "space_comma" | "system";
+    time_format: "12" | "24" | "system";
+    first_weekday: 0 | 1 | "language";
+  };
+
+  /**
+   * Call a backend service.
+   */
   callService(
     domain: ServiceCallRequest["domain"],
     service: ServiceCallRequest["service"],
@@ -173,27 +225,58 @@ export interface HomeAssistant {
     cache?: boolean,
     returnResponse?: boolean
   ): Promise<any>;
+
+  /**
+   * Call a REST API endpoint.
+   */
   callApi<T>(
     method: "GET" | "POST" | "PUT" | "DELETE",
     path: string,
     parameters?: Record<string, any>,
     headers?: Record<string, string>
   ): Promise<T>;
+
+  /**
+   * Fetch with authentication headers included.
+   */
   fetchWithAuth(path: string, init?: Record<string, any>): Promise<Response>;
+
+  /**
+   * Send a raw WebSocket message.
+   */
   sendWS(msg: MessageBase): void;
+
+  /**
+   * Call a WebSocket command.
+   */
   callWS<T>(msg: MessageBase): Promise<T>;
+
+  /**
+   * Format an entity’s state for display.
+   */
   formatEntityState(stateObj: HassEntity, state?: string): string;
+
+  /**
+   * Format an attribute value for display.
+   */
   formatEntityAttributeValue(
     stateObj: HassEntity,
     attribute: string,
     value?: string
   ): string;
+
+  /**
+   * Format an attribute name for display.
+   */
   formatEntityAttributeName(stateObj: HassEntity, attribute: string): string;
+
+  /** Active themes */
   themes: Themes;
 }
 
 export interface LovelaceDashboardBaseConfig {}
 
+/** Base interface for all Lovelace cards. */
 export interface LovelaceCard extends HTMLElement {
   hass?: HomeAssistant;
   preview?: boolean;
@@ -205,6 +288,7 @@ export interface LovelaceCard extends HTMLElement {
   setConfig(config: LovelaceCardConfig): void;
 }
 
+/** Lovelace card configuration. */
 export interface LovelaceCardConfig {
   index?: number;
   view_index?: number;
@@ -217,10 +301,12 @@ export interface LovelaceCardConfig {
   visibility?: boolean;
 }
 
+/** Editor for Lovelace cards. */
 export interface LovelaceCardEditor extends LovelaceGenericElementEditor {
   setConfig(config: LovelaceCardConfig): void;
 }
 
+/** Generic editor element interface. */
 export interface LovelaceGenericElementEditor<C = any> extends HTMLElement {
   hass?: HomeAssistant;
   context?: C;
@@ -228,6 +314,7 @@ export interface LovelaceGenericElementEditor<C = any> extends HTMLElement {
   focusYamlEditor?: () => void;
 }
 
+/** Grid layout options for cards. */
 export interface LovelaceGridOptions {
   columns?: number | "full";
   rows?: number | "auto";
@@ -237,6 +324,7 @@ export interface LovelaceGridOptions {
   max_rows?: number;
 }
 
+/** Deprecated grid layout options (legacy). */
 export interface LovelaceLayoutOptions {
   grid_columns?: number | "full";
   grid_rows?: number | "auto";
@@ -246,18 +334,21 @@ export interface LovelaceLayoutOptions {
   grid_max_rows?: number;
 }
 
+/** MFA module definition. */
 export interface MFAModule {
   id: string;
   name: string;
   enabled: boolean;
 }
 
+/** Configuration for popup dialogs. */
 export type PopupConfig = {
   title?: string;
   size?: "normal" | "fullscreen";
   dismissable?: boolean;
   timeout?: number;
   scrollable?: boolean;
+  orientation?: "auto" | "landscape" | "portrait";
   card: LovelaceCardConfig & { type: string };
   hass?: HomeAssistant;
   button1?: string;
@@ -268,15 +359,22 @@ export type PopupConfig = {
   action3?: ActionItem[];
 };
 
+/** Custom popup element. */
 export interface PopupElement extends LovelaceCard {
   config: PopupConfig;
   isOpen: boolean;
 }
 
+export interface PopupDialogElement extends HTMLElement {
+  hass?: HomeAssistant;
+}
+
+/** Translation resources */
 export interface Resources {
   [language: string]: Record<string, string>;
 }
 
+/** Request object for service calls. */
 export interface ServiceCallRequest {
   domain: string;
   service: string;
@@ -284,18 +382,15 @@ export interface ServiceCallRequest {
   target?: HassServiceTarget;
 }
 
+/** Response object for service calls. */
 export interface ServiceCallResponse {
   context: Context;
 }
 
-export interface ThemeVars {
-  // Incomplete
-  "primary-color": string;
-  "text-primary-color": string;
-  "accent-color": string;
-  [key: string]: string;
-}
+/** Theme variables (dynamic keys). */
+export type ThemeVars = Record<string, string>;
 
+/** A theme with optional light/dark modes. */
 export type Theme = ThemeVars & {
   modes?: {
     light?: ThemeVars;
@@ -303,14 +398,13 @@ export type Theme = ThemeVars & {
   };
 };
 
+/** All themes and current theme state. */
 export interface Themes {
   default_theme: string;
   default_dark_theme: string | null;
   themes: Record<string, Theme>;
-  // Currently effective dark mode. Will never be undefined. If user selected "auto"
-  // in theme picker, this property will still contain either true or false based on
-  // what has been determined via system preferences and support from the selected theme.
+  /** Whether dark mode is active */
   darkMode: boolean;
-  // Currently globally active theme name
+  /** Currently active theme name */
   theme: string;
 }

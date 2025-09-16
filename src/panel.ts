@@ -7,11 +7,13 @@ import {
   TemplateResult,
 } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
+
 import {
   HomeAssistant,
   LovelaceCard,
   LovelaceCardConfig,
-} from "custom-card-helpers";
+  PopupDialogElement,
+} from "./types";
 import { deviceRefresh, deviceReboot } from "./device-actions";
 
 window.customCards.push({
@@ -118,8 +120,8 @@ export class PanelCard extends LitElement {
       if (this.mainCard) this.mainCard.hass = this.hass;
 
       document.querySelectorAll("popup-dialog").forEach((popup) => {
-        if ("hass" in (popup as any)) {
-          (popup as any).hass = this.hass;
+        if ((popup as PopupDialogElement).hass !== undefined) {
+          (popup as PopupDialogElement).hass = this.hass;
         }
       });
     }
