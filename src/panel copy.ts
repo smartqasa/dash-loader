@@ -23,56 +23,52 @@ window.customCards.push({
 
 @customElement("panel-card")
 export class PanelCard extends LitElement {
+  public getCardSize(): number | Promise<number> {
+    return 1;
+  }
+
   @property({ attribute: false }) config?: LovelaceCardConfig;
   @property({ attribute: false }) hass?: HomeAssistant;
 
-  @state() private isMainLoaded = false;
-  @state() private isMainCreated = false;
   @state() private mainCard?: LovelaceCard;
 
-  private handleVisibilityChange = () => {
-    if (document.visibilityState === "visible") {
-      this.isMainCreated = false;
-    }
-  };
-
-  private rebootTime?: string;
-  private refreshTime?: string;
-
-  public getCardSize(): number | Promise<number> {
-    return 100;
-  }
+  private rebootTime: string | undefined;
+  private refreshTime: string | undefined;
 
   public connectedCallback(): void {
     super.connectedCallback();
-
-    document.addEventListener("visibilitychange", this.handleVisibilityChange);
-
     customElements.whenDefined("main-card").then(() => {
-      this.isMainLoaded = true;
+      this.createMainCard();
     });
   }
 
-  public setConfig(config: LovelaceCardConfig): void {
+  public setConfig(config: LovelaceCardConfig) {
     this.config = config;
+    this.createMainCard();
   }
 
   protected render(): TemplateResult {
-    const isAdmin = this.hass?.user?.is_admin || false;
-    const isAdminMode =
-      this.hass?.states["input_boolean.admin_mode"]?.state === "on" || false;
-    this.classList.toggle("admin-view", isAdmin || isAdminMode);
+    if (!this.mainCard) this.createMainCard();
 
-    const card = this.ensureMainCard();
+    const isAdmin = this.hass?.user?.is_admin || false;
+    const isAdminModeOn =
+      this.hass?.states["input_boolean.admin_mode"]?.state === "on" || false;
+    const isAdminView = isAdmin || isAdminModeOn;
+
+    this.classList.toggle("admin-view", isAdminView);
 
     return html`
       <div class="panel-wrapper">
-        ${this.isMainCreated
-          ? card
+        ${this.mainCard
+          ? this.mainCard
           : html`
               <div class="loader-container">
                 <div class="loading-text">SmartQasa is loading</div>
-                <div class="dots"><span></span><span></span><span></span></div>
+                <div class="dots">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
               </div>
             `}
       </div>
@@ -80,71 +76,62 @@ export class PanelCard extends LitElement {
   }
 
   protected updated(changedProps: PropertyValues): void {
-    this.ensureMainCard();
+    if (customElements.get("main-card")) this.createMainCard();
+
     if (!this.mainCard) return;
 
     if (changedProps.has("config") && this.config) {
-      this.mainCard.setConfig(this.config);
+      if (!this.mainCard || !this.mainCard.isConnected) this.createMainCard();
+
+      if (this.mainCard) this.mainCard.setConfig(this.config);
     }
 
     if (changedProps.has("hass") && this.hass) {
-      this.syncHass();
-      this.checkDeviceTriggers();
+      this.mainCard.hass = this.hass;
+
+      const popups = document.querySelectorAll("popup-dialog") ?? [];
+      popups.forEach((popup: Element) => {
+        if ("hass" in (popup as any)) (popup as any).hass = this.hass;
+      });
+
+      const rebootTime = this.hass.states["input_button.reboot_devices"]?.state;
+      if (this.rebootTime !== undefined && this.rebootTime !== rebootTime) {
+        deviceReboot();
+      }
+      this.rebootTime = rebootTime;
+
+      const refreshTime =
+        this.hass.states["input_button.refresh_devices"]?.state;
+      if (this.refreshTime !== undefined && this.refreshTime !== refreshTime) {
+        deviceRefresh();
+      }
+      this.refreshTime = refreshTime;
     }
   }
 
-  public disconnectedCallback(): void {
-    super.disconnectedCallback();
-    document.removeEventListener(
-      "visibilitychange",
-      this.handleVisibilityChange
-    );
-  }
+  private createMainCard(): void {
+    if (!this.config || !this.hass) return;
 
-  private ensureMainCard(): void {
-    if (this.mainCard?.isConnected) return;
-
-    this.isMainCreated = false;
-    if (!this.config || !this.hass || !this.isMainLoaded) return;
+    const ctor = customElements.get("main-card");
+    if (!ctor) {
+      console.warn("[PanelCard] main-card not defined yet");
+      return;
+    }
 
     try {
       const element = document.createElement("main-card") as LovelaceCard;
-      element.setConfig?.(this.config);
+      if (typeof (element as any).setConfig === "function") {
+        element.setConfig(this.config);
+      } else {
+        console.error("[PanelCard] main-card exists but has no setConfig()");
+        return;
+      }
       element.hass = this.hass;
       this.mainCard = element;
-      this.isMainCreated = true;
     } catch (err) {
-      console.error("[PanelCard] Failed to create main-card:", err);
+      console.error("Failed to create main-card:", err);
       this.mainCard = undefined;
-      this.isMainCreated = false;
     }
-  }
-
-  private syncHass(): void {
-    if (this.hass) {
-      if (this.mainCard) this.mainCard.hass = this.hass;
-
-      document.querySelectorAll("popup-dialog").forEach((popup) => {
-        if ("hass" in (popup as any)) {
-          (popup as any).hass = this.hass;
-        }
-      });
-    }
-  }
-
-  private checkDeviceTriggers(): void {
-    const rebootState = this.hass?.states["input_button.reboot_devices"]?.state;
-    if (this.rebootTime !== undefined && this.rebootTime !== rebootState) {
-      deviceReboot();
-    }
-    this.rebootTime = rebootState;
-
-    const refreshState =
-      this.hass?.states["input_button.refresh_devices"]?.state;
-    if (this.refreshTime !== undefined && this.refreshTime !== refreshState) {
-      deviceRefresh();
-    }
-    this.refreshTime = refreshState;
   }
 
   static get styles(): CSSResult {
@@ -199,6 +186,7 @@ export class PanelCard extends LitElement {
       .dots span:nth-child(1) {
         animation-delay: -0.32s;
       }
+
       .dots span:nth-child(2) {
         animation-delay: -0.16s;
       }
