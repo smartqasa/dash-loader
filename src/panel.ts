@@ -8,12 +8,7 @@ import {
 } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 
-import {
-  HomeAssistant,
-  LovelaceCard,
-  LovelaceCardConfig,
-  PopupDialogElement,
-} from "./types";
+import { HomeAssistant, LovelaceCardConfig, PopupDialogElement } from "./types";
 import { deviceRefresh, deviceReboot } from "./device-actions";
 
 window.customCards.push({
@@ -34,20 +29,12 @@ export class PanelCard extends LitElement {
   private rebootTime: string | null = null;
   private refreshTime: string | null = null;
 
-  private handleVisibilityChange = () => {
-    if (document.visibilityState === "visible") {
-      this.requestUpdate();
-    }
-  };
-
   public getCardSize(): number | Promise<number> {
     return 20;
   }
 
   public async connectedCallback(): Promise<void> {
     super.connectedCallback();
-
-    document.addEventListener("visibilitychange", this.handleVisibilityChange);
 
     try {
       await customElements.whenDefined("main-card");
@@ -94,24 +81,6 @@ export class PanelCard extends LitElement {
     }
   }
 
-  public disconnectedCallback(): void {
-    super.disconnectedCallback();
-    document.removeEventListener(
-      "visibilitychange",
-      this.handleVisibilityChange
-    );
-  }
-
-  private syncPopups(): void {
-    if (!this.hass) return;
-
-    document.querySelectorAll("popup-dialog").forEach((popup) => {
-      if ((popup as PopupDialogElement).hass !== undefined) {
-        (popup as PopupDialogElement).hass = this.hass;
-      }
-    });
-  }
-
   private checkDeviceTriggers(): void {
     if (!this.hass) return;
 
@@ -136,6 +105,16 @@ export class PanelCard extends LitElement {
       }
     }
     this.refreshTime = refreshState || null;
+  }
+
+  private syncPopups(): void {
+    if (!this.hass) return;
+
+    document.querySelectorAll("popup-dialog").forEach((popup) => {
+      if ((popup as PopupDialogElement).hass !== undefined) {
+        (popup as PopupDialogElement).hass = this.hass;
+      }
+    });
   }
 
   static get styles(): CSSResult {

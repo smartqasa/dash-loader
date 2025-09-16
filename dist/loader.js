@@ -127,18 +127,12 @@ let PanelCard = class PanelCard extends i {
         this.isAdminView = false;
         this.rebootTime = null;
         this.refreshTime = null;
-        this.handleVisibilityChange = () => {
-            if (document.visibilityState === "visible") {
-                this.requestUpdate();
-            }
-        };
     }
     getCardSize() {
         return 20;
     }
     async connectedCallback() {
         super.connectedCallback();
-        document.addEventListener("visibilitychange", this.handleVisibilityChange);
         try {
             await customElements.whenDefined("main-card");
             this.isMainLoaded = true;
@@ -177,19 +171,6 @@ let PanelCard = class PanelCard extends i {
             this.syncPopups();
         }
     }
-    disconnectedCallback() {
-        super.disconnectedCallback();
-        document.removeEventListener("visibilitychange", this.handleVisibilityChange);
-    }
-    syncPopups() {
-        if (!this.hass)
-            return;
-        document.querySelectorAll("popup-dialog").forEach((popup) => {
-            if (popup.hass !== undefined) {
-                popup.hass = this.hass;
-            }
-        });
-    }
     checkDeviceTriggers() {
         if (!this.hass)
             return;
@@ -213,6 +194,15 @@ let PanelCard = class PanelCard extends i {
             }
         }
         this.refreshTime = refreshState || null;
+    }
+    syncPopups() {
+        if (!this.hass)
+            return;
+        document.querySelectorAll("popup-dialog").forEach((popup) => {
+            if (popup.hass !== undefined) {
+                popup.hass = this.hass;
+            }
+        });
     }
     static get styles() {
         return i$3 `
@@ -533,5 +523,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.7-beta.1"} (Built: ${"2025-09-16T21:31:05.678Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.7-beta.2"} (Built: ${"2025-09-16T21:39:37.099Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
