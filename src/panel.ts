@@ -51,7 +51,13 @@ export class PanelCard extends LitElement {
     document.addEventListener("visibilitychange", this.handleVisibilityChange);
 
     customElements.whenDefined("main-card").then(() => {
-      this.isMainLoaded = true;
+      if (customElements.get("main-card")) {
+        this.isMainLoaded = true;
+      } else {
+        console.error(
+          "[PanelCard] whenDefined resolved, but no constructor found"
+        );
+      }
     });
   }
 

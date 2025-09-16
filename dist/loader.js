@@ -140,7 +140,12 @@ let PanelCard = class PanelCard extends i {
         super.connectedCallback();
         document.addEventListener("visibilitychange", this.handleVisibilityChange);
         customElements.whenDefined("main-card").then(() => {
-            this.isMainLoaded = true;
+            if (customElements.get("main-card")) {
+                this.isMainLoaded = true;
+            }
+            else {
+                console.error("[PanelCard] whenDefined resolved, but no constructor found");
+            }
         });
     }
     setConfig(config) {
@@ -561,5 +566,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.6-beta.4"} (Built: ${"2025-09-16T18:01:30.138Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.6-beta.5"} (Built: ${"2025-09-16T18:34:25.863Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
