@@ -129,24 +129,23 @@ let PanelCard = class PanelCard extends i {
         this.refreshTime = null;
         this.handleVisibilityChange = () => {
             if (document.visibilityState === "visible") {
-                this.mainCard = undefined;
+                this.requestUpdate();
             }
         };
     }
     getCardSize() {
         return 20;
     }
-    connectedCallback() {
+    async connectedCallback() {
         super.connectedCallback();
         document.addEventListener("visibilitychange", this.handleVisibilityChange);
-        customElements.whenDefined("main-card").then(() => {
-            if (customElements.get("main-card")) {
-                this.isMainLoaded = true;
-            }
-            else {
-                console.error("[PanelCard] whenDefined resolved, but no constructor found");
-            }
-        });
+        try {
+            await customElements.whenDefined("main-card");
+            this.isMainLoaded = true;
+        }
+        catch (err) {
+            console.error("[PanelCard] Error waiting for main-card:", err);
+        }
     }
     setConfig(config) {
         this.config = config;
@@ -160,62 +159,40 @@ let PanelCard = class PanelCard extends i {
     }
     render() {
         this.classList.toggle("admin-view", this.isAdminView);
+        if (!this.isMainLoaded || !this.config || !this.hass) {
+            return x `
+        <div class="loader-container">
+          <div class="loading-text">SmartQasa is loading</div>
+          <div class="dots"><span></span><span></span><span></span></div>
+        </div>
+      `;
+        }
         return x `
-      <div class="panel-wrapper">
-        ${this.mainCard ??
-            x `
-          <div class="loader-container">
-            <div class="loading-text">SmartQasa is loading</div>
-            <div class="dots"><span></span><span></span><span></span></div>
-          </div>
-        `}
-      </div>
+      <main-card .config=${this.config} .hass=${this.hass}></main-card>
     `;
     }
     updated(changedProps) {
-        this.ensureMainCard();
-        if (changedProps.has("config") && this.config && this.mainCard) {
-            this.mainCard.setConfig(this.config);
-        }
         if (changedProps.has("hass") && this.hass) {
-            if (this.mainCard)
-                this.syncHass();
             this.checkDeviceTriggers();
+            this.syncPopups();
         }
     }
     disconnectedCallback() {
         super.disconnectedCallback();
         document.removeEventListener("visibilitychange", this.handleVisibilityChange);
     }
-    ensureMainCard() {
-        if (this.mainCard?.isConnected)
+    syncPopups() {
+        if (!this.hass)
             return;
-        this.mainCard = undefined;
-        if (!this.config || !this.hass || !this.isMainLoaded)
-            return;
-        try {
-            const element = document.createElement("main-card");
-            element.setConfig?.(this.config);
-            element.hass = this.hass;
-            this.mainCard = element;
-        }
-        catch (err) {
-            console.error("[PanelCard] Failed to create main-card:", err);
-            this.mainCard = undefined;
-        }
-    }
-    syncHass() {
-        if (this.hass) {
-            if (this.mainCard)
-                this.mainCard.hass = this.hass;
-            document.querySelectorAll("popup-dialog").forEach((popup) => {
-                if (popup.hass !== undefined) {
-                    popup.hass = this.hass;
-                }
-            });
-        }
+        document.querySelectorAll("popup-dialog").forEach((popup) => {
+            if (popup.hass !== undefined) {
+                popup.hass = this.hass;
+            }
+        });
     }
     checkDeviceTriggers() {
+        if (!this.hass)
+            return;
         const rebootState = this.hass?.states?.["input_button.reboot_devices"]?.state;
         if (this.rebootTime !== null && rebootState !== this.rebootTime) {
             try {
@@ -249,19 +226,12 @@ let PanelCard = class PanelCard extends i {
         height: calc(100vh - 56px);
       }
 
-      .panel-wrapper {
-        display: block;
-        width: 100%;
-        height: 100%;
-        position: relative;
-      }
-
       .loader-container {
         display: flex;
         flex-direction: column;
+        height: 100%;
         align-items: center;
         justify-content: center;
-        height: 100%;
         text-align: center;
       }
 
@@ -315,9 +285,6 @@ __decorate([
 __decorate([
     r()
 ], PanelCard.prototype, "isMainLoaded", void 0);
-__decorate([
-    r()
-], PanelCard.prototype, "mainCard", void 0);
 PanelCard = __decorate([
     t("panel-card")
 ], PanelCard);
@@ -566,5 +533,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.6-beta.5"} (Built: ${"2025-09-16T18:34:25.863Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.7-beta.1"} (Built: ${"2025-09-16T21:31:05.678Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

@@ -29,7 +29,6 @@ export class PanelCard extends LitElement {
   @property({ attribute: false }) hass?: HomeAssistant;
 
   @state() private isMainLoaded = false;
-  @state() private mainCard?: LovelaceCard;
 
   private isAdminView = false;
   private rebootTime: string | null = null;
@@ -37,7 +36,7 @@ export class PanelCard extends LitElement {
 
   private handleVisibilityChange = () => {
     if (document.visibilityState === "visible") {
-      this.mainCard = undefined;
+      this.requestUpdate();
     }
   };
 
@@ -45,20 +44,17 @@ export class PanelCard extends LitElement {
     return 20;
   }
 
-  public connectedCallback(): void {
+  public async connectedCallback(): Promise<void> {
     super.connectedCallback();
 
     document.addEventListener("visibilitychange", this.handleVisibilityChange);
 
-    customElements.whenDefined("main-card").then(() => {
-      if (customElements.get("main-card")) {
-        this.isMainLoaded = true;
-      } else {
-        console.error(
-          "[PanelCard] whenDefined resolved, but no constructor found"
-        );
-      }
-    });
+    try {
+      await customElements.whenDefined("main-card");
+      this.isMainLoaded = true;
+    } catch (err) {
+      console.error("[PanelCard] Error waiting for main-card:", err);
+    }
   }
 
   public setConfig(config: LovelaceCardConfig): void {
@@ -77,29 +73,24 @@ export class PanelCard extends LitElement {
   protected render(): TemplateResult {
     this.classList.toggle("admin-view", this.isAdminView);
 
+    if (!this.isMainLoaded || !this.config || !this.hass) {
+      return html`
+        <div class="loader-container">
+          <div class="loading-text">SmartQasa is loading</div>
+          <div class="dots"><span></span><span></span><span></span></div>
+        </div>
+      `;
+    }
+
     return html`
-      <div class="panel-wrapper">
-        ${this.mainCard ??
-        html`
-          <div class="loader-container">
-            <div class="loading-text">SmartQasa is loading</div>
-            <div class="dots"><span></span><span></span><span></span></div>
-          </div>
-        `}
-      </div>
+      <main-card .config=${this.config} .hass=${this.hass}></main-card>
     `;
   }
 
   protected updated(changedProps: PropertyValues): void {
-    this.ensureMainCard();
-
-    if (changedProps.has("config") && this.config && this.mainCard) {
-      this.mainCard.setConfig(this.config);
-    }
-
     if (changedProps.has("hass") && this.hass) {
-      if (this.mainCard) this.syncHass();
       this.checkDeviceTriggers();
+      this.syncPopups();
     }
   }
 
@@ -111,36 +102,19 @@ export class PanelCard extends LitElement {
     );
   }
 
-  private ensureMainCard(): void {
-    if (this.mainCard?.isConnected) return;
+  private syncPopups(): void {
+    if (!this.hass) return;
 
-    this.mainCard = undefined;
-    if (!this.config || !this.hass || !this.isMainLoaded) return;
-
-    try {
-      const element = document.createElement("main-card") as LovelaceCard;
-      element.setConfig?.(this.config);
-      element.hass = this.hass;
-      this.mainCard = element;
-    } catch (err) {
-      console.error("[PanelCard] Failed to create main-card:", err);
-      this.mainCard = undefined;
-    }
-  }
-
-  private syncHass(): void {
-    if (this.hass) {
-      if (this.mainCard) this.mainCard.hass = this.hass;
-
-      document.querySelectorAll("popup-dialog").forEach((popup) => {
-        if ((popup as PopupDialogElement).hass !== undefined) {
-          (popup as PopupDialogElement).hass = this.hass;
-        }
-      });
-    }
+    document.querySelectorAll("popup-dialog").forEach((popup) => {
+      if ((popup as PopupDialogElement).hass !== undefined) {
+        (popup as PopupDialogElement).hass = this.hass;
+      }
+    });
   }
 
   private checkDeviceTriggers(): void {
+    if (!this.hass) return;
+
     const rebootState =
       this.hass?.states?.["input_button.reboot_devices"]?.state;
     if (this.rebootTime !== null && rebootState !== this.rebootTime) {
@@ -176,19 +150,12 @@ export class PanelCard extends LitElement {
         height: calc(100vh - 56px);
       }
 
-      .panel-wrapper {
-        display: block;
-        width: 100%;
-        height: 100%;
-        position: relative;
-      }
-
       .loader-container {
         display: flex;
         flex-direction: column;
+        height: 100%;
         align-items: center;
         justify-content: center;
-        height: 100%;
         text-align: center;
       }
 
