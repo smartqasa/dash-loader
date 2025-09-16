@@ -31,17 +31,18 @@ export class PanelCard extends LitElement {
   @state() private isMainLoaded = false;
   @state() private mainCard?: LovelaceCard;
 
+  private isAdminView = false;
+  private rebootTime: string | null = null;
+  private refreshTime: string | null = null;
+
   private handleVisibilityChange = () => {
     if (document.visibilityState === "visible") {
       this.mainCard = undefined;
     }
   };
 
-  private rebootTime?: string;
-  private refreshTime?: string;
-
   public getCardSize(): number | Promise<number> {
-    return 100;
+    return 20;
   }
 
   public connectedCallback(): void {
@@ -58,11 +59,17 @@ export class PanelCard extends LitElement {
     this.config = config;
   }
 
+  protected willUpdate(changedProps: PropertyValues): void {
+    if (changedProps.has("hass")) {
+      const isAdmin = this.hass?.user?.is_admin || false;
+      const isAdminMode =
+        this.hass?.states["input_boolean.admin_mode"]?.state === "on" || false;
+      this.isAdminView = isAdmin || isAdminMode;
+    }
+  }
+
   protected render(): TemplateResult {
-    const isAdmin = this.hass?.user?.is_admin || false;
-    const isAdminMode =
-      this.hass?.states["input_boolean.admin_mode"]?.state === "on" || false;
-    this.classList.toggle("admin-view", isAdmin || isAdminMode);
+    this.classList.toggle("admin-view", this.isAdminView);
 
     return html`
       <div class="panel-wrapper">
@@ -128,18 +135,27 @@ export class PanelCard extends LitElement {
   }
 
   private checkDeviceTriggers(): void {
-    const rebootState = this.hass?.states["input_button.reboot_devices"]?.state;
-    if (this.rebootTime !== undefined && this.rebootTime !== rebootState) {
-      deviceReboot();
+    const rebootState =
+      this.hass?.states?.["input_button.reboot_devices"]?.state;
+    if (this.rebootTime !== null && rebootState !== this.rebootTime) {
+      try {
+        deviceReboot();
+      } catch (err) {
+        console.error("[PanelCard] Device reboot failed:", err);
+      }
     }
-    this.rebootTime = rebootState;
+    this.rebootTime = rebootState || null;
 
     const refreshState =
-      this.hass?.states["input_button.refresh_devices"]?.state;
-    if (this.refreshTime !== undefined && this.refreshTime !== refreshState) {
-      deviceRefresh();
+      this.hass?.states?.["input_button.refresh_devices"]?.state;
+    if (this.refreshTime !== null && refreshState !== this.refreshTime) {
+      try {
+        deviceRefresh();
+      } catch (err) {
+        console.error("[PanelCard] Device refresh failed:", err);
+      }
     }
-    this.refreshTime = refreshState;
+    this.refreshTime = refreshState || null;
   }
 
   static get styles(): CSSResult {

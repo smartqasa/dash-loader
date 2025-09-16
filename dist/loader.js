@@ -124,6 +124,9 @@ let PanelCard = class PanelCard extends i {
     constructor() {
         super(...arguments);
         this.isMainLoaded = false;
+        this.isAdminView = false;
+        this.rebootTime = null;
+        this.refreshTime = null;
         this.handleVisibilityChange = () => {
             if (document.visibilityState === "visible") {
                 this.mainCard = undefined;
@@ -131,7 +134,7 @@ let PanelCard = class PanelCard extends i {
         };
     }
     getCardSize() {
-        return 100;
+        return 20;
     }
     connectedCallback() {
         super.connectedCallback();
@@ -143,10 +146,15 @@ let PanelCard = class PanelCard extends i {
     setConfig(config) {
         this.config = config;
     }
+    willUpdate(changedProps) {
+        if (changedProps.has("hass")) {
+            const isAdmin = this.hass?.user?.is_admin || false;
+            const isAdminMode = this.hass?.states["input_boolean.admin_mode"]?.state === "on" || false;
+            this.isAdminView = isAdmin || isAdminMode;
+        }
+    }
     render() {
-        const isAdmin = this.hass?.user?.is_admin || false;
-        const isAdminMode = this.hass?.states["input_boolean.admin_mode"]?.state === "on" || false;
-        this.classList.toggle("admin-view", isAdmin || isAdminMode);
+        this.classList.toggle("admin-view", this.isAdminView);
         return x `
       <div class="panel-wrapper">
         ${this.mainCard ??
@@ -203,16 +211,26 @@ let PanelCard = class PanelCard extends i {
         }
     }
     checkDeviceTriggers() {
-        const rebootState = this.hass?.states["input_button.reboot_devices"]?.state;
-        if (this.rebootTime !== undefined && this.rebootTime !== rebootState) {
-            deviceReboot();
+        const rebootState = this.hass?.states?.["input_button.reboot_devices"]?.state;
+        if (this.rebootTime !== null && rebootState !== this.rebootTime) {
+            try {
+                deviceReboot();
+            }
+            catch (err) {
+                console.error("[PanelCard] Device reboot failed:", err);
+            }
         }
-        this.rebootTime = rebootState;
-        const refreshState = this.hass?.states["input_button.refresh_devices"]?.state;
-        if (this.refreshTime !== undefined && this.refreshTime !== refreshState) {
-            deviceRefresh();
+        this.rebootTime = rebootState || null;
+        const refreshState = this.hass?.states?.["input_button.refresh_devices"]?.state;
+        if (this.refreshTime !== null && refreshState !== this.refreshTime) {
+            try {
+                deviceRefresh();
+            }
+            catch (err) {
+                console.error("[PanelCard] Device refresh failed:", err);
+            }
         }
-        this.refreshTime = refreshState;
+        this.refreshTime = refreshState || null;
     }
     static get styles() {
         return i$3 `
@@ -543,5 +561,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.6-beta.3"} (Built: ${"2025-09-16T17:37:18.142Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.6-beta.4"} (Built: ${"2025-09-16T18:01:30.138Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
