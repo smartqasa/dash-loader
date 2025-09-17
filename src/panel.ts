@@ -45,6 +45,11 @@ export class PanelCard extends LitElement {
   public async connectedCallback(): Promise<void> {
     super.connectedCallback();
 
+    console.log(
+      "[PanelCard] Waiting for main-card to be defined",
+      document.hidden
+    );
+
     try {
       await customElements.whenDefined("main-card");
       this.isMainLoaded = true;

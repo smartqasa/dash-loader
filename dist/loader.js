@@ -140,6 +140,7 @@ let PanelCard = class PanelCard extends i {
     }
     async connectedCallback() {
         super.connectedCallback();
+        console.log("[PanelCard] Waiting for main-card to be defined", document.hidden);
         try {
             await customElements.whenDefined("main-card");
             this.isMainLoaded = true;
@@ -536,5 +537,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.8-beta.2"} (Built: ${"2025-09-17T03:01:17.576Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.8-beta.3"} (Built: ${"2025-09-17T03:10:25.128Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
