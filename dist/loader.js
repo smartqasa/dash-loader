@@ -128,6 +128,7 @@ let PanelCard = class PanelCard extends i {
         this.rebootTime = null;
         this.refreshTime = null;
         this.handleVisibility = () => {
+            console.log("[PanelCard] Visibility changed", document.hidden);
             if (!document.hidden) {
                 this.isMainLoaded = !!customElements.get("main-card");
                 this.requestUpdate();
@@ -535,5 +536,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.8-beta.1"} (Built: ${"2025-09-17T02:58:29.072Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.8-beta.2"} (Built: ${"2025-09-17T03:01:17.576Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

@@ -10,6 +10,7 @@ import { customElement, property, state } from "lit/decorators.js";
 
 import { HomeAssistant, LovelaceCardConfig, PopupDialogElement } from "./types";
 import { deviceRefresh, deviceReboot } from "./device-actions";
+import { computeStateDisplay } from "custom-card-helpers";
 
 window.customCards.push({
   type: "panel-card",
@@ -30,6 +31,7 @@ export class PanelCard extends LitElement {
   private refreshTime: string | null = null;
 
   private handleVisibility = () => {
+    console.log("[PanelCard] Visibility changed", document.hidden);
     if (!document.hidden) {
       this.isMainLoaded = !!customElements.get("main-card");
       this.requestUpdate();
