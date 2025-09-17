@@ -7,10 +7,8 @@ import {
   TemplateResult,
 } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
-
 import { HomeAssistant, LovelaceCardConfig, PopupDialogElement } from "./types";
 import { deviceRefresh, deviceReboot } from "./device-actions";
-import { computeStateDisplay } from "custom-card-helpers";
 
 window.customCards.push({
   type: "panel-card",
