@@ -29,6 +29,13 @@ export class PanelCard extends LitElement {
   private rebootTime: string | null = null;
   private refreshTime: string | null = null;
 
+  private handleVisibility = () => {
+    if (!document.hidden) {
+      this.isMainLoaded = !!customElements.get("main-card");
+      this.requestUpdate();
+    }
+  };
+
   public getCardSize(): number | Promise<number> {
     return 20;
   }
@@ -42,6 +49,8 @@ export class PanelCard extends LitElement {
     } catch (err) {
       console.error("[PanelCard] Error waiting for main-card:", err);
     }
+
+    document.addEventListener("visibilitychange", this.handleVisibility);
   }
 
   public setConfig(config: LovelaceCardConfig): void {
@@ -79,6 +88,11 @@ export class PanelCard extends LitElement {
       this.checkDeviceTriggers();
       this.syncPopups();
     }
+  }
+
+  disconnectedCallback(): void {
+    document.removeEventListener("visibilitychange", this.handleVisibility);
+    super.disconnectedCallback();
   }
 
   private checkDeviceTriggers(): void {
@@ -123,6 +137,7 @@ export class PanelCard extends LitElement {
         display: block;
         width: 100%;
         height: 100vh;
+        background-color: var(--panel-background);
       }
 
       :host(.admin-view) {
