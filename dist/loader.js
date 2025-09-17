@@ -114,6 +114,12 @@ function deviceReboot() {
     }
 }
 
+window.onFullyScreensaverStop = () => {
+    console.log("[Fully] Screensaver stopped");
+    document.querySelectorAll("panel-card").forEach((el) => {
+        el.requestUpdate();
+    });
+};
 window.customCards.push({
     type: "panel-card",
     name: "Panel Card",
@@ -127,12 +133,7 @@ let PanelCard = class PanelCard extends i {
         this.isAdminView = false;
         this.rebootTime = null;
         this.refreshTime = null;
-        this.handleLocationChange = () => {
-            console.log("[PanelCard] location-changed", "hidden=", document.hidden, "url=", window.location.href);
-            this.requestUpdate();
-        };
         this.handleVisibility = () => {
-            console.log("[PanelCard] visibilitychange", "hidden=", document.hidden, "url=", window.location.href);
             this.requestUpdate();
         };
     }
@@ -141,7 +142,6 @@ let PanelCard = class PanelCard extends i {
     }
     async connectedCallback() {
         super.connectedCallback();
-        console.log("[PanelCard] connectedCallback", "url: ", window.location.href, "isMainLoaded: ", this.isMainLoaded);
         try {
             await customElements.whenDefined("main-card");
             this.isMainLoaded = true;
@@ -149,7 +149,8 @@ let PanelCard = class PanelCard extends i {
         catch (err) {
             console.error("[PanelCard] Error waiting for main-card:", err);
         }
-        window.addEventListener("location-changed", this.handleLocationChange);
+        if (window.fully?.bind)
+            window.fully.bind("onScreensaverStop", "onFullyScreensaverStop()");
         document.addEventListener("visibilitychange", this.handleVisibility);
     }
     setConfig(config) {
@@ -183,8 +184,6 @@ let PanelCard = class PanelCard extends i {
         }
     }
     disconnectedCallback() {
-        console.log("[PanelCard] disconnectedCallback", "url: ", window.location.href, "isMainLoaded: ", this.isMainLoaded);
-        window.removeEventListener("location-changed", this.handleLocationChange);
         document.removeEventListener("visibilitychange", this.handleVisibility);
         super.disconnectedCallback();
     }
@@ -541,5 +540,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.8-beta.8"} (Built: ${"2025-09-17T04:01:34.236Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.8-beta.9"} (Built: ${"2025-09-17T04:28:10.450Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

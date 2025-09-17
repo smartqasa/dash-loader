@@ -10,6 +10,13 @@ import { customElement, property, state } from "lit/decorators.js";
 import { HomeAssistant, LovelaceCardConfig, PopupDialogElement } from "./types";
 import { deviceRefresh, deviceReboot } from "./device-actions";
 
+(window as any).onFullyScreensaverStop = () => {
+  console.log("[Fully] Screensaver stopped");
+  document.querySelectorAll("panel-card").forEach((el) => {
+    (el as any).requestUpdate();
+  });
+};
+
 window.customCards.push({
   type: "panel-card",
   name: "Panel Card",
@@ -28,25 +35,7 @@ export class PanelCard extends LitElement {
   private rebootTime: string | null = null;
   private refreshTime: string | null = null;
 
-  private handleLocationChange = (): void => {
-    console.log(
-      "[PanelCard] location-changed",
-      "hidden=",
-      document.hidden,
-      "url=",
-      window.location.href
-    );
-    this.requestUpdate();
-  };
-
   private handleVisibility = (): void => {
-    console.log(
-      "[PanelCard] visibilitychange",
-      "hidden=",
-      document.hidden,
-      "url=",
-      window.location.href
-    );
     this.requestUpdate();
   };
 
@@ -57,14 +46,6 @@ export class PanelCard extends LitElement {
   public async connectedCallback(): Promise<void> {
     super.connectedCallback();
 
-    console.log(
-      "[PanelCard] connectedCallback",
-      "url: ",
-      window.location.href,
-      "isMainLoaded: ",
-      this.isMainLoaded
-    );
-
     try {
       await customElements.whenDefined("main-card");
       this.isMainLoaded = true;
@@ -72,7 +53,9 @@ export class PanelCard extends LitElement {
       console.error("[PanelCard] Error waiting for main-card:", err);
     }
 
-    window.addEventListener("location-changed", this.handleLocationChange);
+    if (window.fully?.bind)
+      window.fully.bind("onScreensaverStop", "onFullyScreensaverStop()");
+
     document.addEventListener("visibilitychange", this.handleVisibility);
   }
 
@@ -114,15 +97,6 @@ export class PanelCard extends LitElement {
   }
 
   disconnectedCallback(): void {
-    console.log(
-      "[PanelCard] disconnectedCallback",
-      "url: ",
-      window.location.href,
-      "isMainLoaded: ",
-      this.isMainLoaded
-    );
-
-    window.removeEventListener("location-changed", this.handleLocationChange);
     document.removeEventListener("visibilitychange", this.handleVisibility);
 
     super.disconnectedCallback();
