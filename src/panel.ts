@@ -30,12 +30,26 @@ export class PanelCard extends LitElement {
   private rebootTime: string | null = null;
   private refreshTime: string | null = null;
 
-  private handleVisibility = () => {
-    console.log("[PanelCard] Visibility changed", document.hidden);
-    if (!document.hidden) {
-      this.isMainLoaded = !!customElements.get("main-card");
-      this.requestUpdate();
-    }
+  private handleLocationChange = (): void => {
+    console.log(
+      "[PanelCard] location-changed",
+      "hidden=",
+      document.hidden,
+      "url=",
+      window.location.href
+    );
+    this.requestUpdate();
+  };
+
+  private handleVisibility = (): void => {
+    console.log(
+      "[PanelCard] visibilitychange",
+      "hidden=",
+      document.hidden,
+      "url=",
+      window.location.href
+    );
+    this.requestUpdate();
   };
 
   public getCardSize(): number | Promise<number> {
@@ -45,11 +59,6 @@ export class PanelCard extends LitElement {
   public async connectedCallback(): Promise<void> {
     super.connectedCallback();
 
-    console.log(
-      "[PanelCard] Waiting for main-card to be defined",
-      document.hidden
-    );
-
     try {
       await customElements.whenDefined("main-card");
       this.isMainLoaded = true;
@@ -57,6 +66,7 @@ export class PanelCard extends LitElement {
       console.error("[PanelCard] Error waiting for main-card:", err);
     }
 
+    window.addEventListener("location-changed", this.handleLocationChange);
     document.addEventListener("visibilitychange", this.handleVisibility);
   }
 
@@ -98,7 +108,9 @@ export class PanelCard extends LitElement {
   }
 
   disconnectedCallback(): void {
+    window.removeEventListener("location-changed", this.handleLocationChange);
     document.removeEventListener("visibilitychange", this.handleVisibility);
+
     super.disconnectedCallback();
   }
 

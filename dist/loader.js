@@ -127,12 +127,13 @@ let PanelCard = class PanelCard extends i {
         this.isAdminView = false;
         this.rebootTime = null;
         this.refreshTime = null;
+        this.handleLocationChange = () => {
+            console.log("[PanelCard] location-changed", "hidden=", document.hidden, "url=", window.location.href);
+            this.requestUpdate();
+        };
         this.handleVisibility = () => {
-            console.log("[PanelCard] Visibility changed", document.hidden);
-            if (!document.hidden) {
-                this.isMainLoaded = !!customElements.get("main-card");
-                this.requestUpdate();
-            }
+            console.log("[PanelCard] visibilitychange", "hidden=", document.hidden, "url=", window.location.href);
+            this.requestUpdate();
         };
     }
     getCardSize() {
@@ -140,7 +141,6 @@ let PanelCard = class PanelCard extends i {
     }
     async connectedCallback() {
         super.connectedCallback();
-        console.log("[PanelCard] Waiting for main-card to be defined", document.hidden);
         try {
             await customElements.whenDefined("main-card");
             this.isMainLoaded = true;
@@ -148,6 +148,7 @@ let PanelCard = class PanelCard extends i {
         catch (err) {
             console.error("[PanelCard] Error waiting for main-card:", err);
         }
+        window.addEventListener("location-changed", this.handleLocationChange);
         document.addEventListener("visibilitychange", this.handleVisibility);
     }
     setConfig(config) {
@@ -181,6 +182,7 @@ let PanelCard = class PanelCard extends i {
         }
     }
     disconnectedCallback() {
+        window.removeEventListener("location-changed", this.handleLocationChange);
         document.removeEventListener("visibilitychange", this.handleVisibility);
         super.disconnectedCallback();
     }
@@ -385,13 +387,13 @@ let ScreenSaver = class ScreenSaver extends i {
         }
     }
     disconnectedCallback() {
-        super.disconnectedCallback();
         if (this.timeIntervalId !== undefined) {
             window.clearInterval(this.timeIntervalId);
         }
         if (this.moveTimerId !== undefined) {
             window.clearInterval(this.moveTimerId);
         }
+        super.disconnectedCallback();
     }
     startClock() {
         this.timeIntervalId = window.setInterval(() => {
@@ -537,5 +539,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.8-beta.3"} (Built: ${"2025-09-17T03:10:25.128Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.8-beta.4"} (Built: ${"2025-09-17T03:32:50.177Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

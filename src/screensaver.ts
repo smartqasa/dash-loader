@@ -100,13 +100,14 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
   }
 
   public disconnectedCallback(): void {
-    super.disconnectedCallback();
     if (this.timeIntervalId !== undefined) {
       window.clearInterval(this.timeIntervalId);
     }
     if (this.moveTimerId !== undefined) {
       window.clearInterval(this.moveTimerId);
     }
+
+    super.disconnectedCallback();
   }
 
   private startClock(): void {
