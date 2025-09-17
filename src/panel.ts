@@ -44,15 +44,14 @@ export class PanelCard extends LitElement {
     return 20;
   }
 
-  public async connectedCallback(): Promise<void> {
+  public connectedCallback(): void {
     super.connectedCallback();
 
-    await this.checkMainCard();
-
+    document.addEventListener("visibilitychange", this.handleVisibility);
     if (window.fully?.bind)
       window.fully.bind("onScreensaverStop", "onFullyScreensaverStop()");
 
-    document.addEventListener("visibilitychange", this.handleVisibility);
+    this.checkMainCard();
   }
 
   public setConfig(config: LovelaceCardConfig): void {

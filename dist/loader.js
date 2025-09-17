@@ -141,12 +141,12 @@ let PanelCard = class PanelCard extends i {
     getCardSize() {
         return 20;
     }
-    async connectedCallback() {
+    connectedCallback() {
         super.connectedCallback();
-        await this.checkMainCard();
+        document.addEventListener("visibilitychange", this.handleVisibility);
         if (window.fully?.bind)
             window.fully.bind("onScreensaverStop", "onFullyScreensaverStop()");
-        document.addEventListener("visibilitychange", this.handleVisibility);
+        this.checkMainCard();
     }
     setConfig(config) {
         this.config = config;
@@ -546,5 +546,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.9-beta.1"} (Built: ${"2025-09-17T12:31:13.503Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.9-beta.2"} (Built: ${"2025-09-17T12:44:43.445Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
