@@ -96,13 +96,34 @@ export class PanelCard extends LitElement {
     super.disconnectedCallback();
   }
 
-  private async checkMainCard(): Promise<void> {
+  private async checkMainCard(retries = 5): Promise<void> {
     try {
       await customElements.whenDefined("main-card");
+      const ctor = customElements.get("main-card");
+
+      if (!ctor) {
+        if (retries > 0) {
+          console.warn(
+            `[PanelCard] main-card not available yet, retrying… (${retries} left)`
+          );
+          setTimeout(() => this.checkMainCard(retries - 1), 1000);
+          return;
+        } else {
+          console.error("[PanelCard] main-card still missing → forcing reload");
+          location.reload();
+          return;
+        }
+      }
+
       this.isMainLoaded = true;
-      this.requestUpdate();
     } catch (err) {
       console.error("[PanelCard] Error waiting for main-card:", err);
+      if (retries > 0) {
+        setTimeout(() => this.checkMainCard(retries - 1), 1000);
+      } else {
+        console.error("[PanelCard] Giving up and forcing reload");
+        location.reload();
+      }
     }
   }
 
