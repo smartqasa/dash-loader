@@ -116,7 +116,9 @@ function deviceReboot() {
 
 window.onFullyScreensaverStop = () => {
     document.querySelectorAll("panel-card").forEach((el) => {
-        el.requestUpdate();
+        console.log("[Fully] Screensaver stopped → resetting + checking main-card");
+        el.isMainLoaded = false;
+        el.checkMainCard();
     });
 };
 window.customCards.push({
@@ -141,13 +143,7 @@ let PanelCard = class PanelCard extends i {
     }
     async connectedCallback() {
         super.connectedCallback();
-        try {
-            await customElements.whenDefined("main-card");
-            this.isMainLoaded = true;
-        }
-        catch (err) {
-            console.error("[PanelCard] Error waiting for main-card:", err);
-        }
+        await this.checkMainCard();
         if (window.fully?.bind)
             window.fully.bind("onScreensaverStop", "onFullyScreensaverStop()");
         document.addEventListener("visibilitychange", this.handleVisibility);
@@ -185,6 +181,17 @@ let PanelCard = class PanelCard extends i {
     disconnectedCallback() {
         document.removeEventListener("visibilitychange", this.handleVisibility);
         super.disconnectedCallback();
+    }
+    async checkMainCard() {
+        try {
+            await customElements.whenDefined("main-card");
+            this.isMainLoaded = true;
+            this.requestUpdate();
+            console.log("[PanelCard] main-card defined, isMainLoaded set true");
+        }
+        catch (err) {
+            console.error("[PanelCard] Error waiting for main-card:", err);
+        }
     }
     checkDeviceTriggers() {
         if (!this.hass)
@@ -225,7 +232,7 @@ let PanelCard = class PanelCard extends i {
         display: block;
         width: 100%;
         height: 100vh;
-        background-color: var(--panel-background);
+        background-color: var(--panel-color);
       }
 
       :host(.admin-view) {
@@ -245,7 +252,7 @@ let PanelCard = class PanelCard extends i {
         font-size: 1.5rem;
         font-weight: 300;
         margin-bottom: 1rem;
-        color: white;
+        color: var(--primary-text-color);
       }
 
       .dots {
@@ -258,7 +265,7 @@ let PanelCard = class PanelCard extends i {
         width: 10px;
         height: 10px;
         border-radius: 50%;
-        background: white;
+        background: var(--primary-text-color);
         animation: bounce 1.4s infinite ease-in-out both;
       }
 
@@ -539,5 +546,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.8-beta.10"} (Built: ${"2025-09-17T04:42:43.519Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.9-beta.1"} (Built: ${"2025-09-17T12:31:13.503Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

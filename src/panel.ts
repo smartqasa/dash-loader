@@ -11,8 +11,10 @@ import { HomeAssistant, LovelaceCardConfig, PopupDialogElement } from "./types";
 import { deviceRefresh, deviceReboot } from "./device-actions";
 
 (window as any).onFullyScreensaverStop = () => {
-  document.querySelectorAll("panel-card").forEach((el) => {
-    (el as any).requestUpdate();
+  document.querySelectorAll("panel-card").forEach((el: any) => {
+    console.log("[Fully] Screensaver stopped → resetting + checking main-card");
+    el.isMainLoaded = false;
+    el.checkMainCard();
   });
 };
 
@@ -45,12 +47,7 @@ export class PanelCard extends LitElement {
   public async connectedCallback(): Promise<void> {
     super.connectedCallback();
 
-    try {
-      await customElements.whenDefined("main-card");
-      this.isMainLoaded = true;
-    } catch (err) {
-      console.error("[PanelCard] Error waiting for main-card:", err);
-    }
+    await this.checkMainCard();
 
     if (window.fully?.bind)
       window.fully.bind("onScreensaverStop", "onFullyScreensaverStop()");
@@ -101,6 +98,17 @@ export class PanelCard extends LitElement {
     super.disconnectedCallback();
   }
 
+  private async checkMainCard(): Promise<void> {
+    try {
+      await customElements.whenDefined("main-card");
+      this.isMainLoaded = true;
+      this.requestUpdate();
+      console.log("[PanelCard] main-card defined, isMainLoaded set true");
+    } catch (err) {
+      console.error("[PanelCard] Error waiting for main-card:", err);
+    }
+  }
+
   private checkDeviceTriggers(): void {
     if (!this.hass) return;
 
@@ -143,7 +151,7 @@ export class PanelCard extends LitElement {
         display: block;
         width: 100%;
         height: 100vh;
-        background-color: var(--panel-background);
+        background-color: var(--panel-color);
       }
 
       :host(.admin-view) {
@@ -163,7 +171,7 @@ export class PanelCard extends LitElement {
         font-size: 1.5rem;
         font-weight: 300;
         margin-bottom: 1rem;
-        color: white;
+        color: var(--primary-text-color);
       }
 
       .dots {
@@ -176,7 +184,7 @@ export class PanelCard extends LitElement {
         width: 10px;
         height: 10px;
         border-radius: 50%;
-        background: white;
+        background: var(--primary-text-color);
         animation: bounce 1.4s infinite ease-in-out both;
       }
 
