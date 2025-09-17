@@ -57,10 +57,13 @@ export class PanelCard extends LitElement {
   public async connectedCallback(): Promise<void> {
     super.connectedCallback();
 
-    console.log("[PanelCard] connectedCallback", {
-      url: window.location.href,
-      isMainLoaded: this.isMainLoaded,
-    });
+    console.log(
+      "[PanelCard] connectedCallback",
+      "url: ",
+      window.location.href,
+      "isMainLoaded: ",
+      this.isMainLoaded
+    );
 
     try {
       await customElements.whenDefined("main-card");
@@ -111,9 +114,13 @@ export class PanelCard extends LitElement {
   }
 
   disconnectedCallback(): void {
-    console.log("[PanelCard] disconnectedCallback", {
-      url: window.location.href,
-    });
+    console.log(
+      "[PanelCard] disconnectedCallback",
+      "url: ",
+      window.location.href,
+      "isMainLoaded: ",
+      this.isMainLoaded
+    );
 
     window.removeEventListener("location-changed", this.handleLocationChange);
     document.removeEventListener("visibilitychange", this.handleVisibility);

@@ -141,10 +141,7 @@ let PanelCard = class PanelCard extends i {
     }
     async connectedCallback() {
         super.connectedCallback();
-        console.log("[PanelCard] connectedCallback", {
-            url: window.location.href,
-            isMainLoaded: this.isMainLoaded,
-        });
+        console.log("[PanelCard] connectedCallback", "url: ", window.location.href, "isMainLoaded: ", this.isMainLoaded);
         try {
             await customElements.whenDefined("main-card");
             this.isMainLoaded = true;
@@ -186,9 +183,7 @@ let PanelCard = class PanelCard extends i {
         }
     }
     disconnectedCallback() {
-        console.log("[PanelCard] disconnectedCallback", {
-            url: window.location.href,
-        });
+        console.log("[PanelCard] disconnectedCallback", "url: ", window.location.href, "isMainLoaded: ", this.isMainLoaded);
         window.removeEventListener("location-changed", this.handleLocationChange);
         document.removeEventListener("visibilitychange", this.handleVisibility);
         super.disconnectedCallback();
@@ -546,5 +541,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.8-beta.7"} (Built: ${"2025-09-17T03:59:50.826Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.8-beta.8"} (Built: ${"2025-09-17T04:01:34.236Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
