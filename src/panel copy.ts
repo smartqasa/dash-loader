@@ -30,7 +30,7 @@ export class PanelCard extends LitElement {
   @property({ attribute: false }) config?: LovelaceCardConfig;
   @property({ attribute: false }) hass?: HomeAssistant;
 
-  @state() private mainCard?: LovelaceCard;
+  @state() mainCard?: LovelaceCard;
 
   private rebootTime: string | undefined;
   private refreshTime: string | undefined;

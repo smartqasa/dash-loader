@@ -35,8 +35,8 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
   @property({ attribute: false }) config: Config | undefined;
   @property({ attribute: false }) hass: HomeAssistant | undefined;
 
-  @state() private time: string = "Loading...";
-  @state() private date: string = "Loading...";
+  @state() time: string = "Loading...";
+  @state() date: string = "Loading...";
 
   private rebootTime: string | undefined;
   private refreshTime: string | undefined;

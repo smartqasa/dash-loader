@@ -12,7 +12,6 @@ import { deviceRefresh, deviceReboot } from "./device-actions";
 
 (window as any).onFullyScreensaverStop = () => {
   document.querySelectorAll("panel-card").forEach((el: any) => {
-    console.log("[Fully] Screensaver stopped → resetting + checking main-card");
     el.isMainLoaded = false;
     el.checkMainCard();
   });
@@ -30,7 +29,7 @@ export class PanelCard extends LitElement {
   @property({ attribute: false }) config?: LovelaceCardConfig;
   @property({ attribute: false }) hass?: HomeAssistant;
 
-  @state() private isMainLoaded = false;
+  @state() isMainLoaded = false;
 
   private isAdminView = false;
   private rebootTime: string | null = null;
@@ -102,7 +101,6 @@ export class PanelCard extends LitElement {
       await customElements.whenDefined("main-card");
       this.isMainLoaded = true;
       this.requestUpdate();
-      console.log("[PanelCard] main-card defined, isMainLoaded set true");
     } catch (err) {
       console.error("[PanelCard] Error waiting for main-card:", err);
     }

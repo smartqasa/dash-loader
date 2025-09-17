@@ -15,7 +15,7 @@ import { createThing } from "custom-card-helpers";
 export class MySimpleView extends LitElement {
   @property({ attribute: false }) public hass?: HomeAssistant;
 
-  @state() private cards: LovelaceCard[] = [];
+  @state() cards: LovelaceCard[] = [];
 
   public setConfig(config: any): void {
     if (!config.tiles) return;

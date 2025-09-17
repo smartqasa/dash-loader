@@ -116,7 +116,6 @@ function deviceReboot() {
 
 window.onFullyScreensaverStop = () => {
     document.querySelectorAll("panel-card").forEach((el) => {
-        console.log("[Fully] Screensaver stopped → resetting + checking main-card");
         el.isMainLoaded = false;
         el.checkMainCard();
     });
@@ -187,7 +186,6 @@ let PanelCard = class PanelCard extends i {
             await customElements.whenDefined("main-card");
             this.isMainLoaded = true;
             this.requestUpdate();
-            console.log("[PanelCard] main-card defined, isMainLoaded set true");
         }
         catch (err) {
             console.error("[PanelCard] Error waiting for main-card:", err);
@@ -546,5 +544,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.9-beta.2"} (Built: ${"2025-09-17T12:44:43.445Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.9-beta.3"} (Built: ${"2025-09-17T15:05:54.659Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
