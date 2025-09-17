@@ -11,7 +11,6 @@ import { HomeAssistant, LovelaceCardConfig, PopupDialogElement } from "./types";
 import { deviceRefresh, deviceReboot } from "./device-actions";
 
 (window as any).onFullyScreensaverStop = () => {
-  console.log("[Fully] Screensaver stopped");
   document.querySelectorAll("panel-card").forEach((el) => {
     (el as any).requestUpdate();
   });
