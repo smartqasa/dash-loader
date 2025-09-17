@@ -141,6 +141,10 @@ let PanelCard = class PanelCard extends i {
     }
     async connectedCallback() {
         super.connectedCallback();
+        console.log("[PanelCard] connectedCallback", {
+            url: window.location.href,
+            isMainLoaded: this.isMainLoaded,
+        });
         try {
             await customElements.whenDefined("main-card");
             this.isMainLoaded = true;
@@ -162,6 +166,11 @@ let PanelCard = class PanelCard extends i {
         }
     }
     render() {
+        console.log("[PanelCard] render", {
+            isMainLoaded: this.isMainLoaded,
+            config: !!this.config,
+            hass: !!this.hass,
+        });
         this.classList.toggle("admin-view", this.isAdminView);
         if (!this.isMainLoaded || !this.config || !this.hass) {
             return x `
@@ -182,6 +191,9 @@ let PanelCard = class PanelCard extends i {
         }
     }
     disconnectedCallback() {
+        console.log("[PanelCard] disconnectedCallback", {
+            url: window.location.href,
+        });
         window.removeEventListener("location-changed", this.handleLocationChange);
         document.removeEventListener("visibilitychange", this.handleVisibility);
         super.disconnectedCallback();
@@ -539,5 +551,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.8-beta.5"} (Built: ${"2025-09-17T03:39:10.149Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.8-beta.6"} (Built: ${"2025-09-17T03:55:50.422Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

@@ -57,6 +57,11 @@ export class PanelCard extends LitElement {
   public async connectedCallback(): Promise<void> {
     super.connectedCallback();
 
+    console.log("[PanelCard] connectedCallback", {
+      url: window.location.href,
+      isMainLoaded: this.isMainLoaded,
+    });
+
     try {
       await customElements.whenDefined("main-card");
       this.isMainLoaded = true;
@@ -82,6 +87,12 @@ export class PanelCard extends LitElement {
   }
 
   protected render(): TemplateResult {
+    console.log("[PanelCard] render", {
+      isMainLoaded: this.isMainLoaded,
+      config: !!this.config,
+      hass: !!this.hass,
+    });
+
     this.classList.toggle("admin-view", this.isAdminView);
 
     if (!this.isMainLoaded || !this.config || !this.hass) {
@@ -106,6 +117,10 @@ export class PanelCard extends LitElement {
   }
 
   disconnectedCallback(): void {
+    console.log("[PanelCard] disconnectedCallback", {
+      url: window.location.href,
+    });
+
     window.removeEventListener("location-changed", this.handleLocationChange);
     document.removeEventListener("visibilitychange", this.handleVisibility);
 
