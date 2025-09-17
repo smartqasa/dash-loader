@@ -87,12 +87,6 @@ export class PanelCard extends LitElement {
   }
 
   protected render(): TemplateResult {
-    console.log("[PanelCard] render", {
-      isMainLoaded: this.isMainLoaded,
-      config: !!this.config,
-      hass: !!this.hass,
-    });
-
     this.classList.toggle("admin-view", this.isAdminView);
 
     if (!this.isMainLoaded || !this.config || !this.hass) {

@@ -166,11 +166,6 @@ let PanelCard = class PanelCard extends i {
         }
     }
     render() {
-        console.log("[PanelCard] render", {
-            isMainLoaded: this.isMainLoaded,
-            config: !!this.config,
-            hass: !!this.hass,
-        });
         this.classList.toggle("admin-view", this.isAdminView);
         if (!this.isMainLoaded || !this.config || !this.hass) {
             return x `
@@ -551,5 +546,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.8-beta.6"} (Built: ${"2025-09-17T03:55:50.422Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.8-beta.7"} (Built: ${"2025-09-17T03:59:50.826Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
