@@ -249,7 +249,7 @@ let PanelCard = class PanelCard extends i {
         display: block;
         width: 100%;
         height: 100vh;
-        background-color: var(--panel-color);
+        background-color: var(--panel-color, #000);
       }
 
       :host(.admin-view) {
@@ -563,5 +563,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.9-beta.4"} (Built: ${"2025-09-17T16:00:31.789Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.11-beta.1"} (Built: ${"2025-09-19T13:13:01.279Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

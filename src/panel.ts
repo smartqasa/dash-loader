@@ -169,7 +169,7 @@ export class PanelCard extends LitElement {
         display: block;
         width: 100%;
         height: 100vh;
-        background-color: var(--panel-color);
+        background-color: var(--panel-color, #000);
       }
 
       :host(.admin-view) {
