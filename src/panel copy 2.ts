@@ -8,9 +8,15 @@ import {
 } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { HomeAssistant, LovelaceCardConfig, PopupDialogElement } from "./types";
+import { getDeviceType } from "./get-device-info";
 import { deviceRefresh, deviceReboot } from "./device-actions";
 
-const SCREENSAVER_TIMEOUT = 5 * 60 * 1000;
+(window as any).onFullyScreensaverStop = () => {
+  document.querySelectorAll("panel-card").forEach((el: any) => {
+    el.isMainLoaded = false;
+    el.checkMainCard();
+  });
+};
 
 window.customCards.push({
   type: "panel-card",
@@ -25,12 +31,10 @@ export class PanelCard extends LitElement {
   @property({ attribute: false }) hass?: HomeAssistant;
 
   @state() isMainLoaded = false;
-  @state() isScreensaverActive = false;
 
   private isAdminView = false;
   private rebootTime: string | null = null;
   private refreshTime: string | null = null;
-  private screensaverTimer: ReturnType<typeof setTimeout> | null = null;
 
   private handleVisibility = (): void => {
     this.requestUpdate();
@@ -44,31 +48,10 @@ export class PanelCard extends LitElement {
     super.connectedCallback();
 
     document.addEventListener("visibilitychange", this.handleVisibility);
-
-    if (window.fully?.bind) {
-      window.fully.bind("onMotion", "onFullyMotion()");
-    }
-
-    (window as any).onFullyMotion = () => {
-      this.resetScreensaverTimer();
-      if (this.isScreensaverActive) {
-        this.isScreensaverActive = false;
-      }
-    };
+    if (window.fully?.bind)
+      window.fully.bind("onScreensaverStop", "onFullyScreensaverStop()");
 
     this.checkMainCard();
-    this.resetScreensaverTimer();
-  }
-
-  public disconnectedCallback(): void {
-    document.removeEventListener("visibilitychange", this.handleVisibility);
-
-    if (this.screensaverTimer) {
-      clearTimeout(this.screensaverTimer);
-      this.screensaverTimer = null;
-    }
-
-    super.disconnectedCallback();
   }
 
   public setConfig(config: LovelaceCardConfig): void {
@@ -96,15 +79,6 @@ export class PanelCard extends LitElement {
       `;
     }
 
-    if (this.isScreensaverActive && window.fully) {
-      return html`
-        <screensaver-card
-          .config=${this.config}
-          .hass=${this.hass}
-        ></screensaver-card>
-      `;
-    }
-
     return html`
       <main-card .config=${this.config} .hass=${this.hass}></main-card>
     `;
@@ -117,15 +91,10 @@ export class PanelCard extends LitElement {
     }
   }
 
-  private resetScreensaverTimer(): void {
-    if (this.screensaverTimer) {
-      clearTimeout(this.screensaverTimer);
-    }
-    if (window.fully) {
-      this.screensaverTimer = setTimeout(() => {
-        this.isScreensaverActive = true;
-      }, SCREENSAVER_TIMEOUT);
-    }
+  disconnectedCallback(): void {
+    document.removeEventListener("visibilitychange", this.handleVisibility);
+
+    super.disconnectedCallback();
   }
 
   private async checkMainCard(retries = 5): Promise<void> {

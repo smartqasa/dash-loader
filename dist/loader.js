@@ -114,12 +114,7 @@ function deviceReboot() {
     }
 }
 
-window.onFullyScreensaverStop = () => {
-    document.querySelectorAll("panel-card").forEach((el) => {
-        el.isMainLoaded = false;
-        el.checkMainCard();
-    });
-};
+const SCREENSAVER_TIMEOUT = 5 * 60 * 1000;
 window.customCards.push({
     type: "panel-card",
     name: "Panel Card",
@@ -130,9 +125,11 @@ let PanelCard = class PanelCard extends i {
     constructor() {
         super(...arguments);
         this.isMainLoaded = false;
+        this.isScreensaverActive = false;
         this.isAdminView = false;
         this.rebootTime = null;
         this.refreshTime = null;
+        this.screensaverTimer = null;
         this.handleVisibility = () => {
             this.requestUpdate();
         };
@@ -143,9 +140,25 @@ let PanelCard = class PanelCard extends i {
     connectedCallback() {
         super.connectedCallback();
         document.addEventListener("visibilitychange", this.handleVisibility);
-        if (window.fully?.bind)
-            window.fully.bind("onScreensaverStop", "onFullyScreensaverStop()");
+        if (window.fully?.bind) {
+            window.fully.bind("onMotion", "onFullyMotion()");
+        }
+        window.onFullyMotion = () => {
+            this.resetScreensaverTimer();
+            if (this.isScreensaverActive) {
+                this.isScreensaverActive = false;
+            }
+        };
         this.checkMainCard();
+        this.resetScreensaverTimer();
+    }
+    disconnectedCallback() {
+        document.removeEventListener("visibilitychange", this.handleVisibility);
+        if (this.screensaverTimer) {
+            clearTimeout(this.screensaverTimer);
+            this.screensaverTimer = null;
+        }
+        super.disconnectedCallback();
     }
     setConfig(config) {
         this.config = config;
@@ -167,6 +180,14 @@ let PanelCard = class PanelCard extends i {
         </div>
       `;
         }
+        if (this.isScreensaverActive && window.fully) {
+            return x `
+        <screensaver-card
+          .config=${this.config}
+          .hass=${this.hass}
+        ></screensaver-card>
+      `;
+        }
         return x `
       <main-card .config=${this.config} .hass=${this.hass}></main-card>
     `;
@@ -177,9 +198,15 @@ let PanelCard = class PanelCard extends i {
             this.syncPopups();
         }
     }
-    disconnectedCallback() {
-        document.removeEventListener("visibilitychange", this.handleVisibility);
-        super.disconnectedCallback();
+    resetScreensaverTimer() {
+        if (this.screensaverTimer) {
+            clearTimeout(this.screensaverTimer);
+        }
+        if (window.fully) {
+            this.screensaverTimer = setTimeout(() => {
+                this.isScreensaverActive = true;
+            }, SCREENSAVER_TIMEOUT);
+        }
     }
     async checkMainCard(retries = 5) {
         try {
@@ -315,6 +342,9 @@ __decorate([
 __decorate([
     r()
 ], PanelCard.prototype, "isMainLoaded", void 0);
+__decorate([
+    r()
+], PanelCard.prototype, "isScreensaverActive", void 0);
 PanelCard = __decorate([
     t("panel-card")
 ], PanelCard);
@@ -563,5 +593,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.11-beta.1"} (Built: ${"2025-09-19T13:13:01.279Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.11-beta.2"} (Built: ${"2025-09-20T21:36:31.929Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

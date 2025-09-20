@@ -15,7 +15,7 @@ import logoImage from "./logo.png";
 
 interface Config extends LovelaceCardConfig {
   move_timer?: number;
-  display: "time" | "logo";
+  display?: "time" | "logo";
   name?: string;
 }
 
@@ -32,16 +32,16 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
     return 100;
   }
 
-  @property({ attribute: false }) config: Config | undefined;
-  @property({ attribute: false }) hass: HomeAssistant | undefined;
+  @property({ attribute: false }) config?: Config;
+  @property({ attribute: false }) hass?: HomeAssistant;
 
   @state() time: string = "Loading...";
   @state() date: string = "Loading...";
 
-  private rebootTime: string | undefined;
-  private refreshTime: string | undefined;
-  private moveTimerId: number | undefined;
-  private timeIntervalId: number | undefined;
+  private rebootTime?: string;
+  private refreshTime?: string;
+  private moveTimerId?: number;
+  private timeIntervalId?: number;
 
   public setConfig(config: Config): void {
     if (!config) throw new Error("Invalid configuration provided");
