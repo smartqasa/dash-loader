@@ -15,7 +15,7 @@ import {
 } from "./types";
 import { deviceRefresh, deviceReboot } from "./device-actions";
 
-const SCREENSAVER_TIMEOUT = 5 * 60 * 1000;
+const SCREENSAVER_TIMEOUT = 1 * 60 * 1000;
 
 window.customCards.push({
   type: "panel-card",
@@ -30,19 +30,18 @@ export class PanelCard extends LitElement {
   @property({ attribute: false }) hass?: HomeAssistant;
 
   @state() mainCard?: LovelaceCard;
-  @state() isScreensaverActive = false;
+  @state() isSaverActive = false;
 
+  private wasInForeground = true;
   private isAdminView = false;
   private rebootTime: string | null = null;
   private refreshTime: string | null = null;
-  private boundTouchHandler = () => this.exitScreensaver();
-  private boundMouseHandler = () => this.exitScreensaver();
-  private boundKeyHandler = () => this.exitScreensaver();
-  private screensaverTimer: ReturnType<typeof setTimeout> | null = null;
 
-  private handleVisibility = (): void => {
-    this.requestUpdate();
-  };
+  private boundTouchHandler = () => this.resetSaver();
+  private boundMouseHandler = () => this.resetSaver();
+  private boundKeyHandler = () => this.resetSaver();
+
+  private saverTimer: ReturnType<typeof setTimeout> | null = null;
 
   public getCardSize(): number | Promise<number> {
     return 20;
@@ -50,7 +49,6 @@ export class PanelCard extends LitElement {
 
   public connectedCallback(): void {
     super.connectedCallback();
-    document.addEventListener("visibilitychange", this.handleVisibility);
 
     if (window.fully) {
       window.addEventListener("touchstart", this.boundTouchHandler, {
@@ -59,27 +57,25 @@ export class PanelCard extends LitElement {
       window.addEventListener("mousemove", this.boundMouseHandler);
       window.addEventListener("keydown", this.boundKeyHandler);
 
+      (window as any).onFullyMotion = () => this.resetSaver();
       if (window.fully.bind) {
         window.fully.bind("onMotion", "onFullyMotion()");
       }
-      (window as any).onFullyMotion = () => this.exitScreensaver();
 
-      this.resetScreensaverTimer();
+      this.resetSaver();
     }
   }
 
   public disconnectedCallback(): void {
-    document.removeEventListener("visibilitychange", this.handleVisibility);
-
     if (window.fully) {
       window.removeEventListener("touchstart", this.boundTouchHandler);
       window.removeEventListener("mousemove", this.boundMouseHandler);
       window.removeEventListener("keydown", this.boundKeyHandler);
     }
 
-    if (this.screensaverTimer) {
-      clearTimeout(this.screensaverTimer);
-      this.screensaverTimer = null;
+    if (this.saverTimer) {
+      clearTimeout(this.saverTimer);
+      this.saverTimer = null;
     }
 
     super.disconnectedCallback();
@@ -110,7 +106,7 @@ export class PanelCard extends LitElement {
       `;
     }
 
-    if (this.isScreensaverActive && window.fully) {
+    if (this.isSaverActive) {
       return html`
         <screensaver-card
           .config=${this.config}
@@ -172,22 +168,38 @@ export class PanelCard extends LitElement {
     });
   }
 
-  private resetScreensaverTimer(): void {
-    if (this.screensaverTimer) {
-      clearTimeout(this.screensaverTimer);
-    }
-    if (window.fully) {
-      this.screensaverTimer = setTimeout(() => {
-        this.isScreensaverActive = true;
-      }, SCREENSAVER_TIMEOUT);
-    }
+  private resetSaver(): void {
+    if (!window.fully) return;
+
+    if (this.saverTimer) clearTimeout(this.saverTimer);
+    if (this.isSaverActive) this.exitSaver();
+
+    this.saverTimer = setTimeout(() => {
+      this.showSaver();
+    }, SCREENSAVER_TIMEOUT);
   }
 
-  private exitScreensaver(): void {
-    this.resetScreensaverTimer();
-    if (this.isScreensaverActive) {
+  private async showSaver(): Promise<void> {
+    if (!window.fully) return;
+
+    this.wasInForeground = window.fully.isInForeground();
+
+    this.isSaverActive = true;
+    await this.updateComplete;
+    await new Promise(requestAnimationFrame);
+
+    window.fully.bringToForeground();
+  }
+
+  private exitSaver(): void {
+    if (!window.fully) return;
+
+    this.isSaverActive = false;
+
+    if (this.wasInForeground) {
       window.dispatchEvent(new Event("smartqasa-fade-request"));
-      this.isScreensaverActive = false;
+    } else {
+      window.fully.bringToBackground();
     }
   }
 

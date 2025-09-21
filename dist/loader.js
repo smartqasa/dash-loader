@@ -114,7 +114,7 @@ function deviceReboot() {
     }
 }
 
-const SCREENSAVER_TIMEOUT = 5 * 60 * 1000;
+const SCREENSAVER_TIMEOUT = 1 * 60 * 1000;
 window.customCards.push({
     type: "panel-card",
     name: "Panel Card",
@@ -124,47 +124,43 @@ window.customCards.push({
 let PanelCard = class PanelCard extends i {
     constructor() {
         super(...arguments);
-        this.isScreensaverActive = false;
+        this.isSaverActive = false;
+        this.wasInForeground = true;
         this.isAdminView = false;
         this.rebootTime = null;
         this.refreshTime = null;
-        this.boundTouchHandler = () => this.exitScreensaver();
-        this.boundMouseHandler = () => this.exitScreensaver();
-        this.boundKeyHandler = () => this.exitScreensaver();
-        this.screensaverTimer = null;
-        this.handleVisibility = () => {
-            this.requestUpdate();
-        };
+        this.boundTouchHandler = () => this.resetSaver();
+        this.boundMouseHandler = () => this.resetSaver();
+        this.boundKeyHandler = () => this.resetSaver();
+        this.saverTimer = null;
     }
     getCardSize() {
         return 20;
     }
     connectedCallback() {
         super.connectedCallback();
-        document.addEventListener("visibilitychange", this.handleVisibility);
         if (window.fully) {
             window.addEventListener("touchstart", this.boundTouchHandler, {
                 passive: true,
             });
             window.addEventListener("mousemove", this.boundMouseHandler);
             window.addEventListener("keydown", this.boundKeyHandler);
+            window.onFullyMotion = () => this.resetSaver();
             if (window.fully.bind) {
                 window.fully.bind("onMotion", "onFullyMotion()");
             }
-            window.onFullyMotion = () => this.exitScreensaver();
-            this.resetScreensaverTimer();
+            this.resetSaver();
         }
     }
     disconnectedCallback() {
-        document.removeEventListener("visibilitychange", this.handleVisibility);
         if (window.fully) {
             window.removeEventListener("touchstart", this.boundTouchHandler);
             window.removeEventListener("mousemove", this.boundMouseHandler);
             window.removeEventListener("keydown", this.boundKeyHandler);
         }
-        if (this.screensaverTimer) {
-            clearTimeout(this.screensaverTimer);
-            this.screensaverTimer = null;
+        if (this.saverTimer) {
+            clearTimeout(this.saverTimer);
+            this.saverTimer = null;
         }
         super.disconnectedCallback();
     }
@@ -188,7 +184,7 @@ let PanelCard = class PanelCard extends i {
         </div>
       `;
         }
-        if (this.isScreensaverActive && window.fully) {
+        if (this.isSaverActive) {
             return x `
         <screensaver-card
           .config=${this.config}
@@ -244,21 +240,35 @@ let PanelCard = class PanelCard extends i {
             }
         });
     }
-    resetScreensaverTimer() {
-        if (this.screensaverTimer) {
-            clearTimeout(this.screensaverTimer);
-        }
-        if (window.fully) {
-            this.screensaverTimer = setTimeout(() => {
-                this.isScreensaverActive = true;
-            }, SCREENSAVER_TIMEOUT);
-        }
+    resetSaver() {
+        if (!window.fully)
+            return;
+        if (this.saverTimer)
+            clearTimeout(this.saverTimer);
+        if (this.isSaverActive)
+            this.exitSaver();
+        this.saverTimer = setTimeout(() => {
+            this.showSaver();
+        }, SCREENSAVER_TIMEOUT);
     }
-    exitScreensaver() {
-        this.resetScreensaverTimer();
-        if (this.isScreensaverActive) {
+    async showSaver() {
+        if (!window.fully)
+            return;
+        this.wasInForeground = window.fully.isInForeground();
+        this.isSaverActive = true;
+        await this.updateComplete;
+        await new Promise(requestAnimationFrame);
+        window.fully.bringToForeground();
+    }
+    exitSaver() {
+        if (!window.fully)
+            return;
+        this.isSaverActive = false;
+        if (this.wasInForeground) {
             window.dispatchEvent(new Event("smartqasa-fade-request"));
-            this.isScreensaverActive = false;
+        }
+        else {
+            window.fully.bringToBackground();
         }
     }
     checkDeviceTriggers() {
@@ -359,7 +369,7 @@ __decorate([
 ], PanelCard.prototype, "mainCard", void 0);
 __decorate([
     r()
-], PanelCard.prototype, "isScreensaverActive", void 0);
+], PanelCard.prototype, "isSaverActive", void 0);
 PanelCard = __decorate([
     t("panel-card")
 ], PanelCard);
@@ -606,5 +616,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.13-beta.5"} (Built: ${"2025-09-21T05:44:45.796Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.14-beta.1"} (Built: ${"2025-09-21T12:15:22.579Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

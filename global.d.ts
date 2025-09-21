@@ -30,6 +30,7 @@ declare interface Window {
   customCards: Array<Object>;
   fully?: {
     bind: (event: string, action: string) => void;
+    bringToBackground: () => void;
     bringToForeground: () => void;
     clearCache: () => void;
     getDeviceModel: () => string;
