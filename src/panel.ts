@@ -7,7 +7,12 @@ import {
   TemplateResult,
 } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
-import { HomeAssistant, LovelaceCardConfig, PopupDialogElement } from "./types";
+import {
+  HomeAssistant,
+  LovelaceCardConfig,
+  LovelaceCard,
+  PopupDialogElement,
+} from "./types";
 import { deviceRefresh, deviceReboot } from "./device-actions";
 
 const SCREENSAVER_TIMEOUT = 5 * 60 * 1000;
@@ -24,7 +29,7 @@ export class PanelCard extends LitElement {
   @property({ attribute: false }) config?: LovelaceCardConfig;
   @property({ attribute: false }) hass?: HomeAssistant;
 
-  @state() isMainLoaded = false;
+  @state() mainCard?: LovelaceCard;
   @state() isScreensaverActive = false;
 
   private isAdminView = false;
@@ -42,22 +47,22 @@ export class PanelCard extends LitElement {
 
   public connectedCallback(): void {
     super.connectedCallback();
-
     document.addEventListener("visibilitychange", this.handleVisibility);
 
+    // Generic activity listeners
+    window.addEventListener("touchstart", () => this.exitScreensaver(), {
+      passive: true,
+    });
+    window.addEventListener("mousemove", () => this.exitScreensaver());
+    window.addEventListener("keydown", () => this.exitScreensaver());
+
+    // Fully motion integration
     if (window.fully?.bind) {
       window.fully.bind("onMotion", "onFullyMotion()");
     }
+    (window as any).onFullyMotion = () => this.exitScreensaver();
 
-    (window as any).onFullyMotion = () => {
-      this.resetScreensaverTimer();
-      if (this.isScreensaverActive) {
-        this.isScreensaverActive = false;
-        window.dispatchEvent(new Event("smartqasa-fade-request"));
-      }
-    };
-
-    this.checkMainCard();
+    this.createMainCard();
     this.resetScreensaverTimer();
   }
 
@@ -88,7 +93,7 @@ export class PanelCard extends LitElement {
   protected render(): TemplateResult {
     this.classList.toggle("admin-view", this.isAdminView);
 
-    if (!this.isMainLoaded || !this.config || !this.hass) {
+    if (!this.mainCard || !this.config || !this.hass) {
       return html`
         <div class="loader-container">
           <div class="loading-text">SmartQasa is loading</div>
@@ -106,15 +111,28 @@ export class PanelCard extends LitElement {
       `;
     }
 
-    return html`
-      <main-card .config=${this.config} .hass=${this.hass}></main-card>
-    `;
+    return html` ${this.mainCard} `;
   }
 
   protected updated(changedProps: PropertyValues): void {
     if (changedProps.has("hass") && this.hass) {
       this.checkDeviceTriggers();
-      this.syncPopups();
+      this.syncHass();
+    }
+  }
+
+  private async createMainCard(retries = 5): Promise<void> {
+    try {
+      await customElements.whenDefined("main-card");
+      this.mainCard = document.createElement("main-card") as LovelaceCard;
+    } catch (err) {
+      console.error("[PanelCard] Error waiting for main-card:", err);
+      if (retries > 0) {
+        setTimeout(() => this.createMainCard(retries - 1), 1000);
+      } else {
+        console.error("[PanelCard] Giving up and forcing reload");
+        location.reload();
+      }
     }
   }
 
@@ -129,34 +147,11 @@ export class PanelCard extends LitElement {
     }
   }
 
-  private async checkMainCard(retries = 5): Promise<void> {
-    try {
-      await customElements.whenDefined("main-card");
-      const ctor = customElements.get("main-card");
-
-      if (!ctor) {
-        if (retries > 0) {
-          console.warn(
-            `[PanelCard] main-card not available yet, retrying… (${retries} left)`
-          );
-          setTimeout(() => this.checkMainCard(retries - 1), 1000);
-          return;
-        } else {
-          console.error("[PanelCard] main-card still missing → forcing reload");
-          location.reload();
-          return;
-        }
-      }
-
-      this.isMainLoaded = true;
-    } catch (err) {
-      console.error("[PanelCard] Error waiting for main-card:", err);
-      if (retries > 0) {
-        setTimeout(() => this.checkMainCard(retries - 1), 1000);
-      } else {
-        console.error("[PanelCard] Giving up and forcing reload");
-        location.reload();
-      }
+  private exitScreensaver(): void {
+    this.resetScreensaverTimer();
+    if (this.isScreensaverActive) {
+      this.isScreensaverActive = false;
+      window.dispatchEvent(new Event("smartqasa-fade-request"));
     }
   }
 
@@ -186,8 +181,10 @@ export class PanelCard extends LitElement {
     this.refreshTime = refreshState || null;
   }
 
-  private syncPopups(): void {
+  private syncHass(): void {
     if (!this.hass) return;
+
+    if (this.mainCard) this.mainCard.hass = this.hass;
 
     document.querySelectorAll("popup-dialog").forEach((popup) => {
       if ((popup as PopupDialogElement).hass !== undefined) {
