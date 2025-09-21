@@ -32,9 +32,14 @@ export class PanelCard extends LitElement {
   @state() mainCard?: LovelaceCard;
   @state() isSaverActive = false;
 
+  private fadeRequested = false;
   private isAdminView = false;
   private rebootTime: string | null = null;
   private refreshTime: string | null = null;
+
+  private handleVisibility = (): void => {
+    this.requestUpdate();
+  };
 
   private boundHandleFade = () => this.handleFade();
   private boundTouchHandler = () => this.resetSaver();
@@ -50,7 +55,7 @@ export class PanelCard extends LitElement {
   public connectedCallback(): void {
     super.connectedCallback();
 
-    document.addEventListener("visibilitychange", () => this.requestUpdate());
+    document.addEventListener("visibilitychange", this.handleVisibility);
     window.addEventListener("sq-fade-request", this.boundHandleFade);
 
     if (window.fully) {
@@ -70,6 +75,7 @@ export class PanelCard extends LitElement {
   }
 
   public disconnectedCallback(): void {
+    document.removeEventListener("visibilitychange", this.handleVisibility);
     window.removeEventListener("sq-fade-request", this.boundHandleFade);
 
     if (window.fully) {
@@ -97,13 +103,20 @@ export class PanelCard extends LitElement {
         this.hass?.states["input_boolean.admin_mode"]?.state === "on" || false;
       this.isAdminView = isAdmin || isAdminMode;
     }
+
+    const container = this.shadowRoot?.querySelector<HTMLElement>(".container");
+    if (container) {
+      if (this.fadeRequested) {
+        container.classList.remove("visible");
+      } else {
+        container.classList.add("visible");
+      }
+    }
   }
 
   protected render(): TemplateResult {
     this.classList.toggle("admin-view", this.isAdminView);
 
-    // ALWAYS render container without "visible" class by default.
-    // We call handleFade() after render to add .visible and trigger the transition.
     if (!this.mainCard || !this.config || !this.hass) {
       return html`
         <div class="container loader">
@@ -124,40 +137,29 @@ export class PanelCard extends LitElement {
       `;
     }
 
-    return html`<div class="container">${this.mainCard}</div>`;
+    return html` <div class="container">${this.mainCard}</div> `;
   }
 
   protected firstUpdated(): void {
     this.createMainCard();
-    // Kick off initial fade after first paint.
-    // Use RAF chain so browser commits the non-visible state first.
-    this.handleFade();
   }
 
   protected updated(changedProps: PropertyValues): void {
-    // sync hass/config into mainCard as before
-    if (this.mainCard) {
-      if (changedProps.has("config") && this.config) {
-        this.mainCard.setConfig(this.config);
-      }
-      if (changedProps.has("hass") && this.hass) {
-        this.syncHass();
-        this.checkDeviceTriggers();
-      }
+    if (!this.mainCard) return;
+
+    if (changedProps.has("config") && this.config) {
+      this.mainCard.setConfig(this.config);
+    }
+    if (changedProps.has("hass") && this.hass) {
+      this.syncHass();
+      this.checkDeviceTriggers();
     }
 
-    // Only trigger fade for meaningful container swaps:
-    // - mainCard became available (loader -> main)
-    // - saver toggled (enter or exit)
-    // - config arrived once we have a mainCard
-    if (
-      changedProps.has("mainCard") ||
-      changedProps.has("isSaverActive") ||
-      (changedProps.has("config") && this.mainCard)
-    ) {
-      // ensure DOM painted, then run the deterministic fade
-      // we run handleFade in a microtask so updated finishes and the new container is in the DOM
-      Promise.resolve().then(() => this.handleFade());
+    if (this.fadeRequested) {
+      setTimeout(() => {
+        this.fadeRequested = false;
+        this.requestUpdate();
+      }, 250);
     }
   }
 
@@ -211,7 +213,6 @@ export class PanelCard extends LitElement {
 
   private exitSaver(): void {
     this.isSaverActive = false;
-    // fade back to main content
     this.handleFade();
   }
 
@@ -241,25 +242,9 @@ export class PanelCard extends LitElement {
     this.refreshTime = refreshState || null;
   }
 
-  // ---- RELIABLE TWO-RRAF FADE ----
-  // Remove .visible (or leave it removed), wait two rAF ticks, then add .visible.
-  // This reliably causes the browser to animate opacity from 0 -> 1.
   private handleFade(): void {
-    const container = this.shadowRoot?.querySelector<HTMLElement>(".container");
-    if (!container) return;
-
-    // Remove visible (no-op if already removed)
-    container.classList.remove("visible");
-
-    // Two RAFs: first gives the removal a chance to be painted,
-    // second applies the visible class so the transition runs.
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        container.classList.add("visible");
-        // Optional debug:
-        // console.debug("[PanelCard] handleFade: added .visible");
-      });
-    });
+    this.fadeRequested = true;
+    this.requestUpdate();
   }
 
   static get styles(): CSSResult {
@@ -280,7 +265,7 @@ export class PanelCard extends LitElement {
         height: 100%;
         opacity: 0;
         will-change: opacity;
-        transition: opacity 200ms ease-in-out;
+        transition: opacity 250ms ease-in-out;
       }
 
       .container.visible {

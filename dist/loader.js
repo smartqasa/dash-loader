@@ -125,9 +125,13 @@ let PanelCard = class PanelCard extends i {
     constructor() {
         super(...arguments);
         this.isSaverActive = false;
+        this.fadeRequested = false;
         this.isAdminView = false;
         this.rebootTime = null;
         this.refreshTime = null;
+        this.handleVisibility = () => {
+            this.requestUpdate();
+        };
         this.boundHandleFade = () => this.handleFade();
         this.boundTouchHandler = () => this.resetSaver();
         this.boundMouseHandler = () => this.resetSaver();
@@ -139,7 +143,7 @@ let PanelCard = class PanelCard extends i {
     }
     connectedCallback() {
         super.connectedCallback();
-        document.addEventListener("visibilitychange", () => this.requestUpdate());
+        document.addEventListener("visibilitychange", this.handleVisibility);
         window.addEventListener("sq-fade-request", this.boundHandleFade);
         if (window.fully) {
             window.addEventListener("touchstart", this.boundTouchHandler, {
@@ -155,6 +159,7 @@ let PanelCard = class PanelCard extends i {
         }
     }
     disconnectedCallback() {
+        document.removeEventListener("visibilitychange", this.handleVisibility);
         window.removeEventListener("sq-fade-request", this.boundHandleFade);
         if (window.fully) {
             window.removeEventListener("touchstart", this.boundTouchHandler);
@@ -176,11 +181,18 @@ let PanelCard = class PanelCard extends i {
             const isAdminMode = this.hass?.states["input_boolean.admin_mode"]?.state === "on" || false;
             this.isAdminView = isAdmin || isAdminMode;
         }
+        const container = this.shadowRoot?.querySelector(".container");
+        if (container) {
+            if (this.fadeRequested) {
+                container.classList.remove("visible");
+            }
+            else {
+                container.classList.add("visible");
+            }
+        }
     }
     render() {
         this.classList.toggle("admin-view", this.isAdminView);
-        // ALWAYS render container without "visible" class by default.
-        // We call handleFade() after render to add .visible and trigger the transition.
         if (!this.mainCard || !this.config || !this.hass) {
             return x `
         <div class="container loader">
@@ -199,35 +211,26 @@ let PanelCard = class PanelCard extends i {
         </div>
       `;
         }
-        return x `<div class="container">${this.mainCard}</div>`;
+        return x ` <div class="container">${this.mainCard}</div> `;
     }
     firstUpdated() {
         this.createMainCard();
-        // Kick off initial fade after first paint.
-        // Use RAF chain so browser commits the non-visible state first.
-        this.handleFade();
     }
     updated(changedProps) {
-        // sync hass/config into mainCard as before
-        if (this.mainCard) {
-            if (changedProps.has("config") && this.config) {
-                this.mainCard.setConfig(this.config);
-            }
-            if (changedProps.has("hass") && this.hass) {
-                this.syncHass();
-                this.checkDeviceTriggers();
-            }
+        if (!this.mainCard)
+            return;
+        if (changedProps.has("config") && this.config) {
+            this.mainCard.setConfig(this.config);
         }
-        // Only trigger fade for meaningful container swaps:
-        // - mainCard became available (loader -> main)
-        // - saver toggled (enter or exit)
-        // - config arrived once we have a mainCard
-        if (changedProps.has("mainCard") ||
-            changedProps.has("isSaverActive") ||
-            (changedProps.has("config") && this.mainCard)) {
-            // ensure DOM painted, then run the deterministic fade
-            // we run handleFade in a microtask so updated finishes and the new container is in the DOM
-            Promise.resolve().then(() => this.handleFade());
+        if (changedProps.has("hass") && this.hass) {
+            this.syncHass();
+            this.checkDeviceTriggers();
+        }
+        if (this.fadeRequested) {
+            setTimeout(() => {
+                this.fadeRequested = false;
+                this.requestUpdate();
+            }, 250);
         }
     }
     async createMainCard(retries = 5) {
@@ -277,7 +280,6 @@ let PanelCard = class PanelCard extends i {
     }
     exitSaver() {
         this.isSaverActive = false;
-        // fade back to main content
         this.handleFade();
     }
     checkDeviceTriggers() {
@@ -304,24 +306,9 @@ let PanelCard = class PanelCard extends i {
         }
         this.refreshTime = refreshState || null;
     }
-    // ---- RELIABLE TWO-RRAF FADE ----
-    // Remove .visible (or leave it removed), wait two rAF ticks, then add .visible.
-    // This reliably causes the browser to animate opacity from 0 -> 1.
     handleFade() {
-        const container = this.shadowRoot?.querySelector(".container");
-        if (!container)
-            return;
-        // Remove visible (no-op if already removed)
-        container.classList.remove("visible");
-        // Two RAFs: first gives the removal a chance to be painted,
-        // second applies the visible class so the transition runs.
-        requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                container.classList.add("visible");
-                // Optional debug:
-                // console.debug("[PanelCard] handleFade: added .visible");
-            });
-        });
+        this.fadeRequested = true;
+        this.requestUpdate();
     }
     static get styles() {
         return i$3 `
@@ -341,7 +328,7 @@ let PanelCard = class PanelCard extends i {
         height: 100%;
         opacity: 0;
         will-change: opacity;
-        transition: opacity 200ms ease-in-out;
+        transition: opacity 250ms ease-in-out;
       }
 
       .container.visible {
@@ -653,5 +640,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.14-beta.17"} (Built: ${"2025-09-21T16:53:05.579Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.14-beta.18"} (Built: ${"2025-09-21T17:05:13.773Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
