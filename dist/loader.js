@@ -390,8 +390,6 @@ let ScreenSaver = class ScreenSaver extends i {
         return 100;
     }
     setConfig(config) {
-        if (!config)
-            throw new Error("Invalid configuration provided");
         this.config = config;
     }
     render() {
@@ -400,7 +398,7 @@ let ScreenSaver = class ScreenSaver extends i {
         return x `
       <div class="container">
         <div class="element">
-          ${this.config?.display === "logo"
+          ${this.config?.saver_type === "logo"
             ? x `
                 <div class="logo">
                   <img
@@ -408,8 +406,8 @@ let ScreenSaver = class ScreenSaver extends i {
                     alt="Logo"
                     @error=${() => this.handleImageError()}
                   />
-                  ${this.config.name
-                ? x ` <div class="name">${this.config.name}</div> `
+                  ${this.config.saver_title
+                ? x ` <div class="name">${this.config.saver_title}</div> `
                 : ""}
                 </div>
               `
@@ -460,7 +458,7 @@ let ScreenSaver = class ScreenSaver extends i {
             console.error("Element not found in shadow DOM.");
             return;
         }
-        const moveTimer = (this.config?.move_timer ?? 30) * 1000;
+        const moveTimer = (this.config?.saver_interval ?? 30) * 1000;
         const runCycle = () => {
             // fade out
             element.style.opacity = "0";
@@ -593,5 +591,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.11-beta.2"} (Built: ${"2025-09-20T21:36:31.929Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.11-beta.3"} (Built: ${"2025-09-21T01:50:26.299Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

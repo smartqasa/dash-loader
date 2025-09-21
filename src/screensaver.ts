@@ -14,9 +14,9 @@ import { deviceRefresh, deviceReboot } from "./device-actions";
 import logoImage from "./logo.png";
 
 interface Config extends LovelaceCardConfig {
-  move_timer?: number;
-  display?: "time" | "logo";
-  name?: string;
+  saver_type?: "time" | "logo";
+  saver_title?: string;
+  saver_interval?: number;
 }
 
 window.customCards.push({
@@ -44,7 +44,6 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
   private timeIntervalId?: number;
 
   public setConfig(config: Config): void {
-    if (!config) throw new Error("Invalid configuration provided");
     this.config = config;
   }
 
@@ -54,7 +53,7 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
     return html`
       <div class="container">
         <div class="element">
-          ${this.config?.display === "logo"
+          ${this.config?.saver_type === "logo"
             ? html`
                 <div class="logo">
                   <img
@@ -62,8 +61,8 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
                     alt="Logo"
                     @error=${() => this.handleImageError()}
                   />
-                  ${this.config.name
-                    ? html` <div class="name">${this.config.name}</div> `
+                  ${this.config.saver_title
+                    ? html` <div class="name">${this.config.saver_title}</div> `
                     : ""}
                 </div>
               `
@@ -123,7 +122,7 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
       return;
     }
 
-    const moveTimer = (this.config?.move_timer ?? 30) * 1000;
+    const moveTimer = (this.config?.saver_interval ?? 30) * 1000;
 
     const runCycle = () => {
       // fade out
