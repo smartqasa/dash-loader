@@ -228,7 +228,8 @@ export class PanelCard extends LitElement {
   private handleFade(): void {
     const container = this.shadowRoot?.querySelector<HTMLElement>(".container");
     if (!container) return;
-    if (location.pathname !== this.lastPath) {
+
+    if (this.lastPath && location.pathname !== this.lastPath) {
       container.style.opacity = "0";
     } else {
       container.style.opacity = "1";
