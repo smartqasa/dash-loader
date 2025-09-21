@@ -295,11 +295,11 @@ let PanelCard = class PanelCard extends i {
         console.log("Last path:", this.lastPath, "Current path:", location.pathname);
         if (location.pathname !== this.lastPath) {
             container.style.opacity = "0";
+            this.lastPath = location.pathname;
         }
         else {
             container.style.opacity = "1";
         }
-        this.lastPath = location.pathname;
     }
     static get styles() {
         return i$3 `
@@ -634,5 +634,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.14-beta.30"} (Built: ${"2025-09-21T18:18:04.520Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.14-beta.31"} (Built: ${"2025-09-21T18:19:17.118Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

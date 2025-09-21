@@ -237,11 +237,10 @@ export class PanelCard extends LitElement {
     );
     if (location.pathname !== this.lastPath) {
       container.style.opacity = "0";
+      this.lastPath = location.pathname;
     } else {
       container.style.opacity = "1";
     }
-
-    this.lastPath = location.pathname;
   }
 
   static get styles(): CSSResult {
