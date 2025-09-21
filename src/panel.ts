@@ -32,7 +32,7 @@ export class PanelCard extends LitElement {
   @state() mainCard?: LovelaceCard;
   @state() isSaverActive = false;
 
-  private lastPath?: string;
+  @state() lastPath?: string;
   private isAdminView = false;
   private rebootTime: string | null = null;
   private refreshTime: string | null = null;

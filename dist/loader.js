@@ -388,6 +388,9 @@ __decorate([
 __decorate([
     r()
 ], PanelCard.prototype, "isSaverActive", void 0);
+__decorate([
+    r()
+], PanelCard.prototype, "lastPath", void 0);
 PanelCard = __decorate([
     t("panel-card")
 ], PanelCard);
@@ -631,5 +634,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.14-beta.29"} (Built: ${"2025-09-21T18:15:37.373Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.14-beta.30"} (Built: ${"2025-09-21T18:18:04.520Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
