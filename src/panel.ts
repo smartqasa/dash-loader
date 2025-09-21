@@ -190,7 +190,7 @@ export class PanelCard extends LitElement {
     }, SCREENSAVER_TIMEOUT);
   }
 
-  private async showSaver(): Promise<void> {
+  private showSaver(): void {
     this.isSaverActive = true;
   }
 
@@ -229,9 +229,11 @@ export class PanelCard extends LitElement {
     const container = this.shadowRoot?.querySelector<HTMLElement>(".container");
     if (!container || location.pathname === this.lastPath) return;
 
-    container.style.opacity = "0";
+    //container.style.opacity = "0";
+    container.classList.remove("visible");
     await new Promise((r) => setTimeout(r, 250));
-    container.style.opacity = "1";
+    //container.style.opacity = "1";
+    container.classList.add("visible");
     this.lastPath = location.pathname;
   }
 
