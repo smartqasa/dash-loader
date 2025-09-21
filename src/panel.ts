@@ -7,7 +7,6 @@ import {
   TemplateResult,
 } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
-import { classMap } from "lit/directives/class-map.js";
 import {
   HomeAssistant,
   LovelaceCardConfig,
@@ -32,8 +31,8 @@ export class PanelCard extends LitElement {
 
   @state() mainCard?: LovelaceCard;
   @state() isSaverActive = false;
-  @state() fadeRequested = false;
 
+  private fadeRequested = false;
   private isAdminView = false;
   private rebootTime: string | null = null;
   private refreshTime: string | null = null;
@@ -97,7 +96,7 @@ export class PanelCard extends LitElement {
     this.config = config;
   }
 
-  protected willUpdate(changedProps: PropertyValues): void {
+  protected async willUpdate(changedProps: PropertyValues): Promise<void> {
     if (changedProps.has("hass")) {
       const isAdmin = this.hass?.user?.is_admin || false;
       const isAdminMode =
@@ -105,17 +104,13 @@ export class PanelCard extends LitElement {
       this.isAdminView = isAdmin || isAdminMode;
     }
 
-    if (changedProps.has("fadeRequested")) {
-      const container =
-        this.shadowRoot?.querySelector<HTMLElement>(".container");
-      if (container) {
-        if (this.fadeRequested) {
-          container.style.opacity = "0";
-          console.log("[PanelCard] Fading out");
-        } else {
-          container.style.opacity = "1";
-          console.log("[PanelCard] Fading in");
-        }
+    const container = this.shadowRoot?.querySelector<HTMLElement>(".container");
+    if (container) {
+      if (this.fadeRequested) {
+        container.style.opacity = "0";
+      } else {
+        //await new Promise((resolve) => setTimeout(resolve, 100));
+        container.style.opacity = "1";
       }
     }
   }
@@ -148,7 +143,6 @@ export class PanelCard extends LitElement {
 
   protected firstUpdated(): void {
     this.createMainCard();
-    this.fadeRequested = true;
   }
 
   protected updated(changedProps: PropertyValues): void {
@@ -162,9 +156,7 @@ export class PanelCard extends LitElement {
       this.checkDeviceTriggers();
     }
 
-    if (changedProps.has("fadeRequested") && this.fadeRequested) {
-      this.fadeRequested = false;
-    }
+    this.fadeRequested = false;
   }
 
   private async createMainCard(retries = 5): Promise<void> {
@@ -270,10 +262,6 @@ export class PanelCard extends LitElement {
         opacity: 0;
         will-change: opacity;
         transition: opacity 200ms ease-in-out;
-      }
-
-      .container.visible {
-        opacity: 1;
       }
 
       .container.loader {
