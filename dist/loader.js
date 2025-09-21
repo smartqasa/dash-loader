@@ -237,7 +237,11 @@ let PanelCard = class PanelCard extends i$1 {
             this.syncHass();
             this.checkDeviceTriggers();
         }
-        this.fadeRequested = false;
+        if (this.fadeRequested) {
+            requestAnimationFrame(() => {
+                this.fadeRequested = false;
+            });
+        }
     }
     async createMainCard(retries = 5) {
         try {
@@ -648,5 +652,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.14-beta.8"} (Built: ${"2025-09-21T15:59:35.311Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.14-beta.9"} (Built: ${"2025-09-21T16:02:07.017Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

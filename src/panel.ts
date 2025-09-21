@@ -154,7 +154,12 @@ export class PanelCard extends LitElement {
       this.syncHass();
       this.checkDeviceTriggers();
     }
-    this.fadeRequested = false;
+
+    if (this.fadeRequested) {
+      requestAnimationFrame(() => {
+        this.fadeRequested = false;
+      });
+    }
   }
 
   private async createMainCard(retries = 5): Promise<void> {
