@@ -32,7 +32,6 @@ export class PanelCard extends LitElement {
   @state() mainCard?: LovelaceCard;
   @state() isSaverActive = false;
 
-  private wasInForeground = true;
   private isAdminView = false;
   private rebootTime: string | null = null;
   private refreshTime: string | null = null;
@@ -180,27 +179,12 @@ export class PanelCard extends LitElement {
   }
 
   private async showSaver(): Promise<void> {
-    if (!window.fully) return;
-
-    this.wasInForeground = window.fully.isInForeground();
-
     this.isSaverActive = true;
-    await this.updateComplete;
-    await new Promise(requestAnimationFrame);
-
-    window.fully.bringToForeground();
   }
 
   private exitSaver(): void {
-    if (!window.fully) return;
-
     this.isSaverActive = false;
-
-    if (this.wasInForeground) {
-      window.dispatchEvent(new Event("smartqasa-fade-request"));
-    } else {
-      window.fully.bringToBackground();
-    }
+    window.dispatchEvent(new Event("sq-fade-request"));
   }
 
   private checkDeviceTriggers(): void {

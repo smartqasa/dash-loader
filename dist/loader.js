@@ -125,7 +125,6 @@ let PanelCard = class PanelCard extends i {
     constructor() {
         super(...arguments);
         this.isSaverActive = false;
-        this.wasInForeground = true;
         this.isAdminView = false;
         this.rebootTime = null;
         this.refreshTime = null;
@@ -252,24 +251,11 @@ let PanelCard = class PanelCard extends i {
         }, SCREENSAVER_TIMEOUT);
     }
     async showSaver() {
-        if (!window.fully)
-            return;
-        this.wasInForeground = window.fully.isInForeground();
         this.isSaverActive = true;
-        await this.updateComplete;
-        await new Promise(requestAnimationFrame);
-        window.fully.bringToForeground();
     }
     exitSaver() {
-        if (!window.fully)
-            return;
         this.isSaverActive = false;
-        if (this.wasInForeground) {
-            window.dispatchEvent(new Event("smartqasa-fade-request"));
-        }
-        else {
-            window.fully.bringToBackground();
-        }
+        window.dispatchEvent(new Event("sq-fade-request"));
     }
     checkDeviceTriggers() {
         if (!this.hass)
@@ -616,5 +602,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.14-beta.2"} (Built: ${"2025-09-21T12:26:37.152Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.14-beta.3"} (Built: ${"2025-09-21T12:47:07.871Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
