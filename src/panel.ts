@@ -111,8 +111,10 @@ export class PanelCard extends LitElement {
       if (container) {
         if (this.fadeRequested) {
           container.style.opacity = "0";
+          console.log("[PanelCard] Fading out");
         } else {
           container.style.opacity = "1";
+          console.log("[PanelCard] Fading in");
         }
       }
     }

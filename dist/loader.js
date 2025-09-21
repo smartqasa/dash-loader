@@ -186,9 +186,11 @@ let PanelCard = class PanelCard extends i {
             if (container) {
                 if (this.fadeRequested) {
                     container.style.opacity = "0";
+                    console.log("[PanelCard] Fading out");
                 }
                 else {
                     container.style.opacity = "1";
+                    console.log("[PanelCard] Fading in");
                 }
             }
         }
@@ -643,5 +645,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.14-beta.13"} (Built: ${"2025-09-21T16:20:44.859Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.14-beta.14"} (Built: ${"2025-09-21T16:22:30.512Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
