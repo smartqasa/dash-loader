@@ -229,6 +229,17 @@ export class PanelCard extends LitElement {
     const container = this.shadowRoot?.querySelector<HTMLElement>(".container");
     if (!container) return;
 
+    if (location.pathname !== this.lastPath) {
+      container.style.opacity = "0";
+      await new Promise((resolve) => {
+        container.addEventListener("transitionend", resolve, { once: true });
+      });
+      container.style.opacity = "1";
+      await new Promise((resolve) => {
+        container.addEventListener("transitionend", resolve, { once: true });
+      });
+    }
+
     console.log(
       "Last path:",
       this.lastPath,
@@ -236,21 +247,7 @@ export class PanelCard extends LitElement {
       location.pathname
     );
 
-    if (location.pathname !== this.lastPath) {
-      container.style.opacity = "0";
-
-      await new Promise((resolve) => {
-        container.addEventListener("transitionend", resolve, { once: true });
-      });
-
-      container.style.opacity = "1";
-
-      await new Promise((resolve) => {
-        container.addEventListener("transitionend", resolve, { once: true });
-      });
-
-      this.lastPath = location.pathname;
-    }
+    this.lastPath = location.pathname;
   }
 
   static get styles(): CSSResult {
