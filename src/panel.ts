@@ -7,6 +7,7 @@ import {
   TemplateResult,
 } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
+import { createThing } from "custom-card-helpers";
 import {
   HomeAssistant,
   LovelaceCardConfig,
@@ -51,8 +52,6 @@ export class PanelCard extends LitElement {
   public connectedCallback(): void {
     super.connectedCallback();
     document.addEventListener("visibilitychange", this.handleVisibility);
-
-    this.createMainCard();
 
     if (window.fully) {
       window.addEventListener("touchstart", this.boundTouchHandler, {
@@ -125,16 +124,23 @@ export class PanelCard extends LitElement {
   }
 
   protected updated(changedProps: PropertyValues): void {
+    if (changedProps.has("config") && this.config) {
+      this.createMainCard();
+    }
+
     if (changedProps.has("hass") && this.hass) {
-      this.checkDeviceTriggers();
       this.syncHass();
+      this.checkDeviceTriggers();
     }
   }
 
   private async createMainCard(retries = 5): Promise<void> {
     try {
       await customElements.whenDefined("main-card");
-      this.mainCard = document.createElement("main-card") as LovelaceCard;
+
+      const element = createThing(this.config) as LovelaceCard;
+      if (this.hass) element.hass = this.hass;
+      this.mainCard = element;
     } catch (err) {
       console.error("[PanelCard] Error waiting for main-card:", err);
       if (retries > 0) {
@@ -144,6 +150,18 @@ export class PanelCard extends LitElement {
         location.reload();
       }
     }
+  }
+
+  private syncHass(): void {
+    if (!this.hass) return;
+
+    if (this.mainCard) this.mainCard.hass = this.hass;
+
+    document.querySelectorAll("popup-dialog").forEach((popup) => {
+      if ((popup as PopupDialogElement).hass !== undefined) {
+        (popup as PopupDialogElement).hass = this.hass;
+      }
+    });
   }
 
   private resetScreensaverTimer(): void {
@@ -160,8 +178,8 @@ export class PanelCard extends LitElement {
   private exitScreensaver(): void {
     this.resetScreensaverTimer();
     if (this.isScreensaverActive) {
-      this.isScreensaverActive = false;
       window.dispatchEvent(new Event("smartqasa-fade-request"));
+      this.isScreensaverActive = false;
     }
   }
 
@@ -189,18 +207,6 @@ export class PanelCard extends LitElement {
       }
     }
     this.refreshTime = refreshState || null;
-  }
-
-  private syncHass(): void {
-    if (!this.hass) return;
-
-    if (this.mainCard) this.mainCard.hass = this.hass;
-
-    document.querySelectorAll("popup-dialog").forEach((popup) => {
-      if ((popup as PopupDialogElement).hass !== undefined) {
-        (popup as PopupDialogElement).hass = this.hass;
-      }
-    });
   }
 
   static get styles(): CSSResult {
