@@ -231,13 +231,33 @@ export class PanelCard extends LitElement {
 
     if (location.pathname !== this.lastPath) {
       container.style.opacity = "0";
+      console.log("Fading out due to path change");
+
       await new Promise((resolve) => {
-        container.addEventListener("transitionend", resolve, { once: true });
+        let resolved = false;
+
+        const onEnd = (e: TransitionEvent) => {
+          if (e.propertyName === "opacity") {
+            resolved = true;
+            container.removeEventListener("transitionend", onEnd);
+            resolve(true);
+          }
+        };
+
+        container.addEventListener("transitionend", onEnd);
+
+        // Fallback: resolve after 300ms even if no event
+        setTimeout(() => {
+          if (!resolved) {
+            console.warn("No transitionend fired, forcing resolve");
+            container.removeEventListener("transitionend", onEnd);
+            resolve(true);
+          }
+        }, 300);
       });
+
+      console.log("Faded out, updating path");
       container.style.opacity = "1";
-      await new Promise((resolve) => {
-        container.addEventListener("transitionend", resolve, { once: true });
-      });
     }
 
     console.log(
@@ -246,7 +266,6 @@ export class PanelCard extends LitElement {
       "Current path:",
       location.pathname
     );
-
     this.lastPath = location.pathname;
   }
 

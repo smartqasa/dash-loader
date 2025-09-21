@@ -294,13 +294,28 @@ let PanelCard = class PanelCard extends i {
             return;
         if (location.pathname !== this.lastPath) {
             container.style.opacity = "0";
+            console.log("Fading out due to path change");
             await new Promise((resolve) => {
-                container.addEventListener("transitionend", resolve, { once: true });
+                let resolved = false;
+                const onEnd = (e) => {
+                    if (e.propertyName === "opacity") {
+                        resolved = true;
+                        container.removeEventListener("transitionend", onEnd);
+                        resolve(true);
+                    }
+                };
+                container.addEventListener("transitionend", onEnd);
+                // Fallback: resolve after 300ms even if no event
+                setTimeout(() => {
+                    if (!resolved) {
+                        console.warn("No transitionend fired, forcing resolve");
+                        container.removeEventListener("transitionend", onEnd);
+                        resolve(true);
+                    }
+                }, 300);
             });
+            console.log("Faded out, updating path");
             container.style.opacity = "1";
-            await new Promise((resolve) => {
-                container.addEventListener("transitionend", resolve, { once: true });
-            });
         }
         console.log("Last path:", this.lastPath, "Current path:", location.pathname);
         this.lastPath = location.pathname;
@@ -635,5 +650,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.14-beta.33"} (Built: ${"2025-09-21T18:38:24.174Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.14-beta.34"} (Built: ${"2025-09-21T18:43:16.470Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
