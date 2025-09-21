@@ -196,7 +196,7 @@ export class PanelCard extends LitElement {
 
   private exitSaver(): void {
     this.isSaverActive = false;
-    this.handleFade();
+    this.lastPath = undefined;
   }
 
   private checkDeviceTriggers(): void {
