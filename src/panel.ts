@@ -110,9 +110,9 @@ export class PanelCard extends LitElement {
         this.shadowRoot?.querySelector<HTMLElement>(".container");
       if (container) {
         if (this.fadeRequested) {
-          container.classList.remove("visible");
+          container.style.opacity = "0";
         } else {
-          container.classList.add("visible");
+          container.style.opacity = "1";
         }
       }
     }
@@ -123,7 +123,6 @@ export class PanelCard extends LitElement {
 
     const containerClass = {
       container: true,
-      visible: !this.fadeRequested,
       loader: !this.mainCard || !this.config || !this.hass,
     };
 
@@ -253,6 +252,7 @@ export class PanelCard extends LitElement {
 
   private handleFade(): void {
     this.fadeRequested = true;
+    console.log("[PanelCard] Fade requested");
   }
 
   static get styles(): CSSResult {

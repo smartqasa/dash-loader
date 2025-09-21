@@ -198,10 +198,10 @@ let PanelCard = class PanelCard extends i$1 {
             const container = this.shadowRoot?.querySelector(".container");
             if (container) {
                 if (this.fadeRequested) {
-                    container.classList.remove("visible");
+                    container.style.opacity = "0";
                 }
                 else {
-                    container.classList.add("visible");
+                    container.style.opacity = "1";
                 }
             }
         }
@@ -210,7 +210,6 @@ let PanelCard = class PanelCard extends i$1 {
         this.classList.toggle("admin-view", this.isAdminView);
         const containerClass = {
             container: true,
-            visible: !this.fadeRequested,
             loader: !this.mainCard || !this.config || !this.hass,
         };
         if (!this.mainCard || !this.config || !this.hass) {
@@ -327,6 +326,7 @@ let PanelCard = class PanelCard extends i$1 {
     }
     handleFade() {
         this.fadeRequested = true;
+        console.log("[PanelCard] Fade requested");
     }
     static get styles() {
         return i$4 `
@@ -661,5 +661,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.14-beta.10"} (Built: ${"2025-09-21T16:10:15.800Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.14-beta.11"} (Built: ${"2025-09-21T16:13:30.801Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
