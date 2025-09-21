@@ -32,7 +32,7 @@ export class PanelCard extends LitElement {
   @state() mainCard?: LovelaceCard;
   @state() isSaverActive = false;
 
-  @state() lastPath?: string;
+  private lastPath?: string;
   private isAdminView = false;
   private rebootTime: string | null = null;
   private refreshTime: string | null = null;
@@ -225,7 +225,7 @@ export class PanelCard extends LitElement {
     this.refreshTime = refreshState || null;
   }
 
-  private handleFade(): void {
+  private async handleFade(): Promise<void> {
     const container = this.shadowRoot?.querySelector<HTMLElement>(".container");
     if (!container) return;
 
@@ -235,11 +235,21 @@ export class PanelCard extends LitElement {
       "Current path:",
       location.pathname
     );
+
     if (location.pathname !== this.lastPath) {
       container.style.opacity = "0";
-      this.lastPath = location.pathname;
-    } else {
+
+      await new Promise((resolve) => {
+        container.addEventListener("transitionend", resolve, { once: true });
+      });
+
       container.style.opacity = "1";
+
+      await new Promise((resolve) => {
+        container.addEventListener("transitionend", resolve, { once: true });
+      });
+
+      this.lastPath = location.pathname;
     }
   }
 
