@@ -121,14 +121,9 @@ export class PanelCard extends LitElement {
   protected render(): TemplateResult {
     this.classList.toggle("admin-view", this.isAdminView);
 
-    const containerClass = {
-      container: true,
-      loader: !this.mainCard || !this.config || !this.hass,
-    };
-
     if (!this.mainCard || !this.config || !this.hass) {
       return html`
-        <div class=${classMap(containerClass)}>
+        <div class="container loader">
           <div class="loading-text">SmartQasa is loading</div>
           <div class="dots"><span></span><span></span><span></span></div>
         </div>
@@ -137,7 +132,7 @@ export class PanelCard extends LitElement {
 
     if (this.isSaverActive) {
       return html`
-        <div class=${classMap(containerClass)}>
+        <div class="container">
           <screensaver-card
             .config=${this.config}
             .hass=${this.hass}
@@ -146,9 +141,7 @@ export class PanelCard extends LitElement {
       `;
     }
 
-    return html`
-      <div class=${classMap(containerClass)}>${this.mainCard}</div>
-    `;
+    return html` <div class="container">${this.mainCard}</div> `;
   }
 
   protected firstUpdated(): void {
