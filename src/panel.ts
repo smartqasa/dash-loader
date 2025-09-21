@@ -143,7 +143,7 @@ export class PanelCard extends LitElement {
       this.checkDeviceTriggers();
     }
 
-    this.handleFade();
+    if (this.mainCard && !this.isSaverActive) this.handleFade();
   }
 
   private async createMainCard(retries = 5): Promise<void> {

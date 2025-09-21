@@ -213,7 +213,8 @@ let PanelCard = class PanelCard extends i {
             this.syncHass();
             this.checkDeviceTriggers();
         }
-        this.handleFade();
+        if (this.mainCard && !this.isSaverActive)
+            this.handleFade();
     }
     async createMainCard(retries = 5) {
         try {
@@ -630,5 +631,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.14-beta.35"} (Built: ${"2025-09-21T18:47:51.742Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.14-beta.36"} (Built: ${"2025-09-21T19:02:20.331Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
