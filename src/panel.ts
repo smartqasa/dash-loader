@@ -231,7 +231,7 @@ export class PanelCard extends LitElement {
 
     //container.style.opacity = "0";
     container.classList.remove("visible");
-    await new Promise((r) => setTimeout(r, 250));
+    await new Promise((r) => setTimeout(r, 200));
     //container.style.opacity = "1";
     container.classList.add("visible");
     this.lastPath = location.pathname;
@@ -255,7 +255,7 @@ export class PanelCard extends LitElement {
         height: 100%;
         opacity: 0;
         will-change: opacity;
-        transition: opacity 250ms ease-in-out;
+        transition: opacity 200ms ease-in-out;
       }
 
       .container.visible {
