@@ -175,7 +175,7 @@ let PanelCard = class PanelCard extends i {
     setConfig(config) {
         this.config = config;
     }
-    async willUpdate(changedProps) {
+    willUpdate(changedProps) {
         if (changedProps.has("hass")) {
             const isAdmin = this.hass?.user?.is_admin || false;
             const isAdminMode = this.hass?.states["input_boolean.admin_mode"]?.state === "on" || false;
@@ -187,7 +187,6 @@ let PanelCard = class PanelCard extends i {
                 container.style.opacity = "0";
             }
             else {
-                //await new Promise((resolve) => setTimeout(resolve, 100));
                 container.style.opacity = "1";
             }
         }
@@ -227,7 +226,12 @@ let PanelCard = class PanelCard extends i {
             this.syncHass();
             this.checkDeviceTriggers();
         }
-        this.fadeRequested = false;
+        if (this.fadeRequested) {
+            setTimeout(() => {
+                this.fadeRequested = false;
+                this.requestUpdate();
+            }, 100);
+        }
     }
     async createMainCard(retries = 5) {
         try {
@@ -304,7 +308,7 @@ let PanelCard = class PanelCard extends i {
     }
     handleFade() {
         this.fadeRequested = true;
-        console.log("[PanelCard] Fade requested");
+        this.requestUpdate();
     }
     static get styles() {
         return i$3 `
@@ -632,5 +636,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.14-beta.15"} (Built: ${"2025-09-21T16:33:33.449Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.14-beta.16"} (Built: ${"2025-09-21T16:40:46.538Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

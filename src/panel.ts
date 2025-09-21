@@ -96,7 +96,7 @@ export class PanelCard extends LitElement {
     this.config = config;
   }
 
-  protected async willUpdate(changedProps: PropertyValues): Promise<void> {
+  protected willUpdate(changedProps: PropertyValues): void {
     if (changedProps.has("hass")) {
       const isAdmin = this.hass?.user?.is_admin || false;
       const isAdminMode =
@@ -109,7 +109,6 @@ export class PanelCard extends LitElement {
       if (this.fadeRequested) {
         container.style.opacity = "0";
       } else {
-        //await new Promise((resolve) => setTimeout(resolve, 100));
         container.style.opacity = "1";
       }
     }
@@ -156,7 +155,12 @@ export class PanelCard extends LitElement {
       this.checkDeviceTriggers();
     }
 
-    this.fadeRequested = false;
+    if (this.fadeRequested) {
+      setTimeout(() => {
+        this.fadeRequested = false;
+        this.requestUpdate();
+      }, 100);
+    }
   }
 
   private async createMainCard(retries = 5): Promise<void> {
@@ -240,7 +244,7 @@ export class PanelCard extends LitElement {
 
   private handleFade(): void {
     this.fadeRequested = true;
-    console.log("[PanelCard] Fade requested");
+    this.requestUpdate();
   }
 
   static get styles(): CSSResult {
