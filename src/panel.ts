@@ -107,7 +107,7 @@ export class PanelCard extends LitElement {
 
     if (!this.mainCard || !this.config || !this.hass) {
       return html`
-        <div class="container loader">
+        <div class="container visible loader">
           <div class="loading-text">SmartQasa is loading</div>
           <div class="dots"><span></span><span></span><span></span></div>
         </div>

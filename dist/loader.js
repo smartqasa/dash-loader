@@ -182,7 +182,7 @@ let PanelCard = class PanelCard extends i {
         this.classList.toggle("admin-view", this.isAdminView);
         if (!this.mainCard || !this.config || !this.hass) {
             return x `
-        <div class="container loader">
+        <div class="container visible loader">
           <div class="loading-text">SmartQasa is loading</div>
           <div class="dots"><span></span><span></span><span></span></div>
         </div>
@@ -628,5 +628,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.14-beta.39"} (Built: ${"2025-09-21T19:10:59.663Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.14-beta.40"} (Built: ${"2025-09-21T19:11:12.896Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
