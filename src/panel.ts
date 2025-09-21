@@ -147,6 +147,7 @@ export class PanelCard extends LitElement {
       if (!this.mainCard) {
         const element = document.createElement("main-card") as LovelaceCard;
         this.mainCard = element;
+        console.log("[PanelCard] Main card created.", this);
       }
     } catch (err) {
       console.error("[PanelCard] Error waiting for main-card:", err);
