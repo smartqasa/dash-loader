@@ -53,6 +53,7 @@ export class PanelCard extends LitElement {
       this.resetScreensaverTimer();
       if (this.isScreensaverActive) {
         this.isScreensaverActive = false;
+        window.dispatchEvent(new Event("smartqasa-fade-request"));
       }
     };
 
