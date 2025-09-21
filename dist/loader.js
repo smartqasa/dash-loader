@@ -181,15 +181,6 @@ let PanelCard = class PanelCard extends i {
             const isAdminMode = this.hass?.states["input_boolean.admin_mode"]?.state === "on" || false;
             this.isAdminView = isAdmin || isAdminMode;
         }
-        const container = this.shadowRoot?.querySelector(".container");
-        if (container) {
-            if (this.fadeRequested) {
-                container.classList.remove("visible");
-            }
-            else {
-                container.classList.add("visible");
-            }
-        }
     }
     render() {
         this.classList.toggle("admin-view", this.isAdminView);
@@ -216,7 +207,7 @@ let PanelCard = class PanelCard extends i {
     firstUpdated() {
         this.createMainCard();
     }
-    updated(changedProps) {
+    async updated(changedProps) {
         if (!this.mainCard)
             return;
         if (changedProps.has("config") && this.config) {
@@ -226,11 +217,19 @@ let PanelCard = class PanelCard extends i {
             this.syncHass();
             this.checkDeviceTriggers();
         }
-        if (this.fadeRequested) {
-            setTimeout(() => {
-                this.fadeRequested = false;
-                this.requestUpdate();
-            }, 250);
+        if (changedProps.has("fadeRequested")) {
+            const container = this.shadowRoot?.querySelector(".container");
+            if (container) {
+                if (this.fadeRequested) {
+                    container.classList.remove("visible");
+                    setTimeout(() => {
+                        this.fadeRequested = false;
+                    }, 250);
+                }
+                else {
+                    container.classList.add("visible");
+                }
+            }
         }
     }
     async createMainCard(retries = 5) {
@@ -397,6 +396,9 @@ __decorate([
 __decorate([
     r()
 ], PanelCard.prototype, "isSaverActive", void 0);
+__decorate([
+    r()
+], PanelCard.prototype, "fadeRequested", void 0);
 PanelCard = __decorate([
     t("panel-card")
 ], PanelCard);
@@ -640,5 +642,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.14-beta.18"} (Built: ${"2025-09-21T17:05:13.773Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.14-beta.19"} (Built: ${"2025-09-21T17:16:41.823Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

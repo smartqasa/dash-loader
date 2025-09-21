@@ -31,8 +31,8 @@ export class PanelCard extends LitElement {
 
   @state() mainCard?: LovelaceCard;
   @state() isSaverActive = false;
+  @state() fadeRequested = false;
 
-  private fadeRequested = false;
   private isAdminView = false;
   private rebootTime: string | null = null;
   private refreshTime: string | null = null;
@@ -103,15 +103,6 @@ export class PanelCard extends LitElement {
         this.hass?.states["input_boolean.admin_mode"]?.state === "on" || false;
       this.isAdminView = isAdmin || isAdminMode;
     }
-
-    const container = this.shadowRoot?.querySelector<HTMLElement>(".container");
-    if (container) {
-      if (this.fadeRequested) {
-        container.classList.remove("visible");
-      } else {
-        container.classList.add("visible");
-      }
-    }
   }
 
   protected render(): TemplateResult {
@@ -144,7 +135,7 @@ export class PanelCard extends LitElement {
     this.createMainCard();
   }
 
-  protected updated(changedProps: PropertyValues): void {
+  protected async updated(changedProps: PropertyValues): Promise<void> {
     if (!this.mainCard) return;
 
     if (changedProps.has("config") && this.config) {
@@ -155,11 +146,19 @@ export class PanelCard extends LitElement {
       this.checkDeviceTriggers();
     }
 
-    if (this.fadeRequested) {
-      setTimeout(() => {
-        this.fadeRequested = false;
-        this.requestUpdate();
-      }, 250);
+    if (changedProps.has("fadeRequested")) {
+      const container =
+        this.shadowRoot?.querySelector<HTMLElement>(".container");
+      if (container) {
+        if (this.fadeRequested) {
+          container.classList.remove("visible");
+          setTimeout(() => {
+            this.fadeRequested = false;
+          }, 250);
+        } else {
+          container.classList.add("visible");
+        }
+      }
     }
   }
 
