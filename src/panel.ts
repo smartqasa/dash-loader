@@ -7,7 +7,6 @@ import {
   TemplateResult,
 } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
-import { createThing } from "custom-card-helpers";
 import {
   HomeAssistant,
   LovelaceCardConfig,
@@ -88,6 +87,7 @@ export class PanelCard extends LitElement {
 
   public setConfig(config: LovelaceCardConfig): void {
     this.config = config;
+    console.log("[PanelCard] Config set:", this.config);
   }
 
   protected willUpdate(changedProps: PropertyValues): void {
@@ -145,7 +145,11 @@ export class PanelCard extends LitElement {
       await customElements.whenDefined("main-card");
 
       if (!this.mainCard) {
-        const element = document.createElement("main-card") as LovelaceCard;
+        const element: LovelaceCard = document.createElement(
+          "main-card"
+        ) as LovelaceCard;
+        if (this.config) element.setConfig(this.config);
+        if (this.hass) element.hass = this.hass;
         this.mainCard = element;
         console.log("[PanelCard] Main card created.", this);
       }

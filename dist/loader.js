@@ -170,6 +170,7 @@ let PanelCard = class PanelCard extends i {
     }
     setConfig(config) {
         this.config = config;
+        console.log("[PanelCard] Config set:", this.config);
     }
     willUpdate(changedProps) {
         if (changedProps.has("hass")) {
@@ -218,6 +219,10 @@ let PanelCard = class PanelCard extends i {
             await customElements.whenDefined("main-card");
             if (!this.mainCard) {
                 const element = document.createElement("main-card");
+                if (this.config)
+                    element.setConfig(this.config);
+                if (this.hass)
+                    element.hass = this.hass;
                 this.mainCard = element;
                 console.log("[PanelCard] Main card created.", this);
             }
@@ -603,5 +608,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.13-beta.3"} (Built: ${"2025-09-21T05:25:21.207Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.13-beta.4"} (Built: ${"2025-09-21T05:41:54.962Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
