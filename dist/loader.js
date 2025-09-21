@@ -309,7 +309,7 @@ let PanelCard = class PanelCard extends i {
     }
     handleFade() {
         this.fadeRequested = true;
-        this.requestUpdate();
+        console.log("Fade Requested - true");
     }
     static get styles() {
         return i$3 `
@@ -644,5 +644,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.14-beta.21"} (Built: ${"2025-09-21T17:24:21.302Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.14-beta.22"} (Built: ${"2025-09-21T17:25:15.694Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

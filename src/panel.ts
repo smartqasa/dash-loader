@@ -245,7 +245,7 @@ export class PanelCard extends LitElement {
 
   private handleFade(): void {
     this.fadeRequested = true;
-    this.requestUpdate();
+    console.log("Fade Requested - true");
   }
 
   static get styles(): CSSResult {
