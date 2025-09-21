@@ -35,6 +35,9 @@ export class PanelCard extends LitElement {
   private isAdminView = false;
   private rebootTime: string | null = null;
   private refreshTime: string | null = null;
+  private boundTouchHandler = () => this.exitScreensaver();
+  private boundMouseHandler = () => this.exitScreensaver();
+  private boundKeyHandler = () => this.exitScreensaver();
   private screensaverTimer: ReturnType<typeof setTimeout> | null = null;
 
   private handleVisibility = (): void => {
@@ -49,25 +52,32 @@ export class PanelCard extends LitElement {
     super.connectedCallback();
     document.addEventListener("visibilitychange", this.handleVisibility);
 
-    // Generic activity listeners
-    window.addEventListener("touchstart", () => this.exitScreensaver(), {
-      passive: true,
-    });
-    window.addEventListener("mousemove", () => this.exitScreensaver());
-    window.addEventListener("keydown", () => this.exitScreensaver());
-
-    // Fully motion integration
-    if (window.fully?.bind) {
-      window.fully.bind("onMotion", "onFullyMotion()");
-    }
-    (window as any).onFullyMotion = () => this.exitScreensaver();
-
     this.createMainCard();
-    this.resetScreensaverTimer();
+
+    if (window.fully) {
+      window.addEventListener("touchstart", this.boundTouchHandler, {
+        passive: true,
+      });
+      window.addEventListener("mousemove", this.boundMouseHandler);
+      window.addEventListener("keydown", this.boundKeyHandler);
+
+      if (window.fully.bind) {
+        window.fully.bind("onMotion", "onFullyMotion()");
+      }
+      (window as any).onFullyMotion = () => this.exitScreensaver();
+
+      this.resetScreensaverTimer();
+    }
   }
 
   public disconnectedCallback(): void {
     document.removeEventListener("visibilitychange", this.handleVisibility);
+
+    if (window.fully) {
+      window.removeEventListener("touchstart", this.boundTouchHandler);
+      window.removeEventListener("mousemove", this.boundMouseHandler);
+      window.removeEventListener("keydown", this.boundKeyHandler);
+    }
 
     if (this.screensaverTimer) {
       clearTimeout(this.screensaverTimer);

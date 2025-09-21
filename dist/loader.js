@@ -128,6 +128,9 @@ let PanelCard = class PanelCard extends i {
         this.isAdminView = false;
         this.rebootTime = null;
         this.refreshTime = null;
+        this.boundTouchHandler = () => this.exitScreensaver();
+        this.boundMouseHandler = () => this.exitScreensaver();
+        this.boundKeyHandler = () => this.exitScreensaver();
         this.screensaverTimer = null;
         this.handleVisibility = () => {
             this.requestUpdate();
@@ -139,22 +142,27 @@ let PanelCard = class PanelCard extends i {
     connectedCallback() {
         super.connectedCallback();
         document.addEventListener("visibilitychange", this.handleVisibility);
-        // Generic activity listeners
-        window.addEventListener("touchstart", () => this.exitScreensaver(), {
-            passive: true,
-        });
-        window.addEventListener("mousemove", () => this.exitScreensaver());
-        window.addEventListener("keydown", () => this.exitScreensaver());
-        // Fully motion integration
-        if (window.fully?.bind) {
-            window.fully.bind("onMotion", "onFullyMotion()");
-        }
-        window.onFullyMotion = () => this.exitScreensaver();
         this.createMainCard();
-        this.resetScreensaverTimer();
+        if (window.fully) {
+            window.addEventListener("touchstart", this.boundTouchHandler, {
+                passive: true,
+            });
+            window.addEventListener("mousemove", this.boundMouseHandler);
+            window.addEventListener("keydown", this.boundKeyHandler);
+            if (window.fully.bind) {
+                window.fully.bind("onMotion", "onFullyMotion()");
+            }
+            window.onFullyMotion = () => this.exitScreensaver();
+            this.resetScreensaverTimer();
+        }
     }
     disconnectedCallback() {
         document.removeEventListener("visibilitychange", this.handleVisibility);
+        if (window.fully) {
+            window.removeEventListener("touchstart", this.boundTouchHandler);
+            window.removeEventListener("mousemove", this.boundMouseHandler);
+            window.removeEventListener("keydown", this.boundKeyHandler);
+        }
         if (this.screensaverTimer) {
             clearTimeout(this.screensaverTimer);
             this.screensaverTimer = null;
@@ -586,5 +594,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.11-beta.5"} (Built: ${"2025-09-21T03:34:30.696Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.11-beta.6"} (Built: ${"2025-09-21T03:45:59.039Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
