@@ -109,7 +109,7 @@ export class PanelCard extends LitElement {
 
     if (!this.mainCard || !this.config || !this.hass) {
       return html`
-        <div class="container loader">
+        <div class="container loader visible">
           <div class="loading-text">SmartQasa is loading</div>
           <div class="dots"><span></span><span></span><span></span></div>
         </div>
@@ -118,7 +118,7 @@ export class PanelCard extends LitElement {
 
     if (this.isSaverActive) {
       return html`
-        <div class="container">
+        <div class="container visible">
           <screensaver-card
             .config=${this.config}
             .hass=${this.hass}
@@ -127,7 +127,7 @@ export class PanelCard extends LitElement {
       `;
     }
 
-    return html` <div class="container">${this.mainCard}</div> `;
+    return html` <div class="container visible">${this.mainCard}</div> `;
   }
 
   protected firstUpdated(): void {
