@@ -223,6 +223,7 @@ let PanelCard = class PanelCard extends i {
             if (container) {
                 if (this.fadeRequested) {
                     container.classList.remove("visible");
+                    void container.offsetHeight;
                     setTimeout(() => {
                         this.fadeRequested = false;
                         console.log("Fade Requested - false");
@@ -230,6 +231,7 @@ let PanelCard = class PanelCard extends i {
                 }
                 else {
                     container.classList.add("visible");
+                    void container.offsetHeight;
                 }
             }
         }
@@ -644,5 +646,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.14-beta.22"} (Built: ${"2025-09-21T17:25:15.694Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.14-beta.23"} (Built: ${"2025-09-21T17:30:34.364Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

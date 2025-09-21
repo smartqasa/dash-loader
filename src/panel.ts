@@ -153,12 +153,14 @@ export class PanelCard extends LitElement {
       if (container) {
         if (this.fadeRequested) {
           container.classList.remove("visible");
+          void container.offsetHeight;
           setTimeout(() => {
             this.fadeRequested = false;
             console.log("Fade Requested - false");
           }, 2000);
         } else {
           container.classList.add("visible");
+          void container.offsetHeight;
         }
       }
     }
