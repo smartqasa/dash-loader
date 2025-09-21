@@ -15,7 +15,7 @@ import {
 } from "./types";
 import { deviceRefresh, deviceReboot } from "./device-actions";
 
-const SCREENSAVER_TIMEOUT = 1 * 60 * 1000;
+const SCREENSAVER_TIMEOUT = 5 * 60 * 1000;
 
 window.customCards.push({
   type: "panel-card",

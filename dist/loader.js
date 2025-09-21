@@ -114,7 +114,7 @@ function deviceReboot() {
     }
 }
 
-const SCREENSAVER_TIMEOUT = 1 * 60 * 1000;
+const SCREENSAVER_TIMEOUT = 5 * 60 * 1000;
 window.customCards.push({
     type: "panel-card",
     name: "Panel Card",
@@ -628,5 +628,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.14-beta.40"} (Built: ${"2025-09-21T19:11:12.896Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.15-beta.1"} (Built: ${"2025-09-21T19:21:45.811Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
