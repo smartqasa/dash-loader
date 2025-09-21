@@ -227,21 +227,11 @@ export class PanelCard extends LitElement {
 
   private async handleFade(): Promise<void> {
     const container = this.shadowRoot?.querySelector<HTMLElement>(".container");
-    if (!container) return;
+    if (!container || location.pathname === this.lastPath) return;
 
-    if (location.pathname !== this.lastPath) {
-      container.style.opacity = "0";
-      await new Promise((r) => setTimeout(r, 250));
-      container.style.opacity = "1";
-    }
-
-    console.log(
-      "Last path:",
-      this.lastPath,
-      "Current path:",
-      location.pathname
-    );
-
+    container.style.opacity = "0";
+    await new Promise((r) => setTimeout(r, 250));
+    container.style.opacity = "1";
     this.lastPath = location.pathname;
   }
 
