@@ -125,7 +125,6 @@ let PanelCard = class PanelCard extends i {
     constructor() {
         super(...arguments);
         this.isSaverActive = false;
-        this.lastPath = location.pathname;
         this.isAdminView = false;
         this.rebootTime = null;
         this.refreshTime = null;
@@ -631,5 +630,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.14-beta.24"} (Built: ${"2025-09-21T17:54:22.929Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.14-beta.25"} (Built: ${"2025-09-21T17:57:06.155Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

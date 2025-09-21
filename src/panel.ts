@@ -32,7 +32,7 @@ export class PanelCard extends LitElement {
   @state() mainCard?: LovelaceCard;
   @state() isSaverActive = false;
 
-  private lastPath: string = location.pathname;
+  private lastPath?: string;
   private isAdminView = false;
   private rebootTime: string | null = null;
   private refreshTime: string | null = null;
@@ -228,7 +228,6 @@ export class PanelCard extends LitElement {
   private handleFade(): void {
     const container = this.shadowRoot?.querySelector<HTMLElement>(".container");
     if (!container) return;
-
     if (location.pathname !== this.lastPath) {
       container.style.opacity = "0";
     } else {
