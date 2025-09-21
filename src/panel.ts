@@ -230,12 +230,11 @@ export class PanelCard extends LitElement {
     const container = this.shadowRoot?.querySelector<HTMLElement>(".container");
     if (!container) return;
 
-    container.style.opacity = "0";
-    const onEnd = () => {
-      container.removeEventListener("transitionend", onEnd);
-      container.style.opacity = "1";
-    };
-    container.addEventListener("transitionend", onEnd);
+    container.classList.remove("visible");
+
+    void container.offsetWidth;
+
+    container.classList.add("visible");
   }
 
   static get styles(): CSSResult {
@@ -258,7 +257,7 @@ export class PanelCard extends LitElement {
         transition: opacity 200ms ease-in-out;
       }
 
-      .container.fade {
+      .container.visible {
         opacity: 1;
       }
 

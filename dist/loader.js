@@ -295,12 +295,9 @@ let PanelCard = class PanelCard extends i {
         const container = this.shadowRoot?.querySelector(".container");
         if (!container)
             return;
-        container.style.opacity = "0";
-        const onEnd = () => {
-            container.removeEventListener("transitionend", onEnd);
-            container.style.opacity = "1";
-        };
-        container.addEventListener("transitionend", onEnd);
+        container.classList.remove("visible");
+        void container.offsetWidth;
+        container.classList.add("visible");
     }
     static get styles() {
         return i$3 `
@@ -322,7 +319,7 @@ let PanelCard = class PanelCard extends i {
         transition: opacity 200ms ease-in-out;
       }
 
-      .container.fade {
+      .container.visible {
         opacity: 1;
       }
 
@@ -631,5 +628,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.14-beta.5"} (Built: ${"2025-09-21T15:17:38.501Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.14-beta.6"} (Built: ${"2025-09-21T15:26:08.500Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
