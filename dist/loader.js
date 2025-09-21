@@ -128,6 +128,9 @@ let PanelCard = class PanelCard extends i {
         this.isAdminView = false;
         this.rebootTime = null;
         this.refreshTime = null;
+        this.handleVisibility = () => {
+            this.requestUpdate();
+        };
         this.boundTouchHandler = () => this.resetSaver();
         this.boundMouseHandler = () => this.resetSaver();
         this.boundKeyHandler = () => this.resetSaver();
@@ -138,6 +141,7 @@ let PanelCard = class PanelCard extends i {
     }
     connectedCallback() {
         super.connectedCallback();
+        document.addEventListener("visibilitychange", this.handleVisibility);
         if (window.fully) {
             window.addEventListener("touchstart", this.boundTouchHandler, {
                 passive: true,
@@ -152,6 +156,7 @@ let PanelCard = class PanelCard extends i {
         }
     }
     disconnectedCallback() {
+        document.removeEventListener("visibilitychange", this.handleVisibility);
         if (window.fully) {
             window.removeEventListener("touchstart", this.boundTouchHandler);
             window.removeEventListener("mousemove", this.boundMouseHandler);
@@ -471,15 +476,12 @@ let ScreenSaver = class ScreenSaver extends i {
         }
         const moveTimer = (this.config?.saver_interval ?? 30) * 1000;
         const runCycle = () => {
-            // fade out
             element.style.opacity = "0";
             setTimeout(() => {
                 this.moveElement();
-                // fade back in
                 element.style.opacity = "1";
-            }, 1000); // matches CSS transition duration
+            }, 1000);
         };
-        // run once immediately, then repeat
         runCycle();
         this.moveTimerId = window.setInterval(runCycle, moveTimer);
     }
@@ -602,5 +604,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.14-beta.3"} (Built: ${"2025-09-21T12:47:07.871Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.14-beta.4"} (Built: ${"2025-09-21T12:50:02.097Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

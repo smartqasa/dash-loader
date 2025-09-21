@@ -36,6 +36,10 @@ export class PanelCard extends LitElement {
   private rebootTime: string | null = null;
   private refreshTime: string | null = null;
 
+  private handleVisibility = (): void => {
+    this.requestUpdate();
+  };
+
   private boundTouchHandler = () => this.resetSaver();
   private boundMouseHandler = () => this.resetSaver();
   private boundKeyHandler = () => this.resetSaver();
@@ -48,6 +52,8 @@ export class PanelCard extends LitElement {
 
   public connectedCallback(): void {
     super.connectedCallback();
+
+    document.addEventListener("visibilitychange", this.handleVisibility);
 
     if (window.fully) {
       window.addEventListener("touchstart", this.boundTouchHandler, {
@@ -66,6 +72,8 @@ export class PanelCard extends LitElement {
   }
 
   public disconnectedCallback(): void {
+    document.removeEventListener("visibilitychange", this.handleVisibility);
+
     if (window.fully) {
       window.removeEventListener("touchstart", this.boundTouchHandler);
       window.removeEventListener("mousemove", this.boundMouseHandler);

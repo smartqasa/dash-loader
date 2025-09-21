@@ -125,17 +125,14 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
     const moveTimer = (this.config?.saver_interval ?? 30) * 1000;
 
     const runCycle = () => {
-      // fade out
       element.style.opacity = "0";
 
       setTimeout(() => {
         this.moveElement();
-        // fade back in
         element.style.opacity = "1";
-      }, 1000); // matches CSS transition duration
+      }, 1000);
     };
 
-    // run once immediately, then repeat
     runCycle();
     this.moveTimerId = window.setInterval(runCycle, moveTimer);
   }
