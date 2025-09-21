@@ -155,7 +155,8 @@ export class PanelCard extends LitElement {
           container.classList.remove("visible");
           setTimeout(() => {
             this.fadeRequested = false;
-          }, 250);
+            console.log("Fade Requested - false");
+          }, 2000);
         } else {
           container.classList.add("visible");
         }
