@@ -123,12 +123,18 @@ export class PanelCard extends LitElement {
     return html` ${this.mainCard} `;
   }
 
-  protected updated(changedProps: PropertyValues): void {
-    if (changedProps.has("config") && this.config) {
-      this.createMainCard();
-    }
+  protected firstUpdated(): void {
+    this.createMainCard();
+  }
 
+  protected updated(changedProps: PropertyValues): void {
+    if (!this.mainCard) return;
+
+    if (changedProps.has("config") && this.config) {
+      this.mainCard.setConfig(this.config);
+    }
     if (changedProps.has("hass") && this.hass) {
+      this.mainCard.hass = this.hass;
       this.syncHass();
       this.checkDeviceTriggers();
     }
@@ -138,16 +144,15 @@ export class PanelCard extends LitElement {
     try {
       await customElements.whenDefined("main-card");
 
-      const element = createThing(this.config) as LovelaceCard;
-      if (this.hass) element.hass = this.hass;
-      this.mainCard = element;
+      if (!this.mainCard) {
+        const element = document.createElement("main-card") as LovelaceCard;
+        this.mainCard = element;
+      }
     } catch (err) {
       console.error("[PanelCard] Error waiting for main-card:", err);
       if (retries > 0) {
+        this.mainCard = undefined;
         setTimeout(() => this.createMainCard(retries - 1), 1000);
-      } else {
-        console.error("[PanelCard] Giving up and forcing reload");
-        location.reload();
       }
     }
   }
