@@ -229,6 +229,12 @@ export class PanelCard extends LitElement {
     const container = this.shadowRoot?.querySelector<HTMLElement>(".container");
     if (!container) return;
 
+    console.log(
+      "Last path:",
+      this.lastPath,
+      "Current path:",
+      location.pathname
+    );
     if (location.pathname !== this.lastPath) {
       container.style.opacity = "0";
     } else {
