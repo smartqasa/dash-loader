@@ -294,27 +294,7 @@ let PanelCard = class PanelCard extends i {
             return;
         if (location.pathname !== this.lastPath) {
             container.style.opacity = "0";
-            console.log("Fading out due to path change");
-            await new Promise((resolve) => {
-                let resolved = false;
-                const onEnd = (e) => {
-                    if (e.propertyName === "opacity") {
-                        resolved = true;
-                        container.removeEventListener("transitionend", onEnd);
-                        resolve(true);
-                    }
-                };
-                container.addEventListener("transitionend", onEnd);
-                // Fallback: resolve after 300ms even if no event
-                setTimeout(() => {
-                    if (!resolved) {
-                        console.warn("No transitionend fired, forcing resolve");
-                        container.removeEventListener("transitionend", onEnd);
-                        resolve(true);
-                    }
-                }, 300);
-            });
-            console.log("Faded out, updating path");
+            await new Promise((r) => setTimeout(r, 250));
             container.style.opacity = "1";
         }
         console.log("Last path:", this.lastPath, "Current path:", location.pathname);
@@ -650,5 +630,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.14-beta.34"} (Built: ${"2025-09-21T18:43:16.470Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.14-beta.35"} (Built: ${"2025-09-21T18:47:51.742Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
