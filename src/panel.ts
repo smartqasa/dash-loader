@@ -104,6 +104,18 @@ export class PanelCard extends LitElement {
         this.hass?.states["input_boolean.admin_mode"]?.state === "on" || false;
       this.isAdminView = isAdmin || isAdminMode;
     }
+
+    if (changedProps.has("fadeRequested")) {
+      const container =
+        this.shadowRoot?.querySelector<HTMLElement>(".container");
+      if (container) {
+        if (this.fadeRequested) {
+          container.classList.remove("visible");
+        } else {
+          container.classList.add("visible");
+        }
+      }
+    }
   }
 
   protected render(): TemplateResult {
@@ -155,10 +167,8 @@ export class PanelCard extends LitElement {
       this.checkDeviceTriggers();
     }
 
-    if (this.fadeRequested) {
-      requestAnimationFrame(() => {
-        this.fadeRequested = false;
-      });
+    if (changedProps.has("fadeRequested") && this.fadeRequested) {
+      this.fadeRequested = false;
     }
   }
 

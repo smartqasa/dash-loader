@@ -194,6 +194,17 @@ let PanelCard = class PanelCard extends i$1 {
             const isAdminMode = this.hass?.states["input_boolean.admin_mode"]?.state === "on" || false;
             this.isAdminView = isAdmin || isAdminMode;
         }
+        if (changedProps.has("fadeRequested")) {
+            const container = this.shadowRoot?.querySelector(".container");
+            if (container) {
+                if (this.fadeRequested) {
+                    container.classList.remove("visible");
+                }
+                else {
+                    container.classList.add("visible");
+                }
+            }
+        }
     }
     render() {
         this.classList.toggle("admin-view", this.isAdminView);
@@ -237,10 +248,8 @@ let PanelCard = class PanelCard extends i$1 {
             this.syncHass();
             this.checkDeviceTriggers();
         }
-        if (this.fadeRequested) {
-            requestAnimationFrame(() => {
-                this.fadeRequested = false;
-            });
+        if (changedProps.has("fadeRequested") && this.fadeRequested) {
+            this.fadeRequested = false;
         }
     }
     async createMainCard(retries = 5) {
@@ -652,5 +661,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.14-beta.9"} (Built: ${"2025-09-21T16:02:07.017Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.14-beta.10"} (Built: ${"2025-09-21T16:10:15.800Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
