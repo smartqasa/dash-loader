@@ -7,6 +7,7 @@ import {
   TemplateResult,
 } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
+import { classMap } from "lit/directives/class-map.js";
 import {
   HomeAssistant,
   LovelaceCardConfig,
@@ -31,6 +32,7 @@ export class PanelCard extends LitElement {
 
   @state() mainCard?: LovelaceCard;
   @state() isSaverActive = false;
+  @state() fadeRequested = false;
 
   private isAdminView = false;
   private rebootTime: string | null = null;
@@ -40,7 +42,7 @@ export class PanelCard extends LitElement {
     this.requestUpdate();
   };
 
-  private boundHandleFadeIn = () => this.handleFade();
+  private boundHandleFade = () => this.handleFade();
   private boundTouchHandler = () => this.resetSaver();
   private boundMouseHandler = () => this.resetSaver();
   private boundKeyHandler = () => this.resetSaver();
@@ -55,7 +57,7 @@ export class PanelCard extends LitElement {
     super.connectedCallback();
 
     document.addEventListener("visibilitychange", this.handleVisibility);
-    window.addEventListener("sq-fade-request", this.boundHandleFadeIn);
+    window.addEventListener("sq-fade-request", this.boundHandleFade);
 
     if (window.fully) {
       window.addEventListener("touchstart", this.boundTouchHandler, {
@@ -75,7 +77,7 @@ export class PanelCard extends LitElement {
 
   public disconnectedCallback(): void {
     document.removeEventListener("visibilitychange", this.handleVisibility);
-    window.removeEventListener("sq-fade-request", this.boundHandleFadeIn);
+    window.removeEventListener("sq-fade-request", this.boundHandleFade);
 
     if (window.fully) {
       window.removeEventListener("touchstart", this.boundTouchHandler);
@@ -107,9 +109,15 @@ export class PanelCard extends LitElement {
   protected render(): TemplateResult {
     this.classList.toggle("admin-view", this.isAdminView);
 
+    const containerClass = {
+      container: true,
+      visible: !this.fadeRequested,
+      loader: !this.mainCard || !this.config || !this.hass,
+    };
+
     if (!this.mainCard || !this.config || !this.hass) {
       return html`
-        <div class="container loader visible">
+        <div class=${classMap(containerClass)}>
           <div class="loading-text">SmartQasa is loading</div>
           <div class="dots"><span></span><span></span><span></span></div>
         </div>
@@ -118,7 +126,7 @@ export class PanelCard extends LitElement {
 
     if (this.isSaverActive) {
       return html`
-        <div class="container visible">
+        <div class=${classMap(containerClass)}>
           <screensaver-card
             .config=${this.config}
             .hass=${this.hass}
@@ -127,12 +135,13 @@ export class PanelCard extends LitElement {
       `;
     }
 
-    return html` <div class="container visible">${this.mainCard}</div> `;
+    return html`
+      <div class=${classMap(containerClass)}>${this.mainCard}</div>
+    `;
   }
 
   protected firstUpdated(): void {
     this.createMainCard();
-    this.handleFade();
   }
 
   protected updated(changedProps: PropertyValues): void {
@@ -145,6 +154,7 @@ export class PanelCard extends LitElement {
       this.syncHass();
       this.checkDeviceTriggers();
     }
+    this.fadeRequested = false;
   }
 
   private async createMainCard(retries = 5): Promise<void> {
@@ -227,14 +237,7 @@ export class PanelCard extends LitElement {
   }
 
   private handleFade(): void {
-    const container = this.shadowRoot?.querySelector<HTMLElement>(".container");
-    if (!container) return;
-
-    container.classList.remove("visible");
-
-    void container.offsetWidth;
-
-    container.classList.add("visible");
+    this.fadeRequested = true;
   }
 
   static get styles(): CSSResult {
@@ -254,6 +257,7 @@ export class PanelCard extends LitElement {
         width: 100%;
         height: 100%;
         opacity: 0;
+        will-change: opacity;
         transition: opacity 200ms ease-in-out;
       }
 
