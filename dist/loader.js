@@ -125,14 +125,13 @@ let PanelCard = class PanelCard extends i {
     constructor() {
         super(...arguments);
         this.isSaverActive = false;
-        this.fadeRequested = false;
+        this.lastPath = location.pathname;
         this.isAdminView = false;
         this.rebootTime = null;
         this.refreshTime = null;
         this.handleVisibility = () => {
             this.requestUpdate();
         };
-        this.boundHandleFade = () => this.handleFade();
         this.boundTouchHandler = () => this.resetSaver();
         this.boundMouseHandler = () => this.resetSaver();
         this.boundKeyHandler = () => this.resetSaver();
@@ -144,7 +143,6 @@ let PanelCard = class PanelCard extends i {
     connectedCallback() {
         super.connectedCallback();
         document.addEventListener("visibilitychange", this.handleVisibility);
-        window.addEventListener("sq-fade-request", this.boundHandleFade);
         if (window.fully) {
             window.addEventListener("touchstart", this.boundTouchHandler, {
                 passive: true,
@@ -160,7 +158,6 @@ let PanelCard = class PanelCard extends i {
     }
     disconnectedCallback() {
         document.removeEventListener("visibilitychange", this.handleVisibility);
-        window.removeEventListener("sq-fade-request", this.boundHandleFade);
         if (window.fully) {
             window.removeEventListener("touchstart", this.boundTouchHandler);
             window.removeEventListener("mousemove", this.boundMouseHandler);
@@ -206,9 +203,8 @@ let PanelCard = class PanelCard extends i {
     }
     firstUpdated() {
         this.createMainCard();
-        this.fadeRequested = true;
     }
-    async updated(changedProps) {
+    updated(changedProps) {
         if (!this.mainCard)
             return;
         if (changedProps.has("config") && this.config) {
@@ -218,23 +214,7 @@ let PanelCard = class PanelCard extends i {
             this.syncHass();
             this.checkDeviceTriggers();
         }
-        if (changedProps.has("fadeRequested")) {
-            const container = this.shadowRoot?.querySelector(".container");
-            if (container) {
-                if (this.fadeRequested) {
-                    container.classList.remove("visible");
-                    void container.offsetHeight;
-                    setTimeout(() => {
-                        this.fadeRequested = false;
-                        console.log("Fade Requested - false");
-                    }, 2000);
-                }
-                else {
-                    container.classList.add("visible");
-                    void container.offsetHeight;
-                }
-            }
-        }
+        this.handleFade();
     }
     async createMainCard(retries = 5) {
         try {
@@ -310,8 +290,16 @@ let PanelCard = class PanelCard extends i {
         this.refreshTime = refreshState || null;
     }
     handleFade() {
-        this.fadeRequested = true;
-        console.log("Fade Requested - true");
+        const container = this.shadowRoot?.querySelector(".container");
+        if (!container)
+            return;
+        if (location.pathname !== this.lastPath) {
+            container.style.opacity = "0";
+        }
+        else {
+            container.style.opacity = "1";
+            this.lastPath = location.pathname;
+        }
     }
     static get styles() {
         return i$3 `
@@ -400,9 +388,6 @@ __decorate([
 __decorate([
     r()
 ], PanelCard.prototype, "isSaverActive", void 0);
-__decorate([
-    r()
-], PanelCard.prototype, "fadeRequested", void 0);
 PanelCard = __decorate([
     t("panel-card")
 ], PanelCard);
@@ -646,5 +631,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.14-beta.23"} (Built: ${"2025-09-21T17:30:34.364Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.14-beta.24"} (Built: ${"2025-09-21T17:54:22.929Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

@@ -31,8 +31,8 @@ export class PanelCard extends LitElement {
 
   @state() mainCard?: LovelaceCard;
   @state() isSaverActive = false;
-  @state() fadeRequested = false;
 
+  private lastPath: string = location.pathname;
   private isAdminView = false;
   private rebootTime: string | null = null;
   private refreshTime: string | null = null;
@@ -41,7 +41,6 @@ export class PanelCard extends LitElement {
     this.requestUpdate();
   };
 
-  private boundHandleFade = () => this.handleFade();
   private boundTouchHandler = () => this.resetSaver();
   private boundMouseHandler = () => this.resetSaver();
   private boundKeyHandler = () => this.resetSaver();
@@ -56,7 +55,6 @@ export class PanelCard extends LitElement {
     super.connectedCallback();
 
     document.addEventListener("visibilitychange", this.handleVisibility);
-    window.addEventListener("sq-fade-request", this.boundHandleFade);
 
     if (window.fully) {
       window.addEventListener("touchstart", this.boundTouchHandler, {
@@ -76,7 +74,6 @@ export class PanelCard extends LitElement {
 
   public disconnectedCallback(): void {
     document.removeEventListener("visibilitychange", this.handleVisibility);
-    window.removeEventListener("sq-fade-request", this.boundHandleFade);
 
     if (window.fully) {
       window.removeEventListener("touchstart", this.boundTouchHandler);
@@ -133,10 +130,9 @@ export class PanelCard extends LitElement {
 
   protected firstUpdated(): void {
     this.createMainCard();
-    this.fadeRequested = true;
   }
 
-  protected async updated(changedProps: PropertyValues): Promise<void> {
+  protected updated(changedProps: PropertyValues): void {
     if (!this.mainCard) return;
 
     if (changedProps.has("config") && this.config) {
@@ -147,23 +143,7 @@ export class PanelCard extends LitElement {
       this.checkDeviceTriggers();
     }
 
-    if (changedProps.has("fadeRequested")) {
-      const container =
-        this.shadowRoot?.querySelector<HTMLElement>(".container");
-      if (container) {
-        if (this.fadeRequested) {
-          container.classList.remove("visible");
-          void container.offsetHeight;
-          setTimeout(() => {
-            this.fadeRequested = false;
-            console.log("Fade Requested - false");
-          }, 2000);
-        } else {
-          container.classList.add("visible");
-          void container.offsetHeight;
-        }
-      }
-    }
+    this.handleFade();
   }
 
   private async createMainCard(retries = 5): Promise<void> {
@@ -246,8 +226,15 @@ export class PanelCard extends LitElement {
   }
 
   private handleFade(): void {
-    this.fadeRequested = true;
-    console.log("Fade Requested - true");
+    const container = this.shadowRoot?.querySelector<HTMLElement>(".container");
+    if (!container) return;
+
+    if (location.pathname !== this.lastPath) {
+      container.style.opacity = "0";
+    } else {
+      container.style.opacity = "1";
+      this.lastPath = location.pathname;
+    }
   }
 
   static get styles(): CSSResult {
