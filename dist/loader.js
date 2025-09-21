@@ -206,6 +206,8 @@ let PanelCard = class PanelCard extends i {
     updated(changedProps) {
         if (!this.mainCard)
             return;
+        if (this.mainCard && !this.isSaverActive)
+            this.handleFade();
         if (changedProps.has("config") && this.config) {
             this.mainCard.setConfig(this.config);
         }
@@ -213,8 +215,6 @@ let PanelCard = class PanelCard extends i {
             this.syncHass();
             this.checkDeviceTriggers();
         }
-        if (this.mainCard && !this.isSaverActive)
-            this.handleFade();
     }
     async createMainCard(retries = 5) {
         try {
@@ -630,5 +630,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.16-beta.2"} (Built: ${"2025-09-21T21:18:27.796Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.16-beta.3"} (Built: ${"2025-09-21T21:26:09.097Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

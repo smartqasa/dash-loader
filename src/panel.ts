@@ -135,6 +135,8 @@ export class PanelCard extends LitElement {
   protected updated(changedProps: PropertyValues): void {
     if (!this.mainCard) return;
 
+    if (this.mainCard && !this.isSaverActive) this.handleFade();
+
     if (changedProps.has("config") && this.config) {
       this.mainCard.setConfig(this.config);
     }
@@ -142,8 +144,6 @@ export class PanelCard extends LitElement {
       this.syncHass();
       this.checkDeviceTriggers();
     }
-
-    if (this.mainCard && !this.isSaverActive) this.handleFade();
   }
 
   private async createMainCard(retries = 5): Promise<void> {
