@@ -217,6 +217,7 @@ let PanelCard = class PanelCard extends i {
     }
     firstUpdated() {
         this.createMainCard();
+        this.fadeRequested = true;
     }
     updated(changedProps) {
         if (!this.mainCard)
@@ -642,5 +643,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.14-beta.12"} (Built: ${"2025-09-21T16:16:48.985Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.14-beta.13"} (Built: ${"2025-09-21T16:20:44.859Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

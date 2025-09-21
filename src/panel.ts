@@ -146,6 +146,7 @@ export class PanelCard extends LitElement {
 
   protected firstUpdated(): void {
     this.createMainCard();
+    this.fadeRequested = true;
   }
 
   protected updated(changedProps: PropertyValues): void {
