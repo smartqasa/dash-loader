@@ -131,6 +131,7 @@ let PanelCard = class PanelCard extends i {
         this.handleVisibility = () => {
             this.requestUpdate();
         };
+        this.boundHandleFadeIn = () => this.handleFade();
         this.boundTouchHandler = () => this.resetSaver();
         this.boundMouseHandler = () => this.resetSaver();
         this.boundKeyHandler = () => this.resetSaver();
@@ -142,6 +143,7 @@ let PanelCard = class PanelCard extends i {
     connectedCallback() {
         super.connectedCallback();
         document.addEventListener("visibilitychange", this.handleVisibility);
+        window.addEventListener("sq-fade-request", this.boundHandleFadeIn);
         if (window.fully) {
             window.addEventListener("touchstart", this.boundTouchHandler, {
                 passive: true,
@@ -157,6 +159,7 @@ let PanelCard = class PanelCard extends i {
     }
     disconnectedCallback() {
         document.removeEventListener("visibilitychange", this.handleVisibility);
+        window.removeEventListener("sq-fade-request", this.boundHandleFadeIn);
         if (window.fully) {
             window.removeEventListener("touchstart", this.boundTouchHandler);
             window.removeEventListener("mousemove", this.boundMouseHandler);
@@ -182,7 +185,7 @@ let PanelCard = class PanelCard extends i {
         this.classList.toggle("admin-view", this.isAdminView);
         if (!this.mainCard || !this.config || !this.hass) {
             return x `
-        <div class="loader-container">
+        <div class="container loader">
           <div class="loading-text">SmartQasa is loading</div>
           <div class="dots"><span></span><span></span><span></span></div>
         </div>
@@ -190,16 +193,19 @@ let PanelCard = class PanelCard extends i {
         }
         if (this.isSaverActive) {
             return x `
-        <screensaver-card
-          .config=${this.config}
-          .hass=${this.hass}
-        ></screensaver-card>
+        <div class="container">
+          <screensaver-card
+            .config=${this.config}
+            .hass=${this.hass}
+          ></screensaver-card>
+        </div>
       `;
         }
-        return x ` ${this.mainCard} `;
+        return x ` <div class="container">${this.mainCard}</div> `;
     }
     firstUpdated() {
         this.createMainCard();
+        this.handleFade();
     }
     updated(changedProps) {
         if (!this.mainCard)
@@ -208,7 +214,6 @@ let PanelCard = class PanelCard extends i {
             this.mainCard.setConfig(this.config);
         }
         if (changedProps.has("hass") && this.hass) {
-            this.mainCard.hass = this.hass;
             this.syncHass();
             this.checkDeviceTriggers();
         }
@@ -247,10 +252,10 @@ let PanelCard = class PanelCard extends i {
     resetSaver() {
         if (!window.fully)
             return;
-        if (this.saverTimer)
-            clearTimeout(this.saverTimer);
         if (this.isSaverActive)
             this.exitSaver();
+        if (this.saverTimer)
+            clearTimeout(this.saverTimer);
         this.saverTimer = setTimeout(() => {
             this.showSaver();
         }, SCREENSAVER_TIMEOUT);
@@ -260,7 +265,7 @@ let PanelCard = class PanelCard extends i {
     }
     exitSaver() {
         this.isSaverActive = false;
-        window.dispatchEvent(new Event("sq-fade-request"));
+        this.handleFade();
     }
     checkDeviceTriggers() {
         if (!this.hass)
@@ -286,6 +291,17 @@ let PanelCard = class PanelCard extends i {
         }
         this.refreshTime = refreshState || null;
     }
+    handleFade() {
+        const container = this.shadowRoot?.querySelector(".container");
+        if (!container)
+            return;
+        container.style.opacity = "0";
+        const onEnd = () => {
+            container.removeEventListener("transitionend", onEnd);
+            container.style.opacity = "1";
+        };
+        container.addEventListener("transitionend", onEnd);
+    }
     static get styles() {
         return i$3 `
       :host {
@@ -299,7 +315,18 @@ let PanelCard = class PanelCard extends i {
         height: calc(100vh - 56px);
       }
 
-      .loader-container {
+      .container {
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        transition: opacity 200ms ease-in-out;
+      }
+
+      .container.fade {
+        opacity: 1;
+      }
+
+      .container.loader {
         display: flex;
         flex-direction: column;
         height: 100%;
@@ -604,5 +631,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.14-beta.4"} (Built: ${"2025-09-21T12:50:02.097Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.14-beta.5"} (Built: ${"2025-09-21T15:17:38.501Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

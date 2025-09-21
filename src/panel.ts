@@ -40,6 +40,7 @@ export class PanelCard extends LitElement {
     this.requestUpdate();
   };
 
+  private boundHandleFadeIn = () => this.handleFade();
   private boundTouchHandler = () => this.resetSaver();
   private boundMouseHandler = () => this.resetSaver();
   private boundKeyHandler = () => this.resetSaver();
@@ -54,6 +55,7 @@ export class PanelCard extends LitElement {
     super.connectedCallback();
 
     document.addEventListener("visibilitychange", this.handleVisibility);
+    window.addEventListener("sq-fade-request", this.boundHandleFadeIn);
 
     if (window.fully) {
       window.addEventListener("touchstart", this.boundTouchHandler, {
@@ -73,6 +75,7 @@ export class PanelCard extends LitElement {
 
   public disconnectedCallback(): void {
     document.removeEventListener("visibilitychange", this.handleVisibility);
+    window.removeEventListener("sq-fade-request", this.boundHandleFadeIn);
 
     if (window.fully) {
       window.removeEventListener("touchstart", this.boundTouchHandler);
@@ -106,7 +109,7 @@ export class PanelCard extends LitElement {
 
     if (!this.mainCard || !this.config || !this.hass) {
       return html`
-        <div class="loader-container">
+        <div class="container loader">
           <div class="loading-text">SmartQasa is loading</div>
           <div class="dots"><span></span><span></span><span></span></div>
         </div>
@@ -115,18 +118,21 @@ export class PanelCard extends LitElement {
 
     if (this.isSaverActive) {
       return html`
-        <screensaver-card
-          .config=${this.config}
-          .hass=${this.hass}
-        ></screensaver-card>
+        <div class="container">
+          <screensaver-card
+            .config=${this.config}
+            .hass=${this.hass}
+          ></screensaver-card>
+        </div>
       `;
     }
 
-    return html` ${this.mainCard} `;
+    return html` <div class="container">${this.mainCard}</div> `;
   }
 
   protected firstUpdated(): void {
     this.createMainCard();
+    this.handleFade();
   }
 
   protected updated(changedProps: PropertyValues): void {
@@ -136,7 +142,6 @@ export class PanelCard extends LitElement {
       this.mainCard.setConfig(this.config);
     }
     if (changedProps.has("hass") && this.hass) {
-      this.mainCard.hass = this.hass;
       this.syncHass();
       this.checkDeviceTriggers();
     }
@@ -178,8 +183,8 @@ export class PanelCard extends LitElement {
   private resetSaver(): void {
     if (!window.fully) return;
 
-    if (this.saverTimer) clearTimeout(this.saverTimer);
     if (this.isSaverActive) this.exitSaver();
+    if (this.saverTimer) clearTimeout(this.saverTimer);
 
     this.saverTimer = setTimeout(() => {
       this.showSaver();
@@ -192,7 +197,7 @@ export class PanelCard extends LitElement {
 
   private exitSaver(): void {
     this.isSaverActive = false;
-    window.dispatchEvent(new Event("sq-fade-request"));
+    this.handleFade();
   }
 
   private checkDeviceTriggers(): void {
@@ -221,6 +226,18 @@ export class PanelCard extends LitElement {
     this.refreshTime = refreshState || null;
   }
 
+  private handleFade(): void {
+    const container = this.shadowRoot?.querySelector<HTMLElement>(".container");
+    if (!container) return;
+
+    container.style.opacity = "0";
+    const onEnd = () => {
+      container.removeEventListener("transitionend", onEnd);
+      container.style.opacity = "1";
+    };
+    container.addEventListener("transitionend", onEnd);
+  }
+
   static get styles(): CSSResult {
     return css`
       :host {
@@ -234,7 +251,18 @@ export class PanelCard extends LitElement {
         height: calc(100vh - 56px);
       }
 
-      .loader-container {
+      .container {
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        transition: opacity 200ms ease-in-out;
+      }
+
+      .container.fade {
+        opacity: 1;
+      }
+
+      .container.loader {
         display: flex;
         flex-direction: column;
         height: 100%;
