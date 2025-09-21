@@ -116,7 +116,7 @@ export class PanelCard extends LitElement {
 
     if (this.isSaverActive) {
       return html`
-        <div class="container">
+        <div class="container visible">
           <screensaver-card
             .config=${this.config}
             .hass=${this.hass}
