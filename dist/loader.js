@@ -500,10 +500,10 @@ let ScreenSaver = class ScreenSaver extends i {
         }
         const moveTimer = (this.config?.saver_interval ?? 30) * 1000;
         const runCycle = () => {
-            element.classList.remove("visible");
+            element.classList.add("hidden");
             setTimeout(() => {
                 this.moveElement();
-                element.classList.add("visible");
+                element.classList.remove("hidden");
             }, 1000);
         };
         runCycle();
@@ -558,12 +558,12 @@ let ScreenSaver = class ScreenSaver extends i {
         max-width: 100%;
         box-sizing: border-box;
         overflow: hidden;
-        opacity: 0;
+        opacity: 1;
         transition: opacity 1000ms ease-in-out;
       }
 
-      .element.visible {
-        opacity: 1;
+      .element.hidden {
+        opacity: 0;
       }
 
       .time,
@@ -632,5 +632,5 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.16-beta.4"} (Built: ${"2025-09-22T01:56:23.538Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.16-beta.5"} (Built: ${"2025-09-22T01:58:49.502Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

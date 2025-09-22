@@ -125,11 +125,11 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
     const moveTimer = (this.config?.saver_interval ?? 30) * 1000;
 
     const runCycle = () => {
-      element.classList.remove("visible");
+      element.classList.add("hidden");
 
       setTimeout(() => {
         this.moveElement();
-        element.classList.add("visible");
+        element.classList.remove("hidden");
       }, 1000);
     };
 
@@ -194,12 +194,12 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
         max-width: 100%;
         box-sizing: border-box;
         overflow: hidden;
-        opacity: 0;
+        opacity: 1;
         transition: opacity 1000ms ease-in-out;
       }
 
-      .element.visible {
-        opacity: 1;
+      .element.hidden {
+        opacity: 0;
       }
 
       .time,
