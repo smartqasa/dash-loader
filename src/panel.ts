@@ -229,10 +229,8 @@ export class PanelCard extends LitElement {
     const container = this.shadowRoot?.querySelector<HTMLElement>(".container");
     if (!container || location.pathname === this.lastPath) return;
 
-    //container.style.opacity = "0";
     container.classList.remove("visible");
     await new Promise((r) => setTimeout(r, 200));
-    //container.style.opacity = "1";
     container.classList.add("visible");
     this.lastPath = location.pathname;
   }
