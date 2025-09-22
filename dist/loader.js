@@ -632,5 +632,9 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.16-beta.5"} (Built: ${"2025-09-22T01:58:49.502Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+// index.ts or main.ts
+window.addEventListener("unhandledrejection", (event) => {
+    console.error("Unhandled promise rejection:", event.reason);
+});
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.16-beta.6"} (Built: ${"2025-09-22T21:11:12.310Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
