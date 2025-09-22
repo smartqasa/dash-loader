@@ -3,9 +3,8 @@ window.smartqasa = window.smartqasa || {};
 import "./panel";
 import "./screensaver";
 
-// index.ts or main.ts
 window.addEventListener("unhandledrejection", (event) => {
-  console.error("Unhandled promise rejection:", event.reason);
+  console.error("[LOADER] Unhandled promise rejection:", event.reason);
 });
 
 console.info(
