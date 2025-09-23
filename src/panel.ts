@@ -247,10 +247,12 @@ export class PanelCard extends LitElement {
     const container = this.shadowRoot?.querySelector<HTMLElement>(".container");
     if (!container || location.pathname === this.lastPath) return;
 
+    this.classList.add("fading");
     container.classList.remove("visible");
 
     setTimeout(() => {
       container.classList.add("visible");
+      this.classList.remove("fading");
       this.lastPath = location.pathname;
     }, 200);
   }
@@ -261,11 +263,15 @@ export class PanelCard extends LitElement {
         display: block;
         width: 100%;
         height: 100vh;
-        background-color: var(--panel-color, #000);
+        background-color: var(--panel-color);
       }
 
       :host(.admin-view) {
         height: calc(100vh - 56px);
+      }
+
+      :host(.fading) {
+        background-color: #000;
       }
 
       .container {
