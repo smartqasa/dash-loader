@@ -138,7 +138,11 @@ export class PanelCard extends LitElement {
     if (this.mainCard && !this.isSaverActive) this.handleFade();
 
     if (changedProps.has("config") && this.config) {
-      this.mainCard.setConfig(this.config);
+      try {
+        this.mainCard.setConfig(this.config);
+      } catch (err) {
+        console.error("[PanelCard] setConfig failed:", err);
+      }
     }
     if (changedProps.has("hass") && this.hass) {
       this.syncHass();
@@ -154,7 +158,11 @@ export class PanelCard extends LitElement {
         const element: LovelaceCard = document.createElement(
           "main-card"
         ) as LovelaceCard;
-        if (this.config) element.setConfig(this.config);
+        try {
+          if (this.config) element.setConfig(this.config);
+        } catch (err) {
+          console.error("[PanelCard] setConfig failed:", err);
+        }
         if (this.hass) element.hass = this.hass;
         this.mainCard = element;
       }
@@ -225,14 +233,15 @@ export class PanelCard extends LitElement {
     this.refreshTime = refreshState || null;
   }
 
-  private async handleFade(): Promise<void> {
+  private handleFade(): void {
     const container = this.shadowRoot?.querySelector<HTMLElement>(".container");
     if (!container || location.pathname === this.lastPath) return;
 
     container.classList.remove("visible");
-    await new Promise((r) => setTimeout(r, 200));
-    container.classList.add("visible");
-    this.lastPath = location.pathname;
+    setTimeout(() => {
+      container.classList.add("visible");
+      this.lastPath = location.pathname;
+    }, 200);
   }
 
   static get styles(): CSSResult {

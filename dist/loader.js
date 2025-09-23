@@ -209,7 +209,12 @@ let PanelCard = class PanelCard extends i {
         if (this.mainCard && !this.isSaverActive)
             this.handleFade();
         if (changedProps.has("config") && this.config) {
-            this.mainCard.setConfig(this.config);
+            try {
+                this.mainCard.setConfig(this.config);
+            }
+            catch (err) {
+                console.error("[PanelCard] setConfig failed:", err);
+            }
         }
         if (changedProps.has("hass") && this.hass) {
             this.syncHass();
@@ -221,8 +226,13 @@ let PanelCard = class PanelCard extends i {
             await customElements.whenDefined("main-card");
             if (!this.mainCard) {
                 const element = document.createElement("main-card");
-                if (this.config)
-                    element.setConfig(this.config);
+                try {
+                    if (this.config)
+                        element.setConfig(this.config);
+                }
+                catch (err) {
+                    console.error("[PanelCard] setConfig failed:", err);
+                }
                 if (this.hass)
                     element.hass = this.hass;
                 this.mainCard = element;
@@ -289,14 +299,15 @@ let PanelCard = class PanelCard extends i {
         }
         this.refreshTime = refreshState || null;
     }
-    async handleFade() {
+    handleFade() {
         const container = this.shadowRoot?.querySelector(".container");
         if (!container || location.pathname === this.lastPath)
             return;
         container.classList.remove("visible");
-        await new Promise((r) => setTimeout(r, 200));
-        container.classList.add("visible");
-        this.lastPath = location.pathname;
+        setTimeout(() => {
+            container.classList.add("visible");
+            this.lastPath = location.pathname;
+        }, 200);
     }
     static get styles() {
         return i$3 `
@@ -635,5 +646,5 @@ window.smartqasa = window.smartqasa || {};
 window.addEventListener("unhandledrejection", (event) => {
     console.error("[LOADER] Unhandled promise rejection:", event.reason);
 });
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.16-beta.7"} (Built: ${"2025-09-22T21:13:16.315Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.16-beta.8"} (Built: ${"2025-09-23T00:31:14.593Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
