@@ -254,7 +254,7 @@ export class PanelCard extends LitElement {
       container.classList.add("visible");
       this.classList.remove("fading");
       this.lastPath = location.pathname;
-    }, 200);
+    }, 150);
   }
 
   static get styles(): CSSResult {
@@ -279,7 +279,7 @@ export class PanelCard extends LitElement {
         height: 100%;
         opacity: 0;
         will-change: opacity;
-        transition: opacity 200ms ease-in-out;
+        transition: opacity 150ms ease-in-out;
       }
 
       .container.visible {

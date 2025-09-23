@@ -319,7 +319,7 @@ let PanelCard = class PanelCard extends i {
             container.classList.add("visible");
             this.classList.remove("fading");
             this.lastPath = location.pathname;
-        }, 200);
+        }, 150);
     }
     static get styles() {
         return i$3 `
@@ -343,7 +343,7 @@ let PanelCard = class PanelCard extends i {
         height: 100%;
         opacity: 0;
         will-change: opacity;
-        transition: opacity 200ms ease-in-out;
+        transition: opacity 150ms ease-in-out;
       }
 
       .container.visible {
@@ -662,5 +662,5 @@ window.smartqasa = window.smartqasa || {};
 window.addEventListener("unhandledrejection", (event) => {
     console.error("[LOADER] Unhandled promise rejection:", event.reason);
 });
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.17-beta.1"} (Built: ${"2025-09-23T17:23:31.335Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.17-beta.2"} (Built: ${"2025-09-23T17:25:29.501Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
