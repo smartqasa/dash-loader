@@ -238,6 +238,7 @@ export class PanelCard extends LitElement {
     if (!container || location.pathname === this.lastPath) return;
 
     container.classList.remove("visible");
+
     setTimeout(() => {
       container.classList.add("visible");
       this.lastPath = location.pathname;
