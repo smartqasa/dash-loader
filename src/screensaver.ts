@@ -178,6 +178,7 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
         top: 0;
         left: 0;
         background-color: black;
+        z-index: 1000;
       }
 
       .container {

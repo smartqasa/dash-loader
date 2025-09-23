@@ -560,6 +560,7 @@ let ScreenSaver = class ScreenSaver extends i {
         top: 0;
         left: 0;
         background-color: black;
+        z-index: 1000;
       }
 
       .container {
@@ -656,5 +657,5 @@ window.smartqasa = window.smartqasa || {};
 window.addEventListener("unhandledrejection", (event) => {
     console.error("[LOADER] Unhandled promise rejection:", event.reason);
 });
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.17-beta.3"} (Built: ${"2025-09-23T17:26:56.085Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.17-beta.4"} (Built: ${"2025-09-23T20:26:31.355Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
