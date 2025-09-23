@@ -313,11 +313,9 @@ let PanelCard = class PanelCard extends i {
         const container = this.shadowRoot?.querySelector(".container");
         if (!container || location.pathname === this.lastPath)
             return;
-        this.classList.add("fading");
         container.classList.remove("visible");
         setTimeout(() => {
             container.classList.add("visible");
-            this.classList.remove("fading");
             this.lastPath = location.pathname;
         }, 150);
     }
@@ -332,10 +330,6 @@ let PanelCard = class PanelCard extends i {
 
       :host(.admin-view) {
         height: calc(100vh - 56px);
-      }
-
-      :host(.fading) {
-        background-color: #000;
       }
 
       .container {
@@ -662,5 +656,5 @@ window.smartqasa = window.smartqasa || {};
 window.addEventListener("unhandledrejection", (event) => {
     console.error("[LOADER] Unhandled promise rejection:", event.reason);
 });
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.17-beta.2"} (Built: ${"2025-09-23T17:25:29.501Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.17-beta.3"} (Built: ${"2025-09-23T17:26:56.085Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
