@@ -116,15 +116,17 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
   }
 
   private cycleElement(): void {
-    const element = this.shadowRoot?.querySelector(".element") as HTMLElement;
-    if (!element) {
-      console.error("Element not found in shadow DOM.");
-      return;
-    }
-
     const moveTimer = (this.config?.saver_interval ?? 30) * 1000;
 
     const runCycle = () => {
+      const element = this.shadowRoot?.querySelector(
+        ".element"
+      ) as HTMLElement | null;
+      if (!element) {
+        console.warn("[ScreenSaver] .element not found during cycle");
+        return;
+      }
+
       element.classList.add("hidden");
 
       setTimeout(() => {
@@ -134,6 +136,7 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
     };
 
     runCycle();
+
     this.moveTimerId = window.setInterval(runCycle, moveTimer);
   }
 

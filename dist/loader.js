@@ -504,13 +504,13 @@ let ScreenSaver = class ScreenSaver extends i {
         }, 1000);
     }
     cycleElement() {
-        const element = this.shadowRoot?.querySelector(".element");
-        if (!element) {
-            console.error("Element not found in shadow DOM.");
-            return;
-        }
         const moveTimer = (this.config?.saver_interval ?? 30) * 1000;
         const runCycle = () => {
+            const element = this.shadowRoot?.querySelector(".element");
+            if (!element) {
+                console.warn("[ScreenSaver] .element not found during cycle");
+                return;
+            }
             element.classList.add("hidden");
             setTimeout(() => {
                 this.moveElement();
@@ -646,5 +646,5 @@ window.smartqasa = window.smartqasa || {};
 window.addEventListener("unhandledrejection", (event) => {
     console.error("[LOADER] Unhandled promise rejection:", event.reason);
 });
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.16-beta.9"} (Built: ${"2025-09-23T00:31:26.291Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.16-beta.10"} (Built: ${"2025-09-23T00:34:10.919Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
