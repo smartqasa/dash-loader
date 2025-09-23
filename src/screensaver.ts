@@ -47,6 +47,13 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
     this.config = config;
   }
 
+  public connectedCallback(): void {
+    super.connectedCallback();
+    if (window.smartqasa?.popupClose) {
+      window.smartqasa.popupClose();
+    }
+  }
+
   protected render(): TemplateResult | typeof nothing {
     if (!this.config) return nothing;
 
