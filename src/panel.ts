@@ -153,24 +153,34 @@ export class PanelCard extends LitElement {
   private async createMainCard(retries = 5): Promise<void> {
     try {
       await customElements.whenDefined("main-card");
+    } catch (err) {
+      console.error("[PanelCard] whenDefined failed:", err);
+      if (retries > 0) {
+        setTimeout(() => this.createMainCard(retries - 1), 1000);
+      }
+      return;
+    }
 
-      if (!this.mainCard) {
-        const element: LovelaceCard = document.createElement(
-          "main-card"
-        ) as LovelaceCard;
-        try {
-          if (this.config) element.setConfig(this.config);
-        } catch (err) {
-          console.error("[PanelCard] setConfig failed:", err);
+    if (!this.mainCard) {
+      try {
+        const element = document.createElement("main-card") as LovelaceCard;
+
+        if (this.config) {
+          try {
+            element.setConfig(this.config);
+          } catch (err) {
+            console.error("[PanelCard] setConfig failed:", err);
+          }
         }
+
         if (this.hass) element.hass = this.hass;
         this.mainCard = element;
-      }
-    } catch (err) {
-      console.error("[PanelCard] Error waiting for main-card:", err);
-      if (retries > 0) {
-        this.mainCard = undefined;
-        setTimeout(() => this.createMainCard(retries - 1), 1000);
+      } catch (err) {
+        console.error("[PanelCard] Failed to create main-card element:", err);
+        if (retries > 0) {
+          this.mainCard = undefined;
+          setTimeout(() => this.createMainCard(retries - 1), 1000);
+        }
       }
     }
   }

@@ -224,25 +224,35 @@ let PanelCard = class PanelCard extends i {
     async createMainCard(retries = 5) {
         try {
             await customElements.whenDefined("main-card");
-            if (!this.mainCard) {
+        }
+        catch (err) {
+            console.error("[PanelCard] whenDefined failed:", err);
+            if (retries > 0) {
+                setTimeout(() => this.createMainCard(retries - 1), 1000);
+            }
+            return;
+        }
+        if (!this.mainCard) {
+            try {
                 const element = document.createElement("main-card");
-                try {
-                    if (this.config)
+                if (this.config) {
+                    try {
                         element.setConfig(this.config);
-                }
-                catch (err) {
-                    console.error("[PanelCard] setConfig failed:", err);
+                    }
+                    catch (err) {
+                        console.error("[PanelCard] setConfig failed:", err);
+                    }
                 }
                 if (this.hass)
                     element.hass = this.hass;
                 this.mainCard = element;
             }
-        }
-        catch (err) {
-            console.error("[PanelCard] Error waiting for main-card:", err);
-            if (retries > 0) {
-                this.mainCard = undefined;
-                setTimeout(() => this.createMainCard(retries - 1), 1000);
+            catch (err) {
+                console.error("[PanelCard] Failed to create main-card element:", err);
+                if (retries > 0) {
+                    this.mainCard = undefined;
+                    setTimeout(() => this.createMainCard(retries - 1), 1000);
+                }
             }
         }
     }
@@ -646,5 +656,5 @@ window.smartqasa = window.smartqasa || {};
 window.addEventListener("unhandledrejection", (event) => {
     console.error("[LOADER] Unhandled promise rejection:", event.reason);
 });
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.16-beta.10"} (Built: ${"2025-09-23T00:34:10.919Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.16-beta.11"} (Built: ${"2025-09-23T11:59:10.292Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
