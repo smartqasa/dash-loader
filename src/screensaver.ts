@@ -29,7 +29,7 @@ window.customCards.push({
 @customElement("screensaver-card")
 export class ScreenSaver extends LitElement implements LovelaceCard {
   public getCardSize(): number | Promise<number> {
-    return 100;
+    return 20;
   }
 
   @property({ attribute: false }) config?: Config;
@@ -40,8 +40,11 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
 
   private rebootTime?: string;
   private refreshTime?: string;
+
+  // timers
   private moveTimerId?: number;
   private timeIntervalId?: number;
+  private fadeTimeoutId?: number;
 
   public setConfig(config: Config): void {
     this.config = config;
@@ -49,11 +52,23 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
 
   public connectedCallback(): void {
     super.connectedCallback();
-    try {
-      window.smartqasa?.popupClose?.();
-    } catch (err) {
-      console.error("[ScreenSaver] popupClose failed:", err);
+    window.smartqasa?.popupReset?.();
+  }
+
+  public disconnectedCallback(): void {
+    if (this.timeIntervalId !== undefined) {
+      window.clearInterval(this.timeIntervalId);
+      this.timeIntervalId = undefined;
     }
+    if (this.moveTimerId !== undefined) {
+      window.clearInterval(this.moveTimerId);
+      this.moveTimerId = undefined;
+    }
+    if (this.fadeTimeoutId !== undefined) {
+      window.clearTimeout(this.fadeTimeoutId);
+      this.fadeTimeoutId = undefined;
+    }
+    super.disconnectedCallback();
   }
 
   protected render(): TemplateResult | typeof nothing {
@@ -107,30 +122,29 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
     }
   }
 
-  public disconnectedCallback(): void {
-    if (this.timeIntervalId !== undefined) {
-      window.clearInterval(this.timeIntervalId);
-    }
-    if (this.moveTimerId !== undefined) {
-      window.clearInterval(this.moveTimerId);
-    }
-
-    super.disconnectedCallback();
-  }
-
   private startClock(): void {
     this.timeIntervalId = window.setInterval(() => {
+      if (!this.isConnected) {
+        if (this.timeIntervalId !== undefined) {
+          window.clearInterval(this.timeIntervalId);
+          this.timeIntervalId = undefined;
+        }
+        return;
+      }
       this.updateElement();
     }, 1000);
   }
 
   private cycleElement(): void {
-    const moveTimer = (this.config?.saver_interval ?? 30) * 1000;
+    const moveTimerMs = Math.max(1, this.config?.saver_interval ?? 30) * 1000;
 
     const runCycle = () => {
+      if (!this.isConnected) return;
+
       const element = this.shadowRoot?.querySelector(
         ".element"
       ) as HTMLElement | null;
+
       if (!element) {
         console.warn("[ScreenSaver] .element not found during cycle");
         return;
@@ -138,11 +152,15 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
 
       element.classList.add("hidden");
 
-      setTimeout(() => {
+      this.fadeTimeoutId = window.setTimeout(() => {
+        if (!this.isConnected) return;
+
         this.moveElement();
+
         const el = this.shadowRoot?.querySelector(
           ".element"
         ) as HTMLElement | null;
+
         if (el) {
           el.classList.remove("hidden");
         } else {
@@ -153,7 +171,16 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
 
     runCycle();
 
-    this.moveTimerId = window.setInterval(runCycle, moveTimer);
+    this.moveTimerId = window.setInterval(() => {
+      if (!this.isConnected) {
+        if (this.moveTimerId !== undefined) {
+          window.clearInterval(this.moveTimerId);
+          this.moveTimerId = undefined;
+        }
+        return;
+      }
+      runCycle();
+    }, moveTimerMs);
   }
 
   private updateElement(): void {
@@ -163,17 +190,24 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
   }
 
   private moveElement(): void {
+    if (!this.isConnected) return;
+
     const container = this.shadowRoot?.querySelector(
       ".container"
-    ) as HTMLElement;
-    const element = this.shadowRoot?.querySelector(".element") as HTMLElement;
+    ) as HTMLElement | null;
+    const element = this.shadowRoot?.querySelector(
+      ".element"
+    ) as HTMLElement | null;
 
     if (container && element) {
-      const maxWidth = container.clientWidth - element.clientWidth;
-      const maxHeight = container.clientHeight - element.clientHeight;
+      const maxWidth = Math.max(0, container.clientWidth - element.clientWidth);
+      const maxHeight = Math.max(
+        0,
+        container.clientHeight - element.clientHeight
+      );
 
-      const randomX = Math.floor(Math.random() * maxWidth);
-      const randomY = Math.floor(Math.random() * maxHeight);
+      const randomX = Math.floor(Math.random() * (maxWidth + 1));
+      const randomY = Math.floor(Math.random() * (maxHeight + 1));
 
       element.style.left = `${randomX}px`;
       element.style.top = `${randomY}px`;

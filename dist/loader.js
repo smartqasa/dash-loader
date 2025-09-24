@@ -448,19 +448,29 @@ let ScreenSaver = class ScreenSaver extends i {
         this.date = "Loading...";
     }
     getCardSize() {
-        return 100;
+        return 20;
     }
     setConfig(config) {
         this.config = config;
     }
     connectedCallback() {
         super.connectedCallback();
-        try {
-            window.smartqasa?.popupClose?.();
+        window.smartqasa?.popupReset?.();
+    }
+    disconnectedCallback() {
+        if (this.timeIntervalId !== undefined) {
+            window.clearInterval(this.timeIntervalId);
+            this.timeIntervalId = undefined;
         }
-        catch (err) {
-            console.error("[ScreenSaver] popupClose failed:", err);
+        if (this.moveTimerId !== undefined) {
+            window.clearInterval(this.moveTimerId);
+            this.moveTimerId = undefined;
         }
+        if (this.fadeTimeoutId !== undefined) {
+            window.clearTimeout(this.fadeTimeoutId);
+            this.fadeTimeoutId = undefined;
+        }
+        super.disconnectedCallback();
     }
     render() {
         if (!this.config)
@@ -508,30 +518,32 @@ let ScreenSaver = class ScreenSaver extends i {
             this.refreshTime = refreshTime;
         }
     }
-    disconnectedCallback() {
-        if (this.timeIntervalId !== undefined) {
-            window.clearInterval(this.timeIntervalId);
-        }
-        if (this.moveTimerId !== undefined) {
-            window.clearInterval(this.moveTimerId);
-        }
-        super.disconnectedCallback();
-    }
     startClock() {
         this.timeIntervalId = window.setInterval(() => {
+            if (!this.isConnected) {
+                if (this.timeIntervalId !== undefined) {
+                    window.clearInterval(this.timeIntervalId);
+                    this.timeIntervalId = undefined;
+                }
+                return;
+            }
             this.updateElement();
         }, 1000);
     }
     cycleElement() {
-        const moveTimer = (this.config?.saver_interval ?? 30) * 1000;
+        const moveTimerMs = Math.max(1, this.config?.saver_interval ?? 30) * 1000;
         const runCycle = () => {
+            if (!this.isConnected)
+                return;
             const element = this.shadowRoot?.querySelector(".element");
             if (!element) {
                 console.warn("[ScreenSaver] .element not found during cycle");
                 return;
             }
             element.classList.add("hidden");
-            setTimeout(() => {
+            this.fadeTimeoutId = window.setTimeout(() => {
+                if (!this.isConnected)
+                    return;
                 this.moveElement();
                 const el = this.shadowRoot?.querySelector(".element");
                 if (el) {
@@ -543,7 +555,16 @@ let ScreenSaver = class ScreenSaver extends i {
             }, 1000);
         };
         runCycle();
-        this.moveTimerId = window.setInterval(runCycle, moveTimer);
+        this.moveTimerId = window.setInterval(() => {
+            if (!this.isConnected) {
+                if (this.moveTimerId !== undefined) {
+                    window.clearInterval(this.moveTimerId);
+                    this.moveTimerId = undefined;
+                }
+                return;
+            }
+            runCycle();
+        }, moveTimerMs);
     }
     updateElement() {
         const now = new Date();
@@ -551,13 +572,15 @@ let ScreenSaver = class ScreenSaver extends i {
         this.date = formattedDate(now);
     }
     moveElement() {
+        if (!this.isConnected)
+            return;
         const container = this.shadowRoot?.querySelector(".container");
         const element = this.shadowRoot?.querySelector(".element");
         if (container && element) {
-            const maxWidth = container.clientWidth - element.clientWidth;
-            const maxHeight = container.clientHeight - element.clientHeight;
-            const randomX = Math.floor(Math.random() * maxWidth);
-            const randomY = Math.floor(Math.random() * maxHeight);
+            const maxWidth = Math.max(0, container.clientWidth - element.clientWidth);
+            const maxHeight = Math.max(0, container.clientHeight - element.clientHeight);
+            const randomX = Math.floor(Math.random() * (maxWidth + 1));
+            const randomY = Math.floor(Math.random() * (maxHeight + 1));
             element.style.left = `${randomX}px`;
             element.style.top = `${randomY}px`;
         }
@@ -672,5 +695,5 @@ window.smartqasa = window.smartqasa || {};
 window.addEventListener("unhandledrejection", (event) => {
     console.error("[LOADER] Unhandled promise rejection:", event.reason);
 });
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.17-beta.6"} (Built: ${"2025-09-24T06:58:28.867Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.17-beta.7"} (Built: ${"2025-09-24T11:11:56.622Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
