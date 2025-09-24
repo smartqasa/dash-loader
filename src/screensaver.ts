@@ -49,8 +49,10 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
 
   public connectedCallback(): void {
     super.connectedCallback();
-    if (window.smartqasa?.popupClose) {
-      window.smartqasa.popupClose();
+    try {
+      window.smartqasa?.popupClose?.();
+    } catch (err) {
+      console.error("[ScreenSaver] popupClose failed:", err);
     }
   }
 
@@ -138,7 +140,14 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
 
       setTimeout(() => {
         this.moveElement();
-        element.classList.remove("hidden");
+        const el = this.shadowRoot?.querySelector(
+          ".element"
+        ) as HTMLElement | null;
+        if (el) {
+          el.classList.remove("hidden");
+        } else {
+          console.warn("[ScreenSaver] .element missing during fade-in");
+        }
       }, 1000);
     };
 

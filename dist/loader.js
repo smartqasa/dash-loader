@@ -455,8 +455,11 @@ let ScreenSaver = class ScreenSaver extends i {
     }
     connectedCallback() {
         super.connectedCallback();
-        if (window.smartqasa?.popupClose) {
-            window.smartqasa.popupClose();
+        try {
+            window.smartqasa?.popupClose?.();
+        }
+        catch (err) {
+            console.error("[ScreenSaver] popupClose failed:", err);
         }
     }
     render() {
@@ -530,7 +533,13 @@ let ScreenSaver = class ScreenSaver extends i {
             element.classList.add("hidden");
             setTimeout(() => {
                 this.moveElement();
-                element.classList.remove("hidden");
+                const el = this.shadowRoot?.querySelector(".element");
+                if (el) {
+                    el.classList.remove("hidden");
+                }
+                else {
+                    console.warn("[ScreenSaver] .element missing during fade-in");
+                }
             }, 1000);
         };
         runCycle();
@@ -663,5 +672,5 @@ window.smartqasa = window.smartqasa || {};
 window.addEventListener("unhandledrejection", (event) => {
     console.error("[LOADER] Unhandled promise rejection:", event.reason);
 });
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.17-beta.5"} (Built: ${"2025-09-23T20:56:38.766Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.17-beta.6"} (Built: ${"2025-09-24T06:58:28.867Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
