@@ -41,7 +41,6 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
   private rebootTime?: string;
   private refreshTime?: string;
 
-  // timers
   private moveTimerId?: number;
   private timeIntervalId?: number;
   private fadeTimeoutId?: number;
