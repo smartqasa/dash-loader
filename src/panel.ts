@@ -142,9 +142,9 @@ export class PanelCard extends LitElement {
         setTimeout(() => this.loadMainCard(retries - 1), 1000);
       }
       return;
-    } finally {
-      this.isMainLoaded = true;
     }
+
+    this.isMainLoaded = true;
   }
 
   private syncPopups(): void {
@@ -203,18 +203,6 @@ export class PanelCard extends LitElement {
     this.refreshTime = refreshState || null;
   }
 
-  private handleFade(): void {
-    const container = this.shadowRoot?.querySelector<HTMLElement>(".container");
-    if (!container || location.pathname === this.lastPath) return;
-
-    container.classList.remove("visible");
-
-    setTimeout(() => {
-      container.classList.add("visible");
-      this.lastPath = location.pathname;
-    }, 150);
-  }
-
   static get styles(): CSSResult {
     return css`
       :host {
@@ -226,11 +214,6 @@ export class PanelCard extends LitElement {
 
       :host(.admin-view) {
         height: calc(100vh - 56px);
-      }
-
-      .container {
-        width: 100%;
-        height: 100%;
       }
 
       .loader {

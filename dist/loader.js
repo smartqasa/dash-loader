@@ -219,9 +219,7 @@ let PanelCard = class PanelCard extends i {
             }
             return;
         }
-        finally {
-            this.isMainLoaded = true;
-        }
+        this.isMainLoaded = true;
     }
     syncPopups() {
         if (!this.hass)
@@ -274,16 +272,6 @@ let PanelCard = class PanelCard extends i {
         }
         this.refreshTime = refreshState || null;
     }
-    handleFade() {
-        const container = this.shadowRoot?.querySelector(".container");
-        if (!container || location.pathname === this.lastPath)
-            return;
-        container.classList.remove("visible");
-        setTimeout(() => {
-            container.classList.add("visible");
-            this.lastPath = location.pathname;
-        }, 150);
-    }
     static get styles() {
         return i$3 `
       :host {
@@ -295,11 +283,6 @@ let PanelCard = class PanelCard extends i {
 
       :host(.admin-view) {
         height: calc(100vh - 56px);
-      }
-
-      .container {
-        width: 100%;
-        height: 100%;
       }
 
       .loader {
@@ -654,5 +637,5 @@ window.smartqasa = window.smartqasa || {};
 window.addEventListener("unhandledrejection", (event) => {
     console.error("[LOADER] Unhandled promise rejection:", event.reason);
 });
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.18-beta.1"} (Built: ${"2025-09-25T17:30:03.262Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.18-beta.2"} (Built: ${"2025-09-25T17:57:13.444Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
