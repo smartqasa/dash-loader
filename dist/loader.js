@@ -176,7 +176,8 @@ let PanelCard = class PanelCard extends i {
     willUpdate(changedProps) {
         if (changedProps.has("hass")) {
             const isAdmin = this.hass?.user?.is_admin || false;
-            const isAdminMode = this.hass?.states["input_boolean.admin_mode"]?.state === "on" || false;
+            const isAdminMode = this.hass?.states?.["input_boolean.admin_mode"]?.state === "on" ||
+                false;
             this.isAdminView = isAdmin || isAdminMode;
         }
     }
@@ -246,7 +247,6 @@ let PanelCard = class PanelCard extends i {
     }
     exitSaver() {
         this.isSaverActive = false;
-        this.lastPath = undefined;
     }
     checkDeviceTriggers() {
         if (!this.hass)
@@ -637,5 +637,5 @@ window.smartqasa = window.smartqasa || {};
 window.addEventListener("unhandledrejection", (event) => {
     console.error("[LOADER] Unhandled promise rejection:", event.reason);
 });
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.18-beta.2"} (Built: ${"2025-09-25T17:57:13.444Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.18-beta.3"} (Built: ${"2025-09-25T18:45:48.406Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

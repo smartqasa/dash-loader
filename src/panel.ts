@@ -28,7 +28,6 @@ export class PanelCard extends LitElement {
   @state() isMainLoaded = false;
   @state() isSaverActive = false;
 
-  private lastPath?: string;
   private isAdminView = false;
   private rebootTime: string | null = null;
   private refreshTime: string | null = null;
@@ -96,7 +95,8 @@ export class PanelCard extends LitElement {
     if (changedProps.has("hass")) {
       const isAdmin = this.hass?.user?.is_admin || false;
       const isAdminMode =
-        this.hass?.states["input_boolean.admin_mode"]?.state === "on" || false;
+        this.hass?.states?.["input_boolean.admin_mode"]?.state === "on" ||
+        false;
       this.isAdminView = isAdmin || isAdminMode;
     }
   }
@@ -174,7 +174,6 @@ export class PanelCard extends LitElement {
 
   private exitSaver(): void {
     this.isSaverActive = false;
-    this.lastPath = undefined;
   }
 
   private checkDeviceTriggers(): void {
