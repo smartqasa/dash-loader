@@ -114,7 +114,7 @@ function deviceReboot() {
     }
 }
 
-const SCREENSAVER_TIMEOUT = 5 * 60 * 1000;
+const SCREENSAVER_TIMEOUT = 1 * 60 * 1000;
 window.customCards.push({
     type: "panel-card",
     name: "Panel Card",
@@ -124,11 +124,13 @@ window.customCards.push({
 let PanelCard = class PanelCard extends i {
     constructor() {
         super(...arguments);
+        this.isMainLoaded = false;
         this.isSaverActive = false;
         this.isAdminView = false;
         this.rebootTime = null;
         this.refreshTime = null;
-        this.handleVisibility = () => {
+        this.boundVisibilityHandler = () => {
+            this.resetSaver();
             this.requestUpdate();
         };
         this.boundTouchHandler = () => this.resetSaver();
@@ -141,7 +143,7 @@ let PanelCard = class PanelCard extends i {
     }
     connectedCallback() {
         super.connectedCallback();
-        document.addEventListener("visibilitychange", this.handleVisibility);
+        document.addEventListener("visibilitychange", this.boundVisibilityHandler);
         if (window.fully) {
             window.addEventListener("touchstart", this.boundTouchHandler, {
                 passive: true,
@@ -156,7 +158,7 @@ let PanelCard = class PanelCard extends i {
         }
     }
     disconnectedCallback() {
-        document.removeEventListener("visibilitychange", this.handleVisibility);
+        document.removeEventListener("visibilitychange", this.boundVisibilityHandler);
         if (window.fully) {
             window.removeEventListener("touchstart", this.boundTouchHandler);
             window.removeEventListener("mousemove", this.boundMouseHandler);
@@ -180,87 +182,50 @@ let PanelCard = class PanelCard extends i {
     }
     render() {
         this.classList.toggle("admin-view", this.isAdminView);
-        if (!this.mainCard || !this.config || !this.hass) {
+        if (!this.isMainLoaded) {
             return x `
-        <div class="container visible loader">
-          <div class="loading-text">SmartQasa is loading</div>
+        <div class="loader">
+          <div class="loader-text">SmartQasa is loading</div>
           <div class="dots"><span></span><span></span><span></span></div>
         </div>
       `;
         }
-        if (this.isSaverActive) {
-            return x `
-        <div class="container visible">
-          <screensaver-card
+        return x `
+      <main-card .config=${this.config} .hass=${this.hass}></main-card>
+      ${this.isSaverActive
+            ? x `<screensaver-card
             .config=${this.config}
             .hass=${this.hass}
-          ></screensaver-card>
-        </div>
-      `;
-        }
-        return x ` <div class="container">${this.mainCard}</div> `;
-    }
-    firstUpdated() {
-        this.createMainCard();
+          ></screensaver-card>`
+            : E}
+    `;
     }
     updated(changedProps) {
-        if (!this.mainCard)
-            return;
-        if (this.mainCard && !this.isSaverActive)
-            this.handleFade();
-        if (changedProps.has("config") && this.config) {
-            try {
-                this.mainCard.setConfig(this.config);
-            }
-            catch (err) {
-                console.error("[PanelCard] setConfig failed:", err);
-            }
-        }
+        if (!this.isMainLoaded)
+            this.loadMainCard();
         if (changedProps.has("hass") && this.hass) {
-            this.syncHass();
+            this.syncPopups();
             this.checkDeviceTriggers();
         }
     }
-    async createMainCard(retries = 5) {
+    async loadMainCard(retries = 5) {
         try {
             await customElements.whenDefined("main-card");
         }
         catch (err) {
             console.error("[PanelCard] whenDefined failed:", err);
             if (retries > 0) {
-                setTimeout(() => this.createMainCard(retries - 1), 1000);
+                setTimeout(() => this.loadMainCard(retries - 1), 1000);
             }
             return;
         }
-        if (!this.mainCard) {
-            try {
-                const element = document.createElement("main-card");
-                if (this.config) {
-                    try {
-                        element.setConfig(this.config);
-                    }
-                    catch (err) {
-                        console.error("[PanelCard] setConfig failed:", err);
-                    }
-                }
-                if (this.hass)
-                    element.hass = this.hass;
-                this.mainCard = element;
-            }
-            catch (err) {
-                console.error("[PanelCard] Failed to create main-card element:", err);
-                if (retries > 0) {
-                    this.mainCard = undefined;
-                    setTimeout(() => this.createMainCard(retries - 1), 1000);
-                }
-            }
+        finally {
+            this.isMainLoaded = true;
         }
     }
-    syncHass() {
+    syncPopups() {
         if (!this.hass)
             return;
-        if (this.mainCard)
-            this.mainCard.hass = this.hass;
         document.querySelectorAll("popup-dialog").forEach((popup) => {
             if (popup.hass !== undefined) {
                 popup.hass = this.hass;
@@ -335,25 +300,19 @@ let PanelCard = class PanelCard extends i {
       .container {
         width: 100%;
         height: 100%;
-        opacity: 0;
-        will-change: opacity;
-        transition: opacity 150ms ease-in-out;
       }
 
-      .container.visible {
-        opacity: 1;
-      }
-
-      .container.loader {
+      .loader {
         display: flex;
         flex-direction: column;
+        width: 100%;
         height: 100%;
         align-items: center;
         justify-content: center;
         text-align: center;
       }
 
-      .loading-text {
+      .loader-text {
         font-size: 1.5rem;
         font-weight: 300;
         margin-bottom: 1rem;
@@ -402,7 +361,7 @@ __decorate([
 ], PanelCard.prototype, "hass", void 0);
 __decorate([
     r()
-], PanelCard.prototype, "mainCard", void 0);
+], PanelCard.prototype, "isMainLoaded", void 0);
 __decorate([
     r()
 ], PanelCard.prototype, "isSaverActive", void 0);
@@ -695,5 +654,5 @@ window.smartqasa = window.smartqasa || {};
 window.addEventListener("unhandledrejection", (event) => {
     console.error("[LOADER] Unhandled promise rejection:", event.reason);
 });
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.17-beta.9"} (Built: ${"2025-09-24T14:57:27.347Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.18-beta.1"} (Built: ${"2025-09-25T17:30:03.262Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

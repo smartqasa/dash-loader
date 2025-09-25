@@ -3,19 +3,15 @@ import {
   CSSResult,
   html,
   LitElement,
+  nothing,
   PropertyValues,
   TemplateResult,
 } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
-import {
-  HomeAssistant,
-  LovelaceCardConfig,
-  LovelaceCard,
-  PopupDialogElement,
-} from "./types";
+import { HomeAssistant, LovelaceCardConfig, PopupDialogElement } from "./types";
 import { deviceRefresh, deviceReboot } from "./device-actions";
 
-const SCREENSAVER_TIMEOUT = 5 * 60 * 1000;
+const SCREENSAVER_TIMEOUT = 1 * 60 * 1000;
 
 window.customCards.push({
   type: "panel-card",
@@ -29,7 +25,7 @@ export class PanelCard extends LitElement {
   @property({ attribute: false }) config?: LovelaceCardConfig;
   @property({ attribute: false }) hass?: HomeAssistant;
 
-  @state() mainCard?: LovelaceCard;
+  @state() isMainLoaded = false;
   @state() isSaverActive = false;
 
   private lastPath?: string;
@@ -37,10 +33,10 @@ export class PanelCard extends LitElement {
   private rebootTime: string | null = null;
   private refreshTime: string | null = null;
 
-  private handleVisibility = (): void => {
+  private boundVisibilityHandler = (): void => {
+    this.resetSaver();
     this.requestUpdate();
   };
-
   private boundTouchHandler = () => this.resetSaver();
   private boundMouseHandler = () => this.resetSaver();
   private boundKeyHandler = () => this.resetSaver();
@@ -54,7 +50,7 @@ export class PanelCard extends LitElement {
   public connectedCallback(): void {
     super.connectedCallback();
 
-    document.addEventListener("visibilitychange", this.handleVisibility);
+    document.addEventListener("visibilitychange", this.boundVisibilityHandler);
 
     if (window.fully) {
       window.addEventListener("touchstart", this.boundTouchHandler, {
@@ -73,7 +69,10 @@ export class PanelCard extends LitElement {
   }
 
   public disconnectedCallback(): void {
-    document.removeEventListener("visibilitychange", this.handleVisibility);
+    document.removeEventListener(
+      "visibilitychange",
+      this.boundVisibilityHandler
+    );
 
     if (window.fully) {
       window.removeEventListener("touchstart", this.boundTouchHandler);
@@ -105,90 +104,51 @@ export class PanelCard extends LitElement {
   protected render(): TemplateResult {
     this.classList.toggle("admin-view", this.isAdminView);
 
-    if (!this.mainCard || !this.config || !this.hass) {
+    if (!this.isMainLoaded) {
       return html`
-        <div class="container visible loader">
-          <div class="loading-text">SmartQasa is loading</div>
+        <div class="loader">
+          <div class="loader-text">SmartQasa is loading</div>
           <div class="dots"><span></span><span></span><span></span></div>
         </div>
       `;
     }
 
-    if (this.isSaverActive) {
-      return html`
-        <div class="container visible">
-          <screensaver-card
+    return html`
+      <main-card .config=${this.config} .hass=${this.hass}></main-card>
+      ${this.isSaverActive
+        ? html`<screensaver-card
             .config=${this.config}
             .hass=${this.hass}
-          ></screensaver-card>
-        </div>
-      `;
-    }
-
-    return html` <div class="container">${this.mainCard}</div> `;
-  }
-
-  protected firstUpdated(): void {
-    this.createMainCard();
+          ></screensaver-card>`
+        : nothing}
+    `;
   }
 
   protected updated(changedProps: PropertyValues): void {
-    if (!this.mainCard) return;
+    if (!this.isMainLoaded) this.loadMainCard();
 
-    if (this.mainCard && !this.isSaverActive) this.handleFade();
-
-    if (changedProps.has("config") && this.config) {
-      try {
-        this.mainCard.setConfig(this.config);
-      } catch (err) {
-        console.error("[PanelCard] setConfig failed:", err);
-      }
-    }
     if (changedProps.has("hass") && this.hass) {
-      this.syncHass();
+      this.syncPopups();
       this.checkDeviceTriggers();
     }
   }
 
-  private async createMainCard(retries = 5): Promise<void> {
+  private async loadMainCard(retries = 5): Promise<void> {
     try {
       await customElements.whenDefined("main-card");
     } catch (err) {
       console.error("[PanelCard] whenDefined failed:", err);
       if (retries > 0) {
-        setTimeout(() => this.createMainCard(retries - 1), 1000);
+        setTimeout(() => this.loadMainCard(retries - 1), 1000);
       }
       return;
-    }
-
-    if (!this.mainCard) {
-      try {
-        const element = document.createElement("main-card") as LovelaceCard;
-
-        if (this.config) {
-          try {
-            element.setConfig(this.config);
-          } catch (err) {
-            console.error("[PanelCard] setConfig failed:", err);
-          }
-        }
-
-        if (this.hass) element.hass = this.hass;
-        this.mainCard = element;
-      } catch (err) {
-        console.error("[PanelCard] Failed to create main-card element:", err);
-        if (retries > 0) {
-          this.mainCard = undefined;
-          setTimeout(() => this.createMainCard(retries - 1), 1000);
-        }
-      }
+    } finally {
+      this.isMainLoaded = true;
     }
   }
 
-  private syncHass(): void {
+  private syncPopups(): void {
     if (!this.hass) return;
-
-    if (this.mainCard) this.mainCard.hass = this.hass;
 
     document.querySelectorAll("popup-dialog").forEach((popup) => {
       if ((popup as PopupDialogElement).hass !== undefined) {
@@ -271,25 +231,19 @@ export class PanelCard extends LitElement {
       .container {
         width: 100%;
         height: 100%;
-        opacity: 0;
-        will-change: opacity;
-        transition: opacity 150ms ease-in-out;
       }
 
-      .container.visible {
-        opacity: 1;
-      }
-
-      .container.loader {
+      .loader {
         display: flex;
         flex-direction: column;
+        width: 100%;
         height: 100%;
         align-items: center;
         justify-content: center;
         text-align: center;
       }
 
-      .loading-text {
+      .loader-text {
         font-size: 1.5rem;
         font-weight: 300;
         margin-bottom: 1rem;
