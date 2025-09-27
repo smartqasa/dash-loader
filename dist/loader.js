@@ -129,10 +129,6 @@ let PanelCard = class PanelCard extends i {
         this.isAdminView = false;
         this.rebootTime = null;
         this.refreshTime = null;
-        this.boundVisibilityHandler = () => {
-            this.resetSaver();
-            this.requestUpdate();
-        };
         this.boundTouchHandler = () => this.resetSaver();
         this.boundMouseHandler = () => this.resetSaver();
         this.boundKeyHandler = () => this.resetSaver();
@@ -143,7 +139,6 @@ let PanelCard = class PanelCard extends i {
     }
     connectedCallback() {
         super.connectedCallback();
-        document.addEventListener("visibilitychange", this.boundVisibilityHandler);
         if (window.fully) {
             window.addEventListener("touchstart", this.boundTouchHandler, {
                 passive: true,
@@ -158,7 +153,6 @@ let PanelCard = class PanelCard extends i {
         }
     }
     disconnectedCallback() {
-        document.removeEventListener("visibilitychange", this.boundVisibilityHandler);
         if (window.fully) {
             window.removeEventListener("touchstart", this.boundTouchHandler);
             window.removeEventListener("mousemove", this.boundMouseHandler);
@@ -637,5 +631,5 @@ window.smartqasa = window.smartqasa || {};
 window.addEventListener("unhandledrejection", (event) => {
     console.error("[LOADER] Unhandled promise rejection:", event.reason);
 });
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.18-beta.3"} (Built: ${"2025-09-25T18:45:48.406Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.19-beta.1"} (Built: ${"2025-09-27T03:59:21.359Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
