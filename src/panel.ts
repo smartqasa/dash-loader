@@ -9,7 +9,7 @@ import {
 } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { HomeAssistant, LovelaceCardConfig, PopupDialogElement } from "./types";
-import { deviceRefresh, deviceReboot } from "./device-actions";
+import { deviceFlash, deviceRefresh, deviceReboot } from "./device-actions";
 
 const SCREENSAVER_TIMEOUT = 1 * 60 * 1000;
 
@@ -29,6 +29,7 @@ export class PanelCard extends LitElement {
   @state() isSaverActive = false;
 
   private isAdminView = false;
+  private flashTime: string | null = null;
   private rebootTime: string | null = null;
   private refreshTime: string | null = null;
 
@@ -167,6 +168,16 @@ export class PanelCard extends LitElement {
 
   private checkDeviceTriggers(): void {
     if (!this.hass) return;
+
+    const flashState = this.hass?.states?.["input_button.flash_devices"]?.state;
+    if (this.flashTime !== null && flashState !== this.flashTime) {
+      try {
+        deviceFlash();
+      } catch (err) {
+        console.error("[PanelCard] Device flash failed:", err);
+      }
+    }
+    this.flashTime = flashState || null;
 
     const rebootState =
       this.hass?.states?.["input_button.reboot_devices"]?.state;

@@ -35,6 +35,16 @@ function bustCacheAndReload(): void {
   window.location.reload();
 }
 
+export async function deviceFlash(): Promise<void> {
+  if (typeof window.fully === "undefined") {
+    return;
+  } else {
+    window.fully.turnScreenOff(true);
+    await delay(150);
+    window.fully.turnScreenOn();
+  }
+}
+
 export function deviceRefresh(): void {
   if (typeof window.fully === "undefined") {
     bustCacheAndReload();

@@ -97,6 +97,16 @@ function bustCacheAndReload() {
     window.history.replaceState(null, "", url.toString());
     window.location.reload();
 }
+async function deviceFlash() {
+    if (typeof window.fully === "undefined") {
+        return;
+    }
+    else {
+        window.fully.turnScreenOff(true);
+        await delay(150);
+        window.fully.turnScreenOn();
+    }
+}
 function deviceRefresh() {
     if (typeof window.fully === "undefined") {
         bustCacheAndReload();
@@ -127,6 +137,7 @@ let PanelCard = class PanelCard extends i {
         this.isMainLoaded = false;
         this.isSaverActive = false;
         this.isAdminView = false;
+        this.flashTime = null;
         this.rebootTime = null;
         this.refreshTime = null;
         this.boundTouchHandler = () => this.resetSaver();
@@ -245,6 +256,16 @@ let PanelCard = class PanelCard extends i {
     checkDeviceTriggers() {
         if (!this.hass)
             return;
+        const flashState = this.hass?.states?.["input_button.flash_devices"]?.state;
+        if (this.flashTime !== null && flashState !== this.flashTime) {
+            try {
+                deviceFlash();
+            }
+            catch (err) {
+                console.error("[PanelCard] Device flash failed:", err);
+            }
+        }
+        this.flashTime = flashState || null;
         const rebootState = this.hass?.states?.["input_button.reboot_devices"]?.state;
         if (this.rebootTime !== null && rebootState !== this.rebootTime) {
             try {
@@ -631,5 +652,5 @@ window.smartqasa = window.smartqasa || {};
 window.addEventListener("unhandledrejection", (event) => {
     console.error("[LOADER] Unhandled promise rejection:", event.reason);
 });
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.20-beta.1"} (Built: ${"2025-09-28T11:28:39.495Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.21-beta.1"} (Built: ${"2025-10-10T09:52:04.335Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
