@@ -77,9 +77,9 @@ async function executeFullyAction(action) {
     if (typeof window.fully === "undefined")
         return;
     const timings = {
-        bringToFore: 1000,
-        regainFocus: 500,
-        clearCache: 1000,
+        bringToFore: 500,
+        regainFocus: 250,
+        clearCache: 2000,
     };
     if (!window.fully.isInForeground()) {
         window.fully.bringToForeground();
@@ -98,13 +98,15 @@ function bustCacheAndReload() {
     window.location.reload();
 }
 async function deviceFlash() {
-    if (typeof window.fully === "undefined") {
+    if (typeof window.fully === "undefined")
         return;
-    }
-    else {
+    try {
         window.fully.turnScreenOff(true);
-        await delay(150);
+        await delay(250);
         window.fully.turnScreenOn();
+    }
+    catch (err) {
+        console.error("[deviceFlash] Error:", err);
     }
 }
 function deviceRefresh() {
@@ -124,7 +126,7 @@ function deviceReboot() {
     }
 }
 
-const SCREENSAVER_TIMEOUT = 1 * 60 * 1000;
+const SCREENSAVER_TIMEOUT = 5 * 60 * 1000;
 window.customCards.push({
     type: "panel-card",
     name: "Panel Card",
@@ -652,5 +654,5 @@ window.smartqasa = window.smartqasa || {};
 window.addEventListener("unhandledrejection", (event) => {
     console.error("[LOADER] Unhandled promise rejection:", event.reason);
 });
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.21-beta.1"} (Built: ${"2025-10-10T09:52:04.335Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.21-beta.2"} (Built: ${"2025-10-10T10:22:14.189Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

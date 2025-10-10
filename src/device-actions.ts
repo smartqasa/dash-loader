@@ -7,9 +7,9 @@ async function executeFullyAction(
   if (typeof window.fully === "undefined") return;
 
   const timings = {
-    bringToFore: 1000,
-    regainFocus: 500,
-    clearCache: 1000,
+    bringToFore: 500,
+    regainFocus: 250,
+    clearCache: 2000,
   };
 
   if (!window.fully.isInForeground()) {
@@ -36,12 +36,14 @@ function bustCacheAndReload(): void {
 }
 
 export async function deviceFlash(): Promise<void> {
-  if (typeof window.fully === "undefined") {
-    return;
-  } else {
+  if (typeof window.fully === "undefined") return;
+
+  try {
     window.fully.turnScreenOff(true);
-    await delay(150);
+    await delay(250);
     window.fully.turnScreenOn();
+  } catch (err) {
+    console.error("[deviceFlash] Error:", err);
   }
 }
 
