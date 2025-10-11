@@ -668,5 +668,5 @@ window.addEventListener("error", (event) => {
     });
 });
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.24-beta.1"} (Built: ${"2025-10-11T17:05:31.010Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.24"} (Built: ${"2025-10-11T17:08:25.306Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
