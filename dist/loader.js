@@ -654,5 +654,5 @@ window.smartqasa = window.smartqasa || {};
 window.addEventListener("unhandledrejection", (event) => {
     console.error("[LOADER] Unhandled promise rejection:", event.reason);
 });
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.21-beta.3"} (Built: ${"2025-10-11T02:29:07.850Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.21"} (Built: ${"2025-10-11T11:37:54.909Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
