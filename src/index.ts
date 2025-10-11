@@ -1,8 +1,3 @@
-window.smartqasa = window.smartqasa || {};
-
-import "./panel";
-import "./screensaver";
-
 window.addEventListener("unhandledrejection", (event) => {
   const reason = event.reason;
   console.error(
@@ -25,6 +20,11 @@ window.addEventListener("error", (event) => {
     time: new Date().toISOString(),
   });
 });
+
+window.smartqasa = window.smartqasa || {};
+
+import "./panel";
+import "./screensaver";
 
 console.info(
   `%c SmartQasa Loader ⏏ ${__BUILD_VERSION__} (Built: ${__BUILD_TIMESTAMP__}) `,
