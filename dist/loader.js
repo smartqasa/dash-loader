@@ -650,23 +650,6 @@ ScreenSaver = __decorate([
     t("screensaver-card")
 ], ScreenSaver);
 
-window.addEventListener("unhandledrejection", (event) => {
-    const reason = event.reason;
-    console.error("%c[LOADER] Unhandled Promise Rejection", "color: red; font-weight: bold;", {
-        message: reason?.message ?? reason,
-        stack: reason?.stack ?? "(no stack trace)",
-        type: reason?.name ?? typeof reason,
-        time: new Date().toISOString(),
-    });
-});
-window.addEventListener("error", (event) => {
-    console.error("%c[LOADER] Uncaught Error", "color: red; font-weight: bold;", {
-        message: event.message,
-        file: `${event.filename}:${event.lineno}:${event.colno}`,
-        stack: event.error?.stack ?? "(no stack trace)",
-        time: new Date().toISOString(),
-    });
-});
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.24-beta.1"} (Built: ${"2025-10-11T17:05:31.010Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.25-beta.1"} (Built: ${"2025-10-11T17:48:44.505Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
