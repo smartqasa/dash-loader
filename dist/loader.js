@@ -652,7 +652,21 @@ ScreenSaver = __decorate([
 
 window.smartqasa = window.smartqasa || {};
 window.addEventListener("unhandledrejection", (event) => {
-    console.error("[LOADER] Unhandled promise rejection:", event.reason);
+    const reason = event.reason;
+    console.error("%c[LOADER] Unhandled Promise Rejection", "color: red; font-weight: bold;", {
+        message: reason?.message ?? reason,
+        stack: reason?.stack ?? "(no stack trace)",
+        type: reason?.name ?? typeof reason,
+        time: new Date().toISOString(),
+    });
 });
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.21-beta.3"} (Built: ${"2025-10-11T02:29:07.850Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+window.addEventListener("error", (event) => {
+    console.error("%c[LOADER] Uncaught Error", "color: red; font-weight: bold;", {
+        message: event.message,
+        file: `${event.filename}:${event.lineno}:${event.colno}`,
+        stack: event.error?.stack ?? "(no stack trace)",
+        time: new Date().toISOString(),
+    });
+});
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.22-beta.1"} (Built: ${"2025-10-11T13:11:20.942Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
