@@ -169,37 +169,38 @@ export class PanelCard extends LitElement {
   private checkDeviceTriggers(): void {
     if (!this.hass) return;
 
-    const flashState = this.hass?.states?.["input_button.flash_devices"]?.state;
-    if (this.flashTime !== null && flashState !== this.flashTime) {
-      try {
-        deviceFlash();
-      } catch (err) {
-        console.error("[PanelCard] Device flash failed:", err);
-      }
-    }
-    this.flashTime = flashState || null;
+    const triggers = [
+      {
+        key: "flash",
+        entity: "input_button.flash_devices",
+        action: deviceFlash,
+      },
+      {
+        key: "reboot",
+        entity: "input_button.reboot_devices",
+        action: deviceReboot,
+      },
+      {
+        key: "refresh",
+        entity: "input_button.refresh_devices",
+        action: deviceRefresh,
+      },
+    ];
 
-    const rebootState =
-      this.hass?.states?.["input_button.reboot_devices"]?.state;
-    if (this.rebootTime !== null && rebootState !== this.rebootTime) {
-      try {
-        deviceReboot();
-      } catch (err) {
-        console.error("[PanelCard] Device reboot failed:", err);
-      }
-    }
-    this.rebootTime = rebootState || null;
+    for (const { key, entity, action } of triggers) {
+      const state = this.hass.states?.[entity]?.state;
+      const lastTime = (this as any)[`${key}Time`];
 
-    const refreshState =
-      this.hass?.states?.["input_button.refresh_devices"]?.state;
-    if (this.refreshTime !== null && refreshState !== this.refreshTime) {
-      try {
-        deviceRefresh();
-      } catch (err) {
-        console.error("[PanelCard] Device refresh failed:", err);
+      if (lastTime !== null && state !== lastTime) {
+        try {
+          action();
+        } catch (err) {
+          console.error(`[PanelCard] Device ${key} failed:`, err);
+        }
       }
+
+      (this as any)[`${key}Time`] = state || null;
     }
-    this.refreshTime = refreshState || null;
   }
 
   static get styles(): CSSResult {

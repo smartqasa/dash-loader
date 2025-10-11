@@ -258,36 +258,36 @@ let PanelCard = class PanelCard extends i {
     checkDeviceTriggers() {
         if (!this.hass)
             return;
-        const flashState = this.hass?.states?.["input_button.flash_devices"]?.state;
-        if (this.flashTime !== null && flashState !== this.flashTime) {
-            try {
-                deviceFlash();
+        const triggers = [
+            {
+                key: "flash",
+                entity: "input_button.flash_devices",
+                action: deviceFlash,
+            },
+            {
+                key: "reboot",
+                entity: "input_button.reboot_devices",
+                action: deviceReboot,
+            },
+            {
+                key: "refresh",
+                entity: "input_button.refresh_devices",
+                action: deviceRefresh,
+            },
+        ];
+        for (const { key, entity, action } of triggers) {
+            const state = this.hass.states?.[entity]?.state;
+            const lastTime = this[`${key}Time`];
+            if (lastTime !== null && state !== lastTime) {
+                try {
+                    action();
+                }
+                catch (err) {
+                    console.error(`[PanelCard] Device ${key} failed:`, err);
+                }
             }
-            catch (err) {
-                console.error("[PanelCard] Device flash failed:", err);
-            }
+            this[`${key}Time`] = state || null;
         }
-        this.flashTime = flashState || null;
-        const rebootState = this.hass?.states?.["input_button.reboot_devices"]?.state;
-        if (this.rebootTime !== null && rebootState !== this.rebootTime) {
-            try {
-                deviceReboot();
-            }
-            catch (err) {
-                console.error("[PanelCard] Device reboot failed:", err);
-            }
-        }
-        this.rebootTime = rebootState || null;
-        const refreshState = this.hass?.states?.["input_button.refresh_devices"]?.state;
-        if (this.refreshTime !== null && refreshState !== this.refreshTime) {
-            try {
-                deviceRefresh();
-            }
-            catch (err) {
-                console.error("[PanelCard] Device refresh failed:", err);
-            }
-        }
-        this.refreshTime = refreshState || null;
     }
     static get styles() {
         return i$3 `
@@ -654,5 +654,5 @@ window.smartqasa = window.smartqasa || {};
 window.addEventListener("unhandledrejection", (event) => {
     console.error("[LOADER] Unhandled promise rejection:", event.reason);
 });
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.21-beta.2"} (Built: ${"2025-10-10T10:22:14.189Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.21-beta.3"} (Built: ${"2025-10-11T02:29:07.850Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
