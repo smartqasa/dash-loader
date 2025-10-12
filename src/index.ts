@@ -1,3 +1,5 @@
+window.customCards = window.customCards || [];
+
 window.smartqasa = window.smartqasa || {};
 
 import "./panel";

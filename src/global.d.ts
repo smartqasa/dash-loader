@@ -45,13 +45,10 @@ declare interface Window {
   };
 
   smartqasa: {
-    clearCache: () => void;
     chipsConfig: any;
     confirm: (data: any) => void;
     confirmClose: () => void;
-    darkModeImage: string;
     deviceModel: string;
-    lightModeImage: string;
     menuTab: number;
     popup: (data: any) => void;
     popupClose: () => void;
@@ -59,6 +56,5 @@ declare interface Window {
     popupStack: any[];
     startArea: string | undefined;
     service: (service: string, data?: object) => void;
-    videoSource: string;
   };
 }
