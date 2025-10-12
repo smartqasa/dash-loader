@@ -652,5 +652,5 @@ ScreenSaver = __decorate([
 
 window.customCards = window.customCards || [];
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.26-beta.1"} (Built: ${"2025-10-12T10:58:37.508Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.26"} (Built: ${"2025-10-12T10:59:53.746Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
