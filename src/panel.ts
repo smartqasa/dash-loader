@@ -7,6 +7,7 @@ import {
   PropertyValues,
   TemplateResult,
 } from "lit";
+import { cache } from "lit/directives/cache.js";
 import { customElement, property, state } from "lit/decorators.js";
 import { HomeAssistant, LovelaceCardConfig, PopupDialogElement } from "./types";
 import { deviceFlash, deviceRefresh, deviceReboot } from "./device-actions";
@@ -103,17 +104,17 @@ export class PanelCard extends LitElement {
       `;
     }
 
-    if (this.isSaverActive) {
-      return html`
-        <screensaver-card
-          .config=${this.config}
-          .hass=${this.hass}
-        ></screensaver-card>
-      `;
-    }
-
     return html`
-      <main-card .config=${this.config} .hass=${this.hass}></main-card>
+      ${this.isSaverActive
+        ? cache(html`
+            <screensaver-card
+              .config=${this.config}
+              .hass=${this.hass}
+            ></screensaver-card>
+          `)
+        : cache(html`
+            <main-card .config=${this.config} .hass=${this.hass}></main-card>
+          `)}
     `;
   }
 
