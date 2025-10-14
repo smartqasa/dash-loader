@@ -19,12 +19,14 @@ interface Config extends LovelaceCardConfig {
   saver_interval?: number;
 }
 
+/*
 window.customCards.push({
   type: "screensaver-card",
   name: "Screen Saver Card",
   preview: true,
   description: "A SmartQasa card for displaying a screen saver.",
 });
+*/
 
 @customElement("screensaver-card")
 export class ScreenSaver extends LitElement implements LovelaceCard {
