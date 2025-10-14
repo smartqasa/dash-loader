@@ -7,7 +7,6 @@ import {
   PropertyValues,
   TemplateResult,
 } from "lit";
-import { cache } from "lit/directives/cache.js";
 import { customElement, property, state } from "lit/decorators.js";
 import { HomeAssistant, LovelaceCardConfig, PopupDialogElement } from "./types";
 import { deviceFlash, deviceRefresh, deviceReboot } from "./device-actions";
@@ -30,6 +29,9 @@ export class PanelCard extends LitElement {
   @state() isSaverActive = false;
 
   private isAdminView = false;
+  private flashTime: string | null = null;
+  private rebootTime: string | null = null;
+  private refreshTime: string | null = null;
 
   private boundTouchHandler = () => this.resetSaver();
   private boundMouseHandler = () => this.resetSaver();

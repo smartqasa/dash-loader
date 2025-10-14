@@ -139,6 +139,9 @@ let PanelCard = class PanelCard extends i {
         this.isMainLoaded = false;
         this.isSaverActive = false;
         this.isAdminView = false;
+        this.flashTime = null;
+        this.rebootTime = null;
+        this.refreshTime = null;
         this.boundTouchHandler = () => this.resetSaver();
         this.boundMouseHandler = () => this.resetSaver();
         this.boundKeyHandler = () => this.resetSaver();
@@ -653,5 +656,5 @@ ScreenSaver = __decorate([
 
 window.customCards = window.customCards || [];
 window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.27-beta.3"} (Built: ${"2025-10-14T19:05:51.294Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.27-beta.4"} (Built: ${"2025-10-14T19:14:32.019Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
