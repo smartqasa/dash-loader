@@ -106,15 +106,15 @@ export class PanelCard extends LitElement {
 
     return html`
       ${this.isSaverActive
-        ? cache(html`
+        ? html`
             <screensaver-card
               .config=${this.config}
               .hass=${this.hass}
             ></screensaver-card>
-          `)
-        : cache(html`
+          `
+        : html`
             <main-card .config=${this.config} .hass=${this.hass}></main-card>
-          `)}
+          `}
     `;
   }
 
