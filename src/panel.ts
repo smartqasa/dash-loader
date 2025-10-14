@@ -101,17 +101,17 @@ export class PanelCard extends LitElement {
       `;
     }
 
+    if (this.isSaverActive) {
+      return html`
+        <screensaver-card
+          .config=${this.config}
+          .hass=${this.hass}
+        ></screensaver-card>
+      `;
+    }
+
     return html`
-      ${this.isSaverActive
-        ? html`
-            <screensaver-card
-              .config=${this.config}
-              .hass=${this.hass}
-            ></screensaver-card>
-          `
-        : html`
-            <main-card .config=${this.config} .hass=${this.hass}></main-card>
-          `}
+      <main-card .config=${this.config} .hass=${this.hass}></main-card>
     `;
   }
 
