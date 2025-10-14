@@ -54,6 +54,12 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
   public connectedCallback(): void {
     super.connectedCallback();
     window.smartqasa?.popupReset?.();
+
+    this.updateElement();
+
+    if (this.timeIntervalId === undefined) this.startClock();
+
+    if (this.moveTimerId === undefined) this.cycleElement();
   }
 
   public disconnectedCallback(): void {
@@ -98,12 +104,6 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
         </div>
       </div>
     `;
-  }
-
-  protected firstUpdated(_changedProps: PropertyValues): void {
-    this.updateElement();
-    this.startClock();
-    this.cycleElement();
   }
 
   protected updated(changedProps: PropertyValues): void {
