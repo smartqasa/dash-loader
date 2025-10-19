@@ -14,8 +14,6 @@ window.smartqasa = window.smartqasa || {
   startArea: location.pathname.split("/").pop(),
 };
 
-console.log("Start Area:", window.smartqasa.startArea);
-
 if (window.fully) {
   console.log("Device Model: " + window.fully.getDeviceModel());
   window.smartqasa.deviceModel = window.fully.getDeviceModel();
