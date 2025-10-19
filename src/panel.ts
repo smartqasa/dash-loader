@@ -3,7 +3,6 @@ import {
   CSSResult,
   html,
   LitElement,
-  nothing,
   PropertyValues,
   TemplateResult,
 } from "lit";

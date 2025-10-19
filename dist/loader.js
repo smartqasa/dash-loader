@@ -675,6 +675,23 @@ ScreenSaver = __decorate([
 ], ScreenSaver);
 
 window.customCards = window.customCards || [];
-window.smartqasa = window.smartqasa || {};
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.27-beta.7"} (Built: ${"2025-10-14T23:18:42.833Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+window.smartqasa = window.smartqasa || {
+    chipsConfig: {},
+    confirm: () => { },
+    confirmClose: () => { },
+    deviceModel: "",
+    menuTab: 0,
+    popupStack: [],
+    popup: () => { },
+    popupClose: () => { },
+    popupReset: () => { },
+    service: () => { },
+    startArea: location.pathname.split("/").pop(),
+};
+console.log("Start Area:", window.smartqasa.startArea);
+if (window.fully) {
+    console.log("Device Model: " + window.fully.getDeviceModel());
+    window.smartqasa.deviceModel = window.fully.getDeviceModel();
+}
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.28-beta.1"} (Built: ${"2025-10-19T10:51:21.880Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
