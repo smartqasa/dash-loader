@@ -1,7 +1,7 @@
 window.customCards = window.customCards || [];
 
 window.smartqasa = window.smartqasa || {
-  chipsConfig: {},
+  chipsConfig: [],
   confirm: () => {},
   confirmClose: () => {},
   deviceModel: "",

@@ -676,7 +676,7 @@ ScreenSaver = __decorate([
 
 window.customCards = window.customCards || [];
 window.smartqasa = window.smartqasa || {
-    chipsConfig: {},
+    chipsConfig: [],
     confirm: () => { },
     confirmClose: () => { },
     deviceModel: "",
@@ -692,5 +692,5 @@ if (window.fully) {
     console.log("Device Model: " + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.28-beta.2"} (Built: ${"2025-10-19T11:40:50.464Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.28-beta.3"} (Built: ${"2025-10-19T11:54:11.504Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
