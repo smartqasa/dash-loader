@@ -316,12 +316,12 @@ let PanelCard = class PanelCard extends i$1 {
       :host {
         display: block;
         width: 100%;
-        height: 100vh;
+        height: 100dvh;
         background-color: var(--panel-color);
       }
 
       :host(.admin-view) {
-        height: calc(100vh - 56px);
+        height: calc(100dvh - 56px);
       }
 
       .loader {
@@ -692,5 +692,5 @@ if (window.fully) {
     console.log("Device Model: " + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.30-beta.1"} (Built: ${"2025-10-20T16:39:10.469Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.30-beta.2"} (Built: ${"2025-10-20T16:45:31.072Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

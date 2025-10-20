@@ -211,12 +211,12 @@ export class PanelCard extends LitElement {
       :host {
         display: block;
         width: 100%;
-        height: 100vh;
+        height: 100dvh;
         background-color: var(--panel-color);
       }
 
       :host(.admin-view) {
-        height: calc(100vh - 56px);
+        height: calc(100dvh - 56px);
       }
 
       .loader {
