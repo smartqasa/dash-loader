@@ -575,8 +575,8 @@ let ScreenSaver = class ScreenSaver extends i$1 {
         return i$4 `
       :host {
         display: block;
-        width: 100vw;
-        height: 100vh;
+        width: 100dvw;
+        height: 100dvh;
         position: fixed;
         top: 0;
         left: 0;
@@ -692,5 +692,5 @@ if (window.fully) {
     console.log("Device Model: " + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.29-beta.1"} (Built: ${"2025-10-19T17:43:47.417Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.30-beta.1"} (Built: ${"2025-10-20T16:39:10.469Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
