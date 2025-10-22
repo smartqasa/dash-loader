@@ -265,8 +265,10 @@ let PanelCard = class PanelCard extends i$1 {
             return;
         if (this.isSaverActive)
             this.exitSaver();
-        if (this.saverTimer)
+        if (this.saverTimer) {
             clearTimeout(this.saverTimer);
+            this.saverTimer = null;
+        }
         this.saverTimer = setTimeout(() => {
             this.showSaver();
         }, SCREENSAVER_TIMEOUT);
@@ -442,8 +444,6 @@ let ScreenSaver = class ScreenSaver extends i$1 {
         this.updateElement();
         if (this.timeIntervalId === undefined)
             this.startClock();
-        if (this.moveTimerId === undefined)
-            this.cycleElement();
     }
     disconnectedCallback() {
         if (this.timeIntervalId !== undefined) {
@@ -486,6 +486,11 @@ let ScreenSaver = class ScreenSaver extends i$1 {
         </div>
       </div>
     `;
+    }
+    firstUpdated(changedProps) {
+        super.firstUpdated(changedProps);
+        if (this.moveTimerId === undefined)
+            this.cycleElement();
     }
     updated(changedProps) {
         if (changedProps.has("hass") && this.hass) {
@@ -692,5 +697,5 @@ if (window.fully) {
     console.log("Device Model: " + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.30-beta.2"} (Built: ${"2025-10-20T16:45:31.072Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.31-beta.1"} (Built: ${"2025-10-22T10:41:04.735Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

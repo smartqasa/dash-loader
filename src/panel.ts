@@ -154,7 +154,11 @@ export class PanelCard extends LitElement {
     if (!window.fully) return;
 
     if (this.isSaverActive) this.exitSaver();
-    if (this.saverTimer) clearTimeout(this.saverTimer);
+
+    if (this.saverTimer) {
+      clearTimeout(this.saverTimer);
+      this.saverTimer = null;
+    }
 
     this.saverTimer = setTimeout(() => {
       this.showSaver();

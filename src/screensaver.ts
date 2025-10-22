@@ -58,8 +58,6 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
     this.updateElement();
 
     if (this.timeIntervalId === undefined) this.startClock();
-
-    if (this.moveTimerId === undefined) this.cycleElement();
   }
 
   public disconnectedCallback(): void {
@@ -104,6 +102,11 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
         </div>
       </div>
     `;
+  }
+
+  protected firstUpdated(changedProps: PropertyValues): void {
+    super.firstUpdated(changedProps);
+    if (this.moveTimerId === undefined) this.cycleElement();
   }
 
   protected updated(changedProps: PropertyValues): void {
