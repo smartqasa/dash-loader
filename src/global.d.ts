@@ -49,7 +49,7 @@ declare interface Window {
     getScreenBrightness: () => number;
     getWifiSsid: () => string;
     isInForeground: () => boolean;
-    isPluggedIn: () => boolean;
+    isPlugged: () => boolean;
     isNetworkConnected: () => boolean;
     playSound: (url: string, loop: boolean, stream: number) => void;
     readFile: (path: string) => string;
