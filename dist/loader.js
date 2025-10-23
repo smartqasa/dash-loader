@@ -977,20 +977,26 @@ let SettingsCard = class SettingsCard extends i$1 {
         const deviceModel = window.fully?.getDeviceModel() || "Unknown";
         const androidVer = window.fully?.getAndroidVersion() || "Unknown";
         const fullyVer = window.fully?.getFullyVersion() || "Unknown";
-        const ipAddress = window.fully?.getIp4Address() || "Unknown";
+        const isConnected = window.fully?.isNetworkConnected() ?? false;
         const wifiSsid = window.fully?.getWifiSsid() || "Unknown";
+        const ipAddress = window.fully?.getIp4Address() || "Unknown";
         const batteryLevel = window.fully?.getBatteryLevel() || 0;
         const isCharging = window.fully?.isPlugged() || false;
         const phases = ["Morning", "Day", "Evening", "Night"];
         const currentPhase = this.hass?.states["input_select.phase_of_day"]?.state ?? "Unknown";
         return x `
       <div class="section">
-        <div class="title">Model: ${deviceModel} Android ${androidVer}</div>
-        <div class="title">Software: OS ${androidVer} / Fully ${fullyVer}</div>
+        <div class="title">Model: ${deviceModel}</div>
         <div class="title">
-          Battery: ${batteryLevel}% ${isCharging ? " - Charging" : ""}
+          Software: OS Android ${androidVer} / Fully ${fullyVer}
         </div>
-        <div class="title">WiFi: ${wifiSsid} (${ipAddress})</div>
+        <div class="title">
+          ${isConnected ? "Connected" : "Disconnected"}: ${wifiSsid}
+          (${ipAddress})
+        </div>
+        <div class="title">
+          Battery: ${isCharging ? "Charging" : "Unplugged"}: ${batteryLevel}%
+        </div>
       </div>
       <div class="section">
         <div class="row">
@@ -1182,5 +1188,5 @@ if (window.fully) {
     console.log("Device Model: " + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.33-beta.6"} (Built: ${"2025-10-23T19:34:50.842Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.33-beta.7"} (Built: ${"2025-10-23T19:47:07.331Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

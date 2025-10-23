@@ -55,24 +55,34 @@ export class SettingsCard extends LitElement implements LovelaceCard {
 
   protected render(): TemplateResult | typeof nothing {
     const deviceModel = window.fully?.getDeviceModel() || "Unknown";
+
     const androidVer = window.fully?.getAndroidVersion() || "Unknown";
     const fullyVer = window.fully?.getFullyVersion() || "Unknown";
-    const ipAddress = window.fully?.getIp4Address() || "Unknown";
+
+    const isConnected = window.fully?.isNetworkConnected() ?? false;
     const wifiSsid = window.fully?.getWifiSsid() || "Unknown";
+    const ipAddress = window.fully?.getIp4Address() || "Unknown";
+
     const batteryLevel = window.fully?.getBatteryLevel() || 0;
     const isCharging = window.fully?.isPlugged() || false;
+
     const phases = ["Morning", "Day", "Evening", "Night"];
     const currentPhase =
       this.hass?.states["input_select.phase_of_day"]?.state ?? "Unknown";
 
     return html`
       <div class="section">
-        <div class="title">Model: ${deviceModel} Android ${androidVer}</div>
-        <div class="title">Software: OS ${androidVer} / Fully ${fullyVer}</div>
+        <div class="title">Model: ${deviceModel}</div>
         <div class="title">
-          Battery: ${batteryLevel}% ${isCharging ? " - Charging" : ""}
+          Software: OS Android ${androidVer} / Fully ${fullyVer}
         </div>
-        <div class="title">WiFi: ${wifiSsid} (${ipAddress})</div>
+        <div class="title">
+          ${isConnected ? "Connected" : "Disconnected"}: ${wifiSsid}
+          (${ipAddress})
+        </div>
+        <div class="title">
+          Battery: ${isCharging ? "Charging" : "Unplugged"}: ${batteryLevel}%
+        </div>
       </div>
       <div class="section">
         <div class="row">
