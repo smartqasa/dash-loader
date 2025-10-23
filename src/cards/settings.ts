@@ -83,7 +83,7 @@ export class SettingsCard extends LitElement implements LovelaceCard {
             : "Disconnected"}
         </div>
         <div class="title">
-          ${isCharging ? "Charging" : "Unplugged"}: ${batteryLevel}%
+          Batttery ${isCharging ? "Charging" : "Discharging"}: ${batteryLevel}%
         </div>
       </div>
       <div class="section">

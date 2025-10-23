@@ -997,7 +997,7 @@ let SettingsCard = class SettingsCard extends i$1 {
             : "Disconnected"}
         </div>
         <div class="title">
-          ${isCharging ? "Charging" : "Unplugged"}: ${batteryLevel}%
+          Batttery ${isCharging ? "Charging" : "Discharging"}: ${batteryLevel}%
         </div>
       </div>
       <div class="section">
@@ -1190,5 +1190,5 @@ if (window.fully) {
     console.log("Device Model: " + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.33-beta.9"} (Built: ${"2025-10-23T19:55:38.308Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.33-beta.10"} (Built: ${"2025-10-23T19:59:28.688Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
