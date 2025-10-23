@@ -988,14 +988,14 @@ let SettingsCard = class SettingsCard extends i$1 {
       <div class="section">
         <div class="title">Model: ${deviceModel}</div>
         <div class="title">
-          Software: OS Android ${androidVer} / Fully ${fullyVer}
+          Software: Android ${androidVer} / Fully ${fullyVer}
         </div>
         <div class="title">
           ${isConnected ? "Connected" : "Disconnected"}: ${wifiSsid}
           (${ipAddress})
         </div>
         <div class="title">
-          Battery: ${isCharging ? "Charging" : "Unplugged"}: ${batteryLevel}%
+          ${isCharging ? "Charging" : "Unplugged"}: ${batteryLevel}%
         </div>
       </div>
       <div class="section">
@@ -1008,7 +1008,7 @@ let SettingsCard = class SettingsCard extends i$1 {
             .value=${this.volumeLevel}
             .min=${0}
             .max=${100}
-            .step=${1}
+            .step=${5}
             @sq-slider-render=${(e) => this.handleVolumeRender(e.detail.value)}
             @sq-slider-change=${(e) => this.handleVolumeChange(e.detail.value)}
           ></sq-slider>
@@ -1188,5 +1188,5 @@ if (window.fully) {
     console.log("Device Model: " + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.33-beta.7"} (Built: ${"2025-10-23T19:47:07.331Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.33-beta.8"} (Built: ${"2025-10-23T19:51:15.138Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

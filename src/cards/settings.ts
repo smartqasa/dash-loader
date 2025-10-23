@@ -74,14 +74,14 @@ export class SettingsCard extends LitElement implements LovelaceCard {
       <div class="section">
         <div class="title">Model: ${deviceModel}</div>
         <div class="title">
-          Software: OS Android ${androidVer} / Fully ${fullyVer}
+          Software: Android ${androidVer} / Fully ${fullyVer}
         </div>
         <div class="title">
           ${isConnected ? "Connected" : "Disconnected"}: ${wifiSsid}
           (${ipAddress})
         </div>
         <div class="title">
-          Battery: ${isCharging ? "Charging" : "Unplugged"}: ${batteryLevel}%
+          ${isCharging ? "Charging" : "Unplugged"}: ${batteryLevel}%
         </div>
       </div>
       <div class="section">
@@ -94,7 +94,7 @@ export class SettingsCard extends LitElement implements LovelaceCard {
             .value=${this.volumeLevel}
             .min=${0}
             .max=${100}
-            .step=${1}
+            .step=${5}
             @sq-slider-render=${(e: CustomEvent) =>
               this.handleVolumeRender(e.detail.value)}
             @sq-slider-change=${(e: CustomEvent) =>
