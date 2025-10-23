@@ -369,9 +369,6 @@ let PanelCard = class PanelCard extends i$1 {
                 const value = brightnessMap[activePhase];
                 window.fully.setScreenBrightness(value);
             }
-            else {
-                console.warn(`[PanelCard] No brightness setting found for ${activePhase}`);
-            }
         }
         catch (err) {
             console.warn("[PanelCard] Failed to update brightness on phase change:", err);
@@ -1044,9 +1041,7 @@ let SettingsCard = class SettingsCard extends i$1 {
             console.warn("[SettingsCard] setAudioVolume error:", err);
         }
         try {
-            const haBaseUrl = window.location.origin;
-            const soundUrl = `${haBaseUrl}/local/assets/click.mp3`;
-            window.fully.playSound(soundUrl, false, 3);
+            window.fully.playSound("https://www.soundjay.com/buttons/beep-07a.mp3", false, 3);
         }
         catch (err) {
             console.warn("[SettingsCard] click sound failed:", err);
@@ -1175,5 +1170,5 @@ if (window.fully) {
     console.log("Device Model: " + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.31-beta.14"} (Built: ${"2025-10-23T16:42:08.530Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.31-beta.15"} (Built: ${"2025-10-23T17:33:20.805Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

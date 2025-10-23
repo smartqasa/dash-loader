@@ -200,10 +200,6 @@ export class PanelCard extends LitElement {
       if (activePhase in brightnessMap) {
         const value = brightnessMap[activePhase];
         window.fully.setScreenBrightness(value);
-      } else {
-        console.warn(
-          `[PanelCard] No brightness setting found for ${activePhase}`
-        );
       }
     } catch (err) {
       console.warn(

@@ -129,9 +129,11 @@ export class SettingsCard extends LitElement implements LovelaceCard {
     }
 
     try {
-      const haBaseUrl = window.location.origin;
-      const soundUrl = `${haBaseUrl}/local/assets/click.mp3`;
-      window.fully.playSound(soundUrl, false, 3);
+      window.fully.playSound(
+        "https://www.soundjay.com/buttons/beep-07a.mp3",
+        false,
+        3
+      );
     } catch (err) {
       console.warn("[SettingsCard] click sound failed:", err);
     }
