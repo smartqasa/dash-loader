@@ -133,9 +133,8 @@ export class SettingsCard extends LitElement implements LovelaceCard {
     console.log("clickSound", clickSound);
 
     try {
-      const soundUrl = new URL(clickSound, window.location.origin).href;
-      console.log("[SettingsCard] full sound URL:", soundUrl);
-      window.fully.playSound(soundUrl, false, 3);
+      console.log("[SettingsCard] full sound URL:", clickSound);
+      window.fully.playSound(clickSound, false, 3);
     } catch (err) {
       console.warn("[SettingsCard] click sound failed:", err);
     }
