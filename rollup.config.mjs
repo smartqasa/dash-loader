@@ -37,7 +37,7 @@ export default {
       fileName: "[dirname][hash][extname]",
       include: ["**/*.mp3"],
       limit: 0,
-      publicPath: "/local/community/dash-loader/dist/assets/",
+      publicPath: "/local/community/dash-loader/dist/",
     }),
   ],
 };
