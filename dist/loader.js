@@ -937,7 +937,7 @@ const getDeviceType = () => {
         : "tablet";
 };
 
-var clickSound = "/local/community/dash-loader/assets/f20ab210011713b6.mp3";
+var clickSound = "/local/community/dash-loader/assets/fe677659d3c02c03.mp3";
 
 window.customCards.push({
     type: "settings-card",
@@ -951,10 +951,10 @@ let SettingsCard = class SettingsCard extends i$1 {
         this.mobile = getDeviceType() === "mobile";
         this.volumeLevel = window.fully?.getAudioVolume(3) || 0;
         this.brightnessMap = {
-            Morning: 128,
+            Morning: 255,
             Day: 255,
-            Evening: 100,
-            Night: 30,
+            Evening: 255,
+            Night: 255,
         };
         this.prevBrightness = window.fully?.getScreenBrightness() || 255;
         this.boundHandleDeviceChanges = () => this.handleDeviceChanges();
@@ -1170,5 +1170,5 @@ if (window.fully) {
     console.log("Device Model: " + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.31-beta.23"} (Built: ${"2025-10-23T18:40:46.117Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.31-beta.24"} (Built: ${"2025-10-23T18:56:08.289Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

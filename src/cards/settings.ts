@@ -28,10 +28,10 @@ export class SettingsCard extends LitElement implements LovelaceCard {
 
   @state() volumeLevel: number = window.fully?.getAudioVolume(3) || 0;
   @state() brightnessMap: BrightnessMap = {
-    Morning: 128,
+    Morning: 255,
     Day: 255,
-    Evening: 100,
-    Night: 30,
+    Evening: 255,
+    Night: 255,
   };
 
   private prevBrightness: number = window.fully?.getScreenBrightness() || 255;
