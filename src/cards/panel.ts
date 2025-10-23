@@ -8,8 +8,17 @@ import {
 } from "lit";
 import { cache } from "lit/directives/cache.js";
 import { customElement, property, state } from "lit/decorators.js";
-import { HomeAssistant, LovelaceCardConfig, PopupDialogElement } from "./types";
-import { deviceFlash, deviceRefresh, deviceReboot } from "./device-actions";
+import {
+  HomeAssistant,
+  LovelaceCardConfig,
+  PopupDialogElement,
+} from "../types";
+import { SettingsStorage, BrightnessMap } from "../utilities/settings-storage";
+import {
+  deviceFlash,
+  deviceRefresh,
+  deviceReboot,
+} from "../utilities/device-actions";
 
 const SCREENSAVER_TIMEOUT = 5 * 60 * 1000;
 
@@ -29,6 +38,7 @@ export class PanelCard extends LitElement {
   @state() isSaverActive = false;
 
   private isAdminView = false;
+  private phase: string | null = null;
   private flashTime: string | null = null;
   private rebootTime: string | null = null;
   private refreshTime: string | null = null;
@@ -82,11 +92,10 @@ export class PanelCard extends LitElement {
   }
 
   protected willUpdate(changedProps: PropertyValues): void {
-    if (changedProps.has("hass")) {
+    if (changedProps.has("hass") && this.hass) {
       const isAdmin = this.hass?.user?.is_admin || false;
       const isAdminMode =
-        this.hass?.states?.["input_boolean.admin_mode"]?.state === "on" ||
-        false;
+        this.hass.states?.["input_boolean.admin_mode"]?.state === "on" || false;
       this.isAdminView = isAdmin || isAdminMode;
     }
   }
@@ -123,6 +132,7 @@ export class PanelCard extends LitElement {
     if (changedProps.has("hass") && this.hass) {
       this.syncPopups();
       this.checkDeviceTriggers();
+      this.handlePhaseChange();
     }
   }
 
@@ -171,6 +181,36 @@ export class PanelCard extends LitElement {
 
   private exitSaver(): void {
     this.isSaverActive = false;
+  }
+
+  private handlePhaseChange(): void {
+    if (!this.hass) return;
+
+    const activePhase = this.hass.states["input_select.location_phase"]?.state;
+    if (!activePhase || activePhase === this.phase) return;
+
+    this.phase = activePhase;
+
+    if (typeof window.fully === "undefined") return;
+
+    try {
+      const settings = SettingsStorage.read();
+      const brightnessMap = (settings?.brightnessMap ?? {}) as BrightnessMap;
+
+      if (activePhase in brightnessMap) {
+        const value = brightnessMap[activePhase];
+        window.fully.setScreenBrightness(value);
+      } else {
+        console.warn(
+          `[PanelCard] No brightness setting found for ${activePhase}`
+        );
+      }
+    } catch (err) {
+      console.warn(
+        "[PanelCard] Failed to update brightness on phase change:",
+        err
+      );
+    }
   }
 
   private checkDeviceTriggers(): void {

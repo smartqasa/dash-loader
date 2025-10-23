@@ -28,20 +28,29 @@ declare interface Window {
     service: (service: string, data?: object) => void;
   };
   customCards: Array<Object>;
+
   fully?: {
     bind: (event: string, action: string) => void;
     bringToBackground: () => void;
     bringToForeground: () => void;
     clearCache: () => void;
+    getInternalAppSpecificStoragePath: () => string;
+    getAudioVolume: (stream: number) => number;
+    getScreenBrightness: () => number;
     getDeviceModel: () => string;
     isInForeground: () => boolean;
+    playSound: (url: string, loop: boolean, stream: number) => void;
+    readFile: (path: string) => string;
     reboot: () => void;
     restartApp: () => void;
+    setAudioVolume: (level: number, stream: number) => void;
+    setScreenBrightness: (level: number) => void;
     setStringSetting: (key: string, value: string) => void;
     startApplication: (packageName: string) => void;
     stopScreensaver: () => void;
     turnScreenOff: (keepAlive: boolean) => void;
     turnScreenOn: () => void;
+    writeFile: (path: string, content: string) => void;
   };
 
   smartqasa: {

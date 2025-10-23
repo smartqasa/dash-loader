@@ -91,6 +91,79 @@ const t=t=>(e,o)=>{ void 0!==o?o.addInitializer((()=>{customElements.define(t,e)
  * SPDX-License-Identifier: BSD-3-Clause
  */function r(r){return n({...r,state:true,attribute:false})}
 
+class SettingsStorage {
+    static { this.settingsFile = null; }
+    /** Initialize settings file and ensure it exists */
+    static init(defaultSettings) {
+        if (typeof window.fully === "undefined")
+            return defaultSettings;
+        try {
+            const basePath = window.fully.getInternalAppSpecificStoragePath();
+            this.settingsFile = `${basePath}/sq-settings.json`;
+            const text = window.fully.readFile(this.settingsFile);
+            if (text) {
+                const loaded = JSON.parse(text);
+                const merged = {
+                    ...defaultSettings,
+                    ...loaded,
+                    brightnessMap: {
+                        ...defaultSettings.brightnessMap,
+                        ...(loaded.brightnessMap || {}),
+                    },
+                };
+                // Re-save merged structure to keep file consistent
+                window.fully.writeFile(this.settingsFile, JSON.stringify(merged, null, 2));
+                console.log("[SettingsStorage] Loaded and merged settings:", merged);
+                return merged;
+            }
+            else {
+                window.fully.writeFile(this.settingsFile, JSON.stringify(defaultSettings, null, 2));
+                console.log("[SettingsStorage] Created default settings.json");
+                return defaultSettings;
+            }
+        }
+        catch (e) {
+            console.warn("[SettingsStorage] init error:", e);
+            return defaultSettings;
+        }
+    }
+    /** Update a property and save back to file */
+    static update(partial) {
+        if (typeof window.fully === "undefined" || !this.settingsFile)
+            return;
+        try {
+            const text = window.fully.readFile(this.settingsFile);
+            const data = text ? JSON.parse(text) : {};
+            const merged = {
+                ...data,
+                ...partial,
+                brightnessMap: {
+                    ...(data.brightnessMap || {}),
+                    ...(partial.brightnessMap || {}),
+                },
+            };
+            window.fully.writeFile(this.settingsFile, JSON.stringify(merged, null, 2));
+            console.log("[SettingsStorage] Updated settings:", partial);
+        }
+        catch (e) {
+            console.warn("[SettingsStorage] update error:", e);
+        }
+    }
+    /** Read the current settings file */
+    static read() {
+        if (typeof window.fully === "undefined" || !this.settingsFile)
+            return null;
+        try {
+            const text = window.fully.readFile(this.settingsFile);
+            return text ? JSON.parse(text) : null;
+        }
+        catch (e) {
+            console.warn("[SettingsStorage] read error:", e);
+            return null;
+        }
+    }
+}
+
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 async function executeFullyAction(action) {
     if (typeof window.fully === "undefined")
@@ -158,6 +231,7 @@ let PanelCard = class PanelCard extends i$1 {
         this.isMainLoaded = false;
         this.isSaverActive = false;
         this.isAdminView = false;
+        this.phase = null;
         this.flashTime = null;
         this.rebootTime = null;
         this.refreshTime = null;
@@ -200,10 +274,9 @@ let PanelCard = class PanelCard extends i$1 {
         this.config = config;
     }
     willUpdate(changedProps) {
-        if (changedProps.has("hass")) {
+        if (changedProps.has("hass") && this.hass) {
             const isAdmin = this.hass?.user?.is_admin || false;
-            const isAdminMode = this.hass?.states?.["input_boolean.admin_mode"]?.state === "on" ||
-                false;
+            const isAdminMode = this.hass.states?.["input_boolean.admin_mode"]?.state === "on" || false;
             this.isAdminView = isAdmin || isAdminMode;
         }
     }
@@ -236,6 +309,7 @@ let PanelCard = class PanelCard extends i$1 {
         if (changedProps.has("hass") && this.hass) {
             this.syncPopups();
             this.checkDeviceTriggers();
+            this.handlePhaseChange();
         }
     }
     async loadMainCard(retries = 5) {
@@ -278,6 +352,30 @@ let PanelCard = class PanelCard extends i$1 {
     }
     exitSaver() {
         this.isSaverActive = false;
+    }
+    handlePhaseChange() {
+        if (!this.hass)
+            return;
+        const activePhase = this.hass.states["input_select.location_phase"]?.state;
+        if (!activePhase || activePhase === this.phase)
+            return;
+        this.phase = activePhase;
+        if (typeof window.fully === "undefined")
+            return;
+        try {
+            const settings = SettingsStorage.read();
+            const brightnessMap = (settings?.brightnessMap ?? {});
+            if (activePhase in brightnessMap) {
+                const value = brightnessMap[activePhase];
+                window.fully.setScreenBrightness(value);
+            }
+            else {
+                console.warn(`[PanelCard] No brightness setting found for ${activePhase}`);
+            }
+        }
+        catch (err) {
+            console.warn("[PanelCard] Failed to update brightness on phase change:", err);
+        }
     }
     checkDeviceTriggers() {
         if (!this.hass)
@@ -679,6 +777,239 @@ ScreenSaver = __decorate([
     t("screensaver-card")
 ], ScreenSaver);
 
+const getDeviceType = () => {
+    if (typeof window === "undefined" || !window.screen) {
+        return "tablet";
+    }
+    const { width = 0, height = 0 } = window.screen;
+    const orientation = window.screen.orientation?.type ?? "portrait-primary";
+    const isPortrait = orientation.startsWith("portrait");
+    return (isPortrait && width < 600 && width !== 534) ||
+        (!isPortrait && height < 600 && height !== 534)
+        ? "mobile"
+        : "tablet";
+};
+
+window.customCards.push({
+    type: "settings-card",
+    name: "Settings Card",
+    preview: false,
+    description: "A SmartQasa card for tablet audio and brightness per phase.",
+});
+let SettingsCard = class SettingsCard extends i$1 {
+    constructor() {
+        super(...arguments);
+        this.mobile = getDeviceType() === "mobile";
+        this.volumeLevel = window.fully?.getAudioVolume(3) || 0;
+        this.brightnessMap = {
+            Morning: 128,
+            Day: 255,
+            Evening: 100,
+            Night: 30,
+        };
+        this.prevBrightness = window.fully?.getScreenBrightness() || 255;
+        this.boundHandleDeviceChanges = () => this.handleDeviceChanges();
+    }
+    getCardSize() {
+        return 10;
+    }
+    //private clickAudio = new Audio(clickSound);
+    connectedCallback() {
+        super.connectedCallback();
+        window.addEventListener("resize", this.boundHandleDeviceChanges);
+        this.handleDeviceChanges();
+        this.initSettingsFile();
+    }
+    disconnectedCallback() {
+        window.removeEventListener("resize", this.boundHandleDeviceChanges);
+        super.disconnectedCallback();
+    }
+    setConfig() { }
+    render() {
+        const phases = ["Morning", "Day", "Evening", "Night"];
+        const currentPhase = this.hass?.states["input_select.phase_of_day"]?.state ?? "Unknown";
+        return x `
+      <div class="section">
+        <div class="title">Tablet Info</div>
+      </div>
+      <div class="section">
+        <div class="row">
+          <div class="info">
+            <span class="label">Volume</span>
+            <span class="value">${this.volumeLevel}</span>
+          </div>
+          <sq-slider
+            .value=${this.volumeLevel}
+            .min=${0}
+            .max=${100}
+            .step=${1}
+            @sq-slider-render=${(e) => this.handleVolumeRender(e.detail.value)}
+            @sq-slider-change=${(e) => this.handleVolumeChange(e.detail.value)}
+          ></sq-slider>
+        </div>
+      </div>
+      <div class="section">
+        <div class="title">Brightness</div>
+        ${phases.map((phase) => x `
+            <div class="row">
+              <div class="info">
+                <span
+                  class="label ${phase === currentPhase ? "active-phase" : ""}"
+                >
+                  ${phase}
+                </span>
+                <span class="value">
+                  ${Math.round((this.brightnessMap[phase] / 255) * 100)}%
+                </span>
+              </div>
+              <sq-slider
+                .value=${this.brightnessMap[phase]}
+                .min=${0}
+                .max=${255}
+                .step=${1}
+                @sq-slider-render=${(e) => this.handleBrightnessRender(phase, e.detail.value)}
+                @sq-slider-change=${(e) => this.handleBrightnessChange(phase, e.detail.value)}
+              ></sq-slider>
+            </div>
+          `)}
+      </div>
+    `;
+    }
+    handleDeviceChanges() {
+        this.mobile = getDeviceType() === "mobile";
+    }
+    handleVolumeRender(value) {
+        this.volumeLevel = value;
+    }
+    handleVolumeChange(value) {
+        if (typeof window.fully === "undefined")
+            return;
+        try {
+            window.fully.setAudioVolume(value, 3);
+            this.volumeLevel = value;
+        }
+        catch (e) {
+            console.warn("[SettingsCard] setAudioVolume error:", e);
+        }
+        /*
+        try {
+          this.clickAudio.currentTime = 0;
+          this.clickAudio.volume = Math.min(value / 100, 1);
+          this.clickAudio
+            .play()
+            .catch((err) =>
+              console.warn("[SettingsCard] click sound failed:", err)
+            );
+        } catch (e) {
+          console.warn("[SettingsCard] click sound error:", e);
+        }
+        */
+    }
+    handleBrightnessRender(phase, value) {
+        this.brightnessMap = { ...this.brightnessMap, [phase]: value };
+        window.fully?.setScreenBrightness(value);
+    }
+    handleBrightnessChange(phase, value) {
+        if (typeof window.fully === "undefined")
+            return;
+        this.brightnessMap = { ...this.brightnessMap, [phase]: value };
+        SettingsStorage.update({ brightnessMap: this.brightnessMap });
+        const currentPhase = this.hass?.states["input_select.location_phase"]?.state ?? "Unknown";
+        if (phase === currentPhase)
+            this.prevBrightness = value;
+        window.fully.setScreenBrightness(this.prevBrightness);
+    }
+    initSettingsFile() {
+        const defaults = {
+            brightnessMap: this.brightnessMap,
+        };
+        const settings = SettingsStorage.init(defaults);
+        this.brightnessMap = settings.brightnessMap;
+    }
+    static get styles() {
+        return i$4 `
+      :host {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        min-width: 525px;
+        row-gap: var(--card-spacing);
+        overflow-y: auto;
+        scrollbar-width: none;
+      }
+
+      :host([mobile]) {
+        min-width: auto;
+      }
+
+      .section {
+        display: flex;
+        flex-direction: column;
+        row-gap: var(--card-spacing);
+        padding: var(--card-padding);
+        background-color: var(--card-background-color);
+        box-shadow: var(--card-box-shadow);
+        border: var(--card-border);
+        border-radius: var(--card-border-radius);
+        box-sizing: border-box;
+      }
+
+      .title {
+        font-size: var(--primary-font-size);
+        font-weight: var(--primary-font-weight);
+        color: var(--primary-text-color);
+      }
+
+      .row {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+      }
+
+      .info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .label {
+        font-size: var(--primary-font-size);
+        color: var(--primary-text-color);
+      }
+
+      .label.active-phase {
+        color: var(--accent-color);
+        font-weight: bold;
+      }
+
+      .value {
+        font-size: var(--secondary-font-size);
+        color: var(--secondary-text-color);
+      }
+
+      sq-slider {
+        flex: 1;
+      }
+    `;
+    }
+};
+__decorate([
+    n({ attribute: false })
+], SettingsCard.prototype, "hass", void 0);
+__decorate([
+    n({ type: Boolean, reflect: true })
+], SettingsCard.prototype, "mobile", void 0);
+__decorate([
+    r()
+], SettingsCard.prototype, "volumeLevel", void 0);
+__decorate([
+    r()
+], SettingsCard.prototype, "brightnessMap", void 0);
+SettingsCard = __decorate([
+    t("settings-card")
+], SettingsCard);
+
 window.customCards = window.customCards || [];
 window.smartqasa = window.smartqasa || {
     chipsConfig: [],
@@ -697,5 +1028,5 @@ if (window.fully) {
     console.log("Device Model: " + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.31-beta.2"} (Built: ${"2025-10-22T12:36:48.976Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.31-beta.4"} (Built: ${"2025-10-23T15:33:17.290Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

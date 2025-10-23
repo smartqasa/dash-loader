@@ -8,10 +8,10 @@ import {
   TemplateResult,
 } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
-import { HomeAssistant, LovelaceCard, LovelaceCardConfig } from "./types";
-import { formattedDate, formattedTime } from "./format-date-time";
-import { deviceRefresh, deviceReboot } from "./device-actions";
-import logoImage from "./logo.png";
+import { HomeAssistant, LovelaceCard, LovelaceCardConfig } from "../types";
+import { formattedDate, formattedTime } from "../utilities/format-date-time";
+import { deviceRefresh, deviceReboot } from "../utilities/device-actions";
+import logoImage from "../logo.png";
 
 interface Config extends LovelaceCardConfig {
   saver_type?: "time" | "logo";

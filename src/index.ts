@@ -19,8 +19,9 @@ if (window.fully) {
   window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
 
-import "./panel";
-import "./screensaver";
+import "./cards/panel";
+import "./cards/screensaver";
+import "./cards/settings";
 
 console.info(
   `%c SmartQasa Loader ⏏ ${__BUILD_VERSION__} (Built: ${__BUILD_TIMESTAMP__}) `,
