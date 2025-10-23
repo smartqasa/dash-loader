@@ -139,13 +139,6 @@ export class SettingsCard extends LitElement implements LovelaceCard {
     } catch (err) {
       console.warn("[SettingsCard] click sound failed:", err);
     }
-
-    try {
-      console.log("[SettingsCard] full sound URL:", clickSound);
-      window.fully.playSound(clickSound, false, 3);
-    } catch (err) {
-      console.warn("[SettingsCard] click sound failed:", err);
-    }
   }
 
   private handleBrightnessRender(phase: string, value: number) {

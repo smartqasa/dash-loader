@@ -33,11 +33,11 @@ export default {
       __BUILD_TIMESTAMP__: JSON.stringify(timestamp),
     }),
     url({
-      destDir: "dist/assets",
+      destDir: "dist",
       fileName: "[dirname][hash][extname]",
       include: ["**/*.mp3"],
       limit: 0,
-      publicPath: "/local/community/dash-loader/dist/",
+      publicPath: "/local/community/dash-loader/",
     }),
   ],
 };
