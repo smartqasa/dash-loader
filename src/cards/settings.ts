@@ -35,7 +35,6 @@ export class SettingsCard extends LitElement implements LovelaceCard {
 
   private prevBrightness: number = window.fully?.getScreenBrightness() || 255;
   private boundHandleDeviceChanges = () => this.handleDeviceChanges();
-  //private clickAudio = new Audio(clickSound);
 
   public connectedCallback(): void {
     super.connectedCallback();
@@ -128,18 +127,11 @@ export class SettingsCard extends LitElement implements LovelaceCard {
     } catch (e) {
       console.warn("[SettingsCard] setAudioVolume error:", e);
     }
-
     /*
     try {
-      this.clickAudio.currentTime = 0;
-      this.clickAudio.volume = Math.min(value / 100, 1);
-      this.clickAudio
-        .play()
-        .catch((err) =>
-          console.warn("[SettingsCard] click sound failed:", err)
-        );
-    } catch (e) {
-      console.warn("[SettingsCard] click sound error:", e);
+      window.fully.playSound("Tap", false, 3);
+    } catch (err) {
+      console.warn("[SettingsCard] click sound failed:", err);
     }
     */
   }

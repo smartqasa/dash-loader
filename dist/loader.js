@@ -813,7 +813,6 @@ let SettingsCard = class SettingsCard extends i$1 {
     getCardSize() {
         return 10;
     }
-    //private clickAudio = new Audio(clickSound);
     connectedCallback() {
         super.connectedCallback();
         window.addEventListener("resize", this.boundHandleDeviceChanges);
@@ -893,15 +892,9 @@ let SettingsCard = class SettingsCard extends i$1 {
         }
         /*
         try {
-          this.clickAudio.currentTime = 0;
-          this.clickAudio.volume = Math.min(value / 100, 1);
-          this.clickAudio
-            .play()
-            .catch((err) =>
-              console.warn("[SettingsCard] click sound failed:", err)
-            );
-        } catch (e) {
-          console.warn("[SettingsCard] click sound error:", e);
+          window.fully.playSound("Tap", false, 3);
+        } catch (err) {
+          console.warn("[SettingsCard] click sound failed:", err);
         }
         */
     }
@@ -1028,5 +1021,5 @@ if (window.fully) {
     console.log("Device Model: " + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.31-beta.4"} (Built: ${"2025-10-23T15:33:17.290Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.31-beta.8"} (Built: ${"2025-10-23T16:02:38.165Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
