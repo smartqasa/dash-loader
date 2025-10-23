@@ -7,6 +7,7 @@ import {
   SettingsData,
   BrightnessMap,
 } from "../utilities/settings-storage";
+import clickSound from "../assets/click.mp3";
 
 window.customCards.push({
   type: "settings-card",
@@ -34,6 +35,7 @@ export class SettingsCard extends LitElement implements LovelaceCard {
   };
 
   private prevBrightness: number = window.fully?.getScreenBrightness() || 255;
+
   private boundHandleDeviceChanges = () => this.handleDeviceChanges();
 
   public connectedCallback(): void {
@@ -128,12 +130,10 @@ export class SettingsCard extends LitElement implements LovelaceCard {
       console.warn("[SettingsCard] setAudioVolume error:", err);
     }
 
+    console.log("clickSound", clickSound);
+
     try {
-      window.fully.playSound(
-        "https://www.soundjay.com/buttons/beep-07a.mp3",
-        false,
-        3
-      );
+      window.fully.playSound(clickSound, false, 3);
     } catch (err) {
       console.warn("[SettingsCard] click sound failed:", err);
     }

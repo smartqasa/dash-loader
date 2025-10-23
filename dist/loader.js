@@ -940,6 +940,8 @@ const getDeviceType = () => {
         : "tablet";
 };
 
+var clickSound = "assets/f20ab210011713b6.mp3";
+
 window.customCards.push({
     type: "settings-card",
     name: "Settings Card",
@@ -1040,8 +1042,9 @@ let SettingsCard = class SettingsCard extends i$1 {
         catch (err) {
             console.warn("[SettingsCard] setAudioVolume error:", err);
         }
+        console.log("clickSound", clickSound);
         try {
-            window.fully.playSound("https://www.soundjay.com/buttons/beep-07a.mp3", false, 3);
+            window.fully.playSound(clickSound, false, 3);
         }
         catch (err) {
             console.warn("[SettingsCard] click sound failed:", err);
@@ -1170,5 +1173,5 @@ if (window.fully) {
     console.log("Device Model: " + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.31-beta.15"} (Built: ${"2025-10-23T17:33:20.805Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.31-beta.17"} (Built: ${"2025-10-23T18:06:24.831Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

@@ -36,7 +36,7 @@ export default {
       destDir: "dist/assets",
       fileName: "[dirname][hash][extname]",
       include: ["**/*.mp3"],
-      limit: 10240,
+      limit: 0,
     }),
   ],
 };
