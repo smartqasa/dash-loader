@@ -40,11 +40,17 @@ declare interface Window {
     bringToForeground: () => void;
     clearCache: () => void;
     getInternalAppSpecificStoragePath: () => string;
+    getAndroidVersion: () => string;
     getAudioVolume: (stream: number) => number;
-    getScreenBrightness: () => number;
+    getBatteryLevel: () => number;
     getDeviceModel: () => string;
     getDeviceName: () => string;
+    getIp4Address: () => string;
+    getScreenBrightness: () => number;
+    getWifiSsid: () => string;
     isInForeground: () => boolean;
+    isPluggedIn: () => boolean;
+    isNetworkConnected: () => boolean;
     playSound: (url: string, loop: boolean, stream: number) => void;
     readFile: (path: string) => string;
     reboot: () => void;
@@ -56,6 +62,7 @@ declare interface Window {
     stopScreensaver: () => void;
     turnScreenOff: (keepAlive: boolean) => void;
     turnScreenOn: () => void;
+
     writeFile: (path: string, content: string) => void;
   };
 

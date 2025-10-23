@@ -54,15 +54,23 @@ export class SettingsCard extends LitElement implements LovelaceCard {
   public setConfig(): void {}
 
   protected render(): TemplateResult | typeof nothing {
-    const deviceName = window.fully?.getDeviceName() || "Unknown";
     const deviceModel = window.fully?.getDeviceModel() || "Unknown";
+    const androidVer = window.fully?.getAndroidVersion() || "Unknown";
+    const ipAddress = window.fully?.getIp4Address() || "Unknown";
+    const wifiSsid = window.fully?.getWifiSsid() || "Unknown";
+    const batteryLevel = window.fully?.getBatteryLevel() || 0;
+    const isPluggedIn = window.fully?.isPluggedIn() || false;
     const phases = ["Morning", "Day", "Evening", "Night"];
     const currentPhase =
       this.hass?.states["input_select.phase_of_day"]?.state ?? "Unknown";
 
     return html`
       <div class="section">
-        <div class="title">Tablet: ${deviceName} (${deviceModel})</div>
+        <div class="title">Model: ${deviceModel} Android ${androidVer}</div>
+        <div class="title">
+          Battery: ${batteryLevel}% ${isPluggedIn ? "⚡" : ""}
+        </div>
+        <div class="title">WiFi: ${wifiSsid}</div>
       </div>
       <div class="section">
         <div class="row">
