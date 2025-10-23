@@ -529,33 +529,97 @@ let ScreenSaver = class ScreenSaver extends i$1 {
         super(...arguments);
         this.time = "Loading...";
         this.date = "Loading...";
+        // Heartbeats
+        this.lastClockBeat = 0;
+        this.lastMoveBeat = 0;
+        // ---------- Visibility / Watchdog ----------
+        this.handleVisibility = () => {
+            if (document.visibilityState === "visible") {
+                const now = this.now();
+                // Clock stale? Restart.
+                if (now - this.lastClockBeat > 5_000) {
+                    this.stopClock();
+                    this.startClock();
+                }
+                // Move cycle stale? Restart.
+                const moveTimerMs = Math.max(1, this.config?.saver_interval ?? 30) * 1000;
+                if (now - this.lastMoveBeat > moveTimerMs * 1.5) {
+                    this.stopMoveCycle();
+                    this.cycleElement();
+                }
+                // Make sure it's onscreen
+                this.ensureInBounds();
+            }
+        };
     }
     getCardSize() {
         return 20;
     }
+    // ---------- Utils ----------
+    get containerEl() {
+        return this.shadowRoot?.querySelector(".container");
+    }
+    get elementEl() {
+        return this.shadowRoot?.querySelector(".element");
+    }
+    clamp(n, min, max) {
+        if (Number.isNaN(n))
+            return min;
+        if (min > max)
+            return min;
+        return Math.min(Math.max(n, min), max);
+    }
+    now() {
+        return (window.performance && performance.now()) || Date.now();
+    }
+    // ---------- Lovelace plumbing ----------
     setConfig(config) {
         this.config = config;
     }
+    // ---------- Lifecycle ----------
     connectedCallback() {
         super.connectedCallback();
         window.smartqasa?.popupReset?.();
+        // Start immediately
         this.updateElement();
         if (this.timeIntervalId === undefined)
             this.startClock();
+        if (this.moveTimerId === undefined)
+            this.cycleElement();
+        // Page visibility / focus
+        document.addEventListener("visibilitychange", this.handleVisibility, {
+            passive: true,
+        });
+        window.addEventListener("focus", this.handleVisibility, { passive: true });
+        // Keep element in-bounds on layout changes
+        this.resizeObs = new ResizeObserver(() => this.ensureInBounds());
+        const container = this.containerEl;
+        if (container)
+            this.resizeObs.observe(container);
+        // If element ever leaves viewport, snap back
+        this.interObs = new IntersectionObserver((entries) => {
+            const entry = entries[0];
+            if (!entry?.isIntersecting) {
+                this.recenterElement();
+                this.elementEl?.classList.remove("hidden");
+            }
+        }, { root: null, threshold: 0.01 });
+        const el = this.elementEl;
+        if (el)
+            this.interObs.observe(el);
+        // Start watchdog
+        this.startWatchdog();
     }
     disconnectedCallback() {
-        if (this.timeIntervalId !== undefined) {
-            window.clearInterval(this.timeIntervalId);
-            this.timeIntervalId = undefined;
-        }
-        if (this.moveTimerId !== undefined) {
-            window.clearInterval(this.moveTimerId);
-            this.moveTimerId = undefined;
-        }
-        if (this.fadeTimeoutId !== undefined) {
-            window.clearTimeout(this.fadeTimeoutId);
-            this.fadeTimeoutId = undefined;
-        }
+        document.removeEventListener("visibilitychange", this.handleVisibility);
+        window.removeEventListener("focus", this.handleVisibility);
+        this.stopClock();
+        this.stopMoveCycle();
+        this.stopWatchdog();
+        this.resizeObs?.disconnect();
+        this.resizeObs = undefined;
+        this.interObs?.disconnect();
+        this.interObs = undefined;
         super.disconnectedCallback();
     }
     render() {
@@ -573,8 +637,8 @@ let ScreenSaver = class ScreenSaver extends i$1 {
                     @error=${() => this.handleImageError()}
                   />
                   ${this.config.saver_title
-                ? x ` <div class="name">${this.config.saver_title}</div> `
-                : ""}
+                ? x `<div class="name">${this.config.saver_title}</div>`
+                : E}
                 </div>
               `
             : x `
@@ -604,24 +668,64 @@ let ScreenSaver = class ScreenSaver extends i$1 {
             this.refreshTime = refreshTime;
         }
     }
+    startWatchdog() {
+        if (this.watchdogId !== undefined)
+            return;
+        this.watchdogId = window.setInterval(() => {
+            if (!this.isConnected)
+                return;
+            const now = this.now();
+            // Clock heartbeat
+            if (now - this.lastClockBeat > 5_000) {
+                this.stopClock();
+                this.startClock();
+            }
+            // Move heartbeat
+            const moveTimerMs = Math.max(1, this.config?.saver_interval ?? 30) * 1000;
+            if (now - this.lastMoveBeat > moveTimerMs * 1.5) {
+                this.stopMoveCycle();
+                this.cycleElement();
+            }
+        }, 2_000);
+    }
+    stopWatchdog() {
+        if (this.watchdogId !== undefined) {
+            window.clearInterval(this.watchdogId);
+            this.watchdogId = undefined;
+        }
+    }
+    // ---------- Clock ----------
     startClock() {
+        this.lastClockBeat = this.now();
+        if (this.timeIntervalId !== undefined)
+            return;
         this.timeIntervalId = window.setInterval(() => {
             if (!this.isConnected) {
-                if (this.timeIntervalId !== undefined) {
-                    window.clearInterval(this.timeIntervalId);
-                    this.timeIntervalId = undefined;
-                }
+                this.stopClock();
                 return;
             }
             this.updateElement();
+            this.lastClockBeat = this.now();
         }, 1000);
     }
+    stopClock() {
+        if (this.timeIntervalId !== undefined) {
+            window.clearInterval(this.timeIntervalId);
+            this.timeIntervalId = undefined;
+        }
+    }
+    updateElement() {
+        const now = new Date();
+        this.time = formattedTime(now);
+        this.date = formattedDate(now);
+    }
+    // ---------- Movement Cycle ----------
     cycleElement() {
         const moveTimerMs = Math.max(1, this.config?.saver_interval ?? 30) * 1000;
         const runCycle = () => {
             if (!this.isConnected)
                 return;
-            const element = this.shadowRoot?.querySelector(".element");
+            const element = this.elementEl;
             if (!element) {
                 console.warn("[ScreenSaver] .element not found during cycle");
                 return;
@@ -631,49 +735,98 @@ let ScreenSaver = class ScreenSaver extends i$1 {
                 if (!this.isConnected)
                     return;
                 this.moveElement();
-                const el = this.shadowRoot?.querySelector(".element");
-                if (el) {
+                this.ensureInBounds();
+                const el = this.elementEl;
+                if (el)
                     el.classList.remove("hidden");
-                }
-                else {
+                else
                     console.warn("[ScreenSaver] .element missing during fade-in");
-                }
+                this.lastMoveBeat = this.now();
             }, 1000);
         };
         runCycle();
+        if (this.moveTimerId !== undefined)
+            return;
         this.moveTimerId = window.setInterval(() => {
             if (!this.isConnected) {
-                if (this.moveTimerId !== undefined) {
-                    window.clearInterval(this.moveTimerId);
-                    this.moveTimerId = undefined;
-                }
+                this.stopMoveCycle();
                 return;
             }
             runCycle();
         }, moveTimerMs);
     }
-    updateElement() {
-        const now = new Date();
-        this.time = formattedTime(now);
-        this.date = formattedDate(now);
+    stopMoveCycle() {
+        if (this.moveTimerId !== undefined) {
+            window.clearInterval(this.moveTimerId);
+            this.moveTimerId = undefined;
+        }
+        if (this.fadeTimeoutId !== undefined) {
+            window.clearTimeout(this.fadeTimeoutId);
+            this.fadeTimeoutId = undefined;
+        }
     }
     moveElement() {
         if (!this.isConnected)
             return;
-        const container = this.shadowRoot?.querySelector(".container");
-        const element = this.shadowRoot?.querySelector(".element");
-        if (container && element) {
-            const maxWidth = Math.max(0, container.clientWidth - element.clientWidth);
-            const maxHeight = Math.max(0, container.clientHeight - element.clientHeight);
-            const randomX = Math.floor(Math.random() * (maxWidth + 1));
-            const randomY = Math.floor(Math.random() * (maxHeight + 1));
-            element.style.left = `${randomX}px`;
-            element.style.top = `${randomY}px`;
-        }
+        const container = this.containerEl;
+        const element = this.elementEl;
+        if (!container || !element)
+            return;
+        const cw = Math.max(0, container.clientWidth);
+        const ch = Math.max(0, container.clientHeight);
+        const ew = Math.max(0, element.clientWidth);
+        const eh = Math.max(0, element.clientHeight);
+        const maxX = Math.max(0, cw - ew);
+        const maxY = Math.max(0, ch - eh);
+        const randomX = Math.floor(Math.random() * (maxX + 1));
+        const randomY = Math.floor(Math.random() * (maxY + 1));
+        element.style.left = `${this.clamp(randomX, 0, maxX)}px`;
+        element.style.top = `${this.clamp(randomY, 0, maxY)}px`;
+    }
+    ensureInBounds() {
+        const container = this.containerEl;
+        const element = this.elementEl;
+        if (!container || !element)
+            return;
+        const cw = Math.max(0, container.clientWidth);
+        const ch = Math.max(0, container.clientHeight);
+        const ew = Math.max(0, element.clientWidth);
+        const eh = Math.max(0, element.clientHeight);
+        const maxX = Math.max(0, cw - ew);
+        const maxY = Math.max(0, ch - eh);
+        const currentX = parseFloat(element.style.left || "0") || 0;
+        const currentY = parseFloat(element.style.top || "0") || 0;
+        const safeX = this.clamp(currentX, 0, maxX);
+        const safeY = this.clamp(currentY, 0, maxY);
+        if (safeX !== currentX)
+            element.style.left = `${safeX}px`;
+        if (safeY !== currentY)
+            element.style.top = `${safeY}px`;
+        const rect = element.getBoundingClientRect();
+        const vw = window.innerWidth || cw;
+        const vh = window.innerHeight || ch;
+        const offscreen = rect.right < 0 || rect.bottom < 0 || rect.left > vw || rect.top > vh;
+        if (offscreen)
+            this.recenterElement();
+    }
+    recenterElement() {
+        const container = this.containerEl;
+        const element = this.elementEl;
+        if (!container || !element)
+            return;
+        const cw = Math.max(0, container.clientWidth);
+        const ch = Math.max(0, container.clientHeight);
+        const ew = Math.max(0, element.clientWidth);
+        const eh = Math.max(0, element.clientHeight);
+        const cx = cw / 2;
+        const cy = ch / 2;
+        element.style.left = `${this.clamp(cx - ew / 2, 0, Math.max(0, cw - ew))}px`;
+        element.style.top = `${this.clamp(cy - eh / 2, 0, Math.max(0, ch - eh))}px`;
     }
     handleImageError() {
         console.error("Failed to load image.");
     }
+    // ---------- Styles ----------
     static get styles() {
         return i$4 `
       :host {
@@ -1021,5 +1174,5 @@ if (window.fully) {
     console.log("Device Model: " + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.31-beta.8"} (Built: ${"2025-10-23T16:02:38.165Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.31-beta.9"} (Built: ${"2025-10-23T16:13:10.417Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
