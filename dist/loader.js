@@ -978,8 +978,9 @@ let SettingsCard = class SettingsCard extends i$1 {
         const androidVer = window.fully?.getAndroidVersion() || "Unknown";
         const fullyVer = window.fully?.getFullyVersion() || "Unknown";
         const isConnected = window.fully?.isNetworkConnected() ?? false;
-        const wifiSsid = window.fully?.getWifiSsid() || "Unknown";
         const ipAddress = window.fully?.getIp4Address() || "Unknown";
+        const isWifiConnect = window.fully?.isWifiConnected() ?? false;
+        const wifiSsid = window.fully?.getWifiSsid() || "Unknown";
         const batteryLevel = window.fully?.getBatteryLevel() || 0;
         const isCharging = window.fully?.isPlugged() || false;
         const phases = ["Morning", "Day", "Evening", "Night"];
@@ -991,8 +992,9 @@ let SettingsCard = class SettingsCard extends i$1 {
           Software: Android ${androidVer} / Fully ${fullyVer}
         </div>
         <div class="title">
-          ${isConnected ? "Connected" : "Disconnected"}: ${wifiSsid}
-          (${ipAddress})
+          ${isConnected
+            ? `Connected: ${isWifiConnect ? `${wifiSsid}` : "Ethernet"} (${ipAddress})`
+            : "Disconnected"}
         </div>
         <div class="title">
           ${isCharging ? "Charging" : "Unplugged"}: ${batteryLevel}%
@@ -1188,5 +1190,5 @@ if (window.fully) {
     console.log("Device Model: " + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.33-beta.8"} (Built: ${"2025-10-23T19:51:15.138Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.33-beta.9"} (Built: ${"2025-10-23T19:55:38.308Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

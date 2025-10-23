@@ -52,6 +52,7 @@ declare interface Window {
     isInForeground: () => boolean;
     isPlugged: () => boolean;
     isNetworkConnected: () => boolean;
+    isWifiConnected: () => boolean;
     playSound: (url: string, loop: boolean, stream: number) => void;
     readFile: (path: string) => string;
     reboot: () => void;

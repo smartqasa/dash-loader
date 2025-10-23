@@ -60,8 +60,9 @@ export class SettingsCard extends LitElement implements LovelaceCard {
     const fullyVer = window.fully?.getFullyVersion() || "Unknown";
 
     const isConnected = window.fully?.isNetworkConnected() ?? false;
-    const wifiSsid = window.fully?.getWifiSsid() || "Unknown";
     const ipAddress = window.fully?.getIp4Address() || "Unknown";
+    const isWifiConnect = window.fully?.isWifiConnected() ?? false;
+    const wifiSsid = window.fully?.getWifiSsid() || "Unknown";
 
     const batteryLevel = window.fully?.getBatteryLevel() || 0;
     const isCharging = window.fully?.isPlugged() || false;
@@ -77,8 +78,9 @@ export class SettingsCard extends LitElement implements LovelaceCard {
           Software: Android ${androidVer} / Fully ${fullyVer}
         </div>
         <div class="title">
-          ${isConnected ? "Connected" : "Disconnected"}: ${wifiSsid}
-          (${ipAddress})
+          ${isConnected
+            ? `Connected: ${isWifiConnect ? `${wifiSsid}` : "Ethernet"} (${ipAddress})`
+            : "Disconnected"}
         </div>
         <div class="title">
           ${isCharging ? "Charging" : "Unplugged"}: ${batteryLevel}%
