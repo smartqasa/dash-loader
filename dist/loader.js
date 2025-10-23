@@ -943,8 +943,6 @@ const getDeviceType = () => {
         : "tablet";
 };
 
-var clickSound = "assets/f20ab210011713b6.mp3";
-
 window.customCards.push({
     type: "settings-card",
     name: "Settings Card",
@@ -1046,7 +1044,9 @@ let SettingsCard = class SettingsCard extends i$1 {
             console.warn("[SettingsCard] setAudioVolume error:", err);
         }
         try {
-            window.fully.playSound(clickSound, false, 3);
+            const haBaseUrl = window.location.origin;
+            const soundUrl = `${haBaseUrl}/local/assets/click.mp3`;
+            window.fully.playSound(soundUrl, false, 3);
         }
         catch (err) {
             console.warn("[SettingsCard] click sound failed:", err);
@@ -1175,5 +1175,5 @@ if (window.fully) {
     console.log("Device Model: " + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.31-beta.13"} (Built: ${"2025-10-23T16:34:24.977Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.31-beta.14"} (Built: ${"2025-10-23T16:42:08.530Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

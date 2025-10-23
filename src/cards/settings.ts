@@ -7,7 +7,6 @@ import {
   SettingsData,
   BrightnessMap,
 } from "../utilities/settings-storage";
-import clickSound from "../assets/click.mp3";
 
 window.customCards.push({
   type: "settings-card",
@@ -130,7 +129,9 @@ export class SettingsCard extends LitElement implements LovelaceCard {
     }
 
     try {
-      window.fully.playSound(clickSound, false, 3);
+      const haBaseUrl = window.location.origin;
+      const soundUrl = `${haBaseUrl}/local/assets/click.mp3`;
+      window.fully.playSound(soundUrl, false, 3);
     } catch (err) {
       console.warn("[SettingsCard] click sound failed:", err);
     }
