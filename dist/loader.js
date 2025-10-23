@@ -1044,7 +1044,9 @@ let SettingsCard = class SettingsCard extends i$1 {
         }
         console.log("clickSound", clickSound);
         try {
-            window.fully.playSound(clickSound, false, 3);
+            const soundUrl = new URL(clickSound, window.location.origin).href;
+            console.log("[SettingsCard] full sound URL:", soundUrl);
+            window.fully.playSound(soundUrl, false, 3);
         }
         catch (err) {
             console.warn("[SettingsCard] click sound failed:", err);
@@ -1173,5 +1175,5 @@ if (window.fully) {
     console.log("Device Model: " + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.31-beta.17"} (Built: ${"2025-10-23T18:06:24.831Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.31-beta.18"} (Built: ${"2025-10-23T18:12:50.267Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
