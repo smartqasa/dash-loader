@@ -7,6 +7,7 @@ import {
   SettingsData,
   BrightnessMap,
 } from "../utilities/settings-storage";
+import clickSound from "../assets/click.mp3";
 
 window.customCards.push({
   type: "settings-card",
@@ -124,16 +125,15 @@ export class SettingsCard extends LitElement implements LovelaceCard {
     try {
       window.fully.setAudioVolume(value, 3);
       this.volumeLevel = value;
-    } catch (e) {
-      console.warn("[SettingsCard] setAudioVolume error:", e);
+    } catch (err) {
+      console.warn("[SettingsCard] setAudioVolume error:", err);
     }
-    /*
+
     try {
-      window.fully.playSound("Tap", false, 3);
+      window.fully.playSound(clickSound, false, 3);
     } catch (err) {
       console.warn("[SettingsCard] click sound failed:", err);
     }
-    */
   }
 
   private handleBrightnessRender(phase: string, value: number) {

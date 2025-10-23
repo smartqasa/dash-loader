@@ -3,6 +3,7 @@ import replace from "@rollup/plugin-replace";
 import resolve from "@rollup/plugin-node-resolve";
 import typescript from "@rollup/plugin-typescript";
 import json from "@rollup/plugin-json";
+import url from "@rollup/plugin-url";
 
 import { readFileSync } from "fs";
 const { version } = JSON.parse(
@@ -30,6 +31,12 @@ export default {
       preventAssignment: true,
       __BUILD_VERSION__: JSON.stringify(version),
       __BUILD_TIMESTAMP__: JSON.stringify(timestamp),
+    }),
+    url({
+      destDir: "dist/assets",
+      fileName: "[dirname][hash][extname]",
+      include: ["**/*.mp3"],
+      limit: 10240,
     }),
   ],
 };
