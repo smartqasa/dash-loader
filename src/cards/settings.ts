@@ -56,6 +56,7 @@ export class SettingsCard extends LitElement implements LovelaceCard {
   protected render(): TemplateResult | typeof nothing {
     const deviceModel = window.fully?.getDeviceModel() || "Unknown";
     const androidVer = window.fully?.getAndroidVersion() || "Unknown";
+    const fullyVer = window.fully?.getFullyVersion() || "Unknown";
     const ipAddress = window.fully?.getIp4Address() || "Unknown";
     const wifiSsid = window.fully?.getWifiSsid() || "Unknown";
     const batteryLevel = window.fully?.getBatteryLevel() || 0;
@@ -67,10 +68,11 @@ export class SettingsCard extends LitElement implements LovelaceCard {
     return html`
       <div class="section">
         <div class="title">Model: ${deviceModel} Android ${androidVer}</div>
+        <div class="title">Software: OS ${androidVer} / Fully ${fullyVer}</div>
         <div class="title">
-          Battery: ${batteryLevel}% ${isCharging ? "⚡" : ""}
+          Battery: ${batteryLevel}% ${isCharging ? " - Charging" : ""}
         </div>
-        <div class="title">WiFi: ${wifiSsid}</div>
+        <div class="title">WiFi: ${wifiSsid} (${ipAddress})</div>
       </div>
       <div class="section">
         <div class="row">

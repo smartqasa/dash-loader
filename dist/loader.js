@@ -976,7 +976,8 @@ let SettingsCard = class SettingsCard extends i$1 {
     render() {
         const deviceModel = window.fully?.getDeviceModel() || "Unknown";
         const androidVer = window.fully?.getAndroidVersion() || "Unknown";
-        window.fully?.getIp4Address() || "Unknown";
+        const fullyVer = window.fully?.getFullyVersion() || "Unknown";
+        const ipAddress = window.fully?.getIp4Address() || "Unknown";
         const wifiSsid = window.fully?.getWifiSsid() || "Unknown";
         const batteryLevel = window.fully?.getBatteryLevel() || 0;
         const isCharging = window.fully?.isPlugged() || false;
@@ -985,10 +986,11 @@ let SettingsCard = class SettingsCard extends i$1 {
         return x `
       <div class="section">
         <div class="title">Model: ${deviceModel} Android ${androidVer}</div>
+        <div class="title">Software: OS ${androidVer} / Fully ${fullyVer}</div>
         <div class="title">
-          Battery: ${batteryLevel}% ${isCharging ? "⚡" : ""}
+          Battery: ${batteryLevel}% ${isCharging ? " - Charging" : ""}
         </div>
-        <div class="title">WiFi: ${wifiSsid}</div>
+        <div class="title">WiFi: ${wifiSsid} (${ipAddress})</div>
       </div>
       <div class="section">
         <div class="row">
@@ -1180,5 +1182,5 @@ if (window.fully) {
     console.log("Device Model: " + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.33-beta.5"} (Built: ${"2025-10-23T19:26:35.708Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.33-beta.6"} (Built: ${"2025-10-23T19:34:50.842Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

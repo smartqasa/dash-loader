@@ -39,12 +39,13 @@ declare interface Window {
     bringToBackground: () => void;
     bringToForeground: () => void;
     clearCache: () => void;
-    getInternalAppSpecificStoragePath: () => string;
     getAndroidVersion: () => string;
     getAudioVolume: (stream: number) => number;
     getBatteryLevel: () => number;
     getDeviceModel: () => string;
     getDeviceName: () => string;
+    getFullyVersion: () => string;
+    getInternalAppSpecificStoragePath: () => string;
     getIp4Address: () => string;
     getScreenBrightness: () => number;
     getWifiSsid: () => string;
