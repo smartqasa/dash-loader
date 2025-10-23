@@ -113,12 +113,10 @@ class SettingsStorage {
                 };
                 // Re-save merged structure to keep file consistent
                 window.fully.writeFile(this.settingsFile, JSON.stringify(merged, null, 2));
-                console.log("[SettingsStorage] Loaded and merged settings:", merged);
                 return merged;
             }
             else {
                 window.fully.writeFile(this.settingsFile, JSON.stringify(defaultSettings, null, 2));
-                console.log("[SettingsStorage] Created default settings.json");
                 return defaultSettings;
             }
         }
@@ -143,7 +141,6 @@ class SettingsStorage {
                 },
             };
             window.fully.writeFile(this.settingsFile, JSON.stringify(merged, null, 2));
-            console.log("[SettingsStorage] Updated settings:", partial);
         }
         catch (e) {
             console.warn("[SettingsStorage] update error:", e);
@@ -1042,10 +1039,8 @@ let SettingsCard = class SettingsCard extends i$1 {
         catch (err) {
             console.warn("[SettingsCard] setAudioVolume error:", err);
         }
-        console.log("clickSound", clickSound);
         try {
             const soundUrl = `${window.location.origin}${clickSound}`;
-            console.log("[SettingsCard] final sound URL:", soundUrl);
             window.fully.playSound(soundUrl, false, 3);
         }
         catch (err) {
@@ -1175,5 +1170,5 @@ if (window.fully) {
     console.log("Device Model: " + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.31-beta.22"} (Built: ${"2025-10-23T18:36:09.332Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.31-beta.23"} (Built: ${"2025-10-23T18:40:46.117Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

@@ -41,14 +41,12 @@ export class SettingsStorage {
           this.settingsFile,
           JSON.stringify(merged, null, 2)
         );
-        console.log("[SettingsStorage] Loaded and merged settings:", merged);
         return merged;
       } else {
         window.fully.writeFile(
           this.settingsFile,
           JSON.stringify(defaultSettings, null, 2)
         );
-        console.log("[SettingsStorage] Created default settings.json");
         return defaultSettings;
       }
     } catch (e) {
@@ -76,7 +74,6 @@ export class SettingsStorage {
         this.settingsFile,
         JSON.stringify(merged, null, 2)
       );
-      console.log("[SettingsStorage] Updated settings:", partial);
     } catch (e) {
       console.warn("[SettingsStorage] update error:", e);
     }
