@@ -974,11 +974,13 @@ let SettingsCard = class SettingsCard extends i$1 {
     }
     setConfig() { }
     render() {
+        const deviceName = window.fully?.getDeviceName() || "Unknown";
+        const deviceModel = window.fully?.getDeviceModel() || "Unknown";
         const phases = ["Morning", "Day", "Evening", "Night"];
         const currentPhase = this.hass?.states["input_select.phase_of_day"]?.state ?? "Unknown";
         return x `
       <div class="section">
-        <div class="title">Tablet Info</div>
+        <div class="title">Tablet: ${deviceName} (${deviceModel})</div>
       </div>
       <div class="section">
         <div class="row">
@@ -1170,5 +1172,5 @@ if (window.fully) {
     console.log("Device Model: " + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.33-beta.1"} (Built: ${"2025-10-23T19:03:45.705Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.33-beta.2"} (Built: ${"2025-10-23T19:04:03.797Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

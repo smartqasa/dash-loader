@@ -54,13 +54,15 @@ export class SettingsCard extends LitElement implements LovelaceCard {
   public setConfig(): void {}
 
   protected render(): TemplateResult | typeof nothing {
+    const deviceName = window.fully?.getDeviceName() || "Unknown";
+    const deviceModel = window.fully?.getDeviceModel() || "Unknown";
     const phases = ["Morning", "Day", "Evening", "Night"];
     const currentPhase =
       this.hass?.states["input_select.phase_of_day"]?.state ?? "Unknown";
 
     return html`
       <div class="section">
-        <div class="title">Tablet Info</div>
+        <div class="title">Tablet: ${deviceName} (${deviceModel})</div>
       </div>
       <div class="section">
         <div class="row">

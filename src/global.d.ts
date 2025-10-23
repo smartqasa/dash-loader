@@ -43,6 +43,7 @@ declare interface Window {
     getAudioVolume: (stream: number) => number;
     getScreenBrightness: () => number;
     getDeviceModel: () => string;
+    getDeviceName: () => string;
     isInForeground: () => boolean;
     playSound: (url: string, loop: boolean, stream: number) => void;
     readFile: (path: string) => string;
