@@ -354,6 +354,7 @@ let PanelCard = class PanelCard extends i$1 {
         if (!this.hass)
             return;
         const activePhase = this.hass.states["input_select.location_phase"]?.state;
+        console.log("[PanelCard] Active phase:", activePhase, "Current phase:", this.phase);
         if (!activePhase || activePhase === this.phase)
             return;
         this.phase = activePhase;
@@ -1190,5 +1191,5 @@ if (window.fully) {
     console.log("Device Model: " + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.33-beta.10"} (Built: ${"2025-10-23T19:59:28.688Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.34-beta.1"} (Built: ${"2025-10-24T09:55:37.688Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
