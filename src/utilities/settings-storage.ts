@@ -81,11 +81,19 @@ export class SettingsStorage {
 
   /** Read the current settings file */
   static read(): SettingsData | null {
-    if (typeof window.fully === "undefined" || !this.settingsFile) return null;
+    if (typeof window.fully === "undefined") return null;
 
     try {
+      // Rebuild file path if not yet initialized
+      if (!this.settingsFile) {
+        const basePath = window.fully.getInternalAppSpecificStoragePath();
+        this.settingsFile = `${basePath}/sq-settings.json`;
+      }
+
       const text = window.fully.readFile(this.settingsFile);
-      return text ? (JSON.parse(text) as SettingsData) : null;
+      if (!text) return null;
+
+      return JSON.parse(text) as SettingsData;
     } catch (e) {
       console.warn("[SettingsStorage] read error:", e);
       return null;

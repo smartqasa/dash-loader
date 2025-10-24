@@ -148,11 +148,18 @@ class SettingsStorage {
     }
     /** Read the current settings file */
     static read() {
-        if (typeof window.fully === "undefined" || !this.settingsFile)
+        if (typeof window.fully === "undefined")
             return null;
         try {
+            // Rebuild file path if not yet initialized
+            if (!this.settingsFile) {
+                const basePath = window.fully.getInternalAppSpecificStoragePath();
+                this.settingsFile = `${basePath}/sq-settings.json`;
+            }
             const text = window.fully.readFile(this.settingsFile);
-            return text ? JSON.parse(text) : null;
+            if (!text)
+                return null;
+            return JSON.parse(text);
         }
         catch (e) {
             console.warn("[SettingsStorage] read error:", e);
@@ -1190,5 +1197,5 @@ if (window.fully) {
     console.log("Device Model: " + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.34-beta.9"} (Built: ${"2025-10-24T10:46:11.302Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.34-beta.10"} (Built: ${"2025-10-24T10:53:21.838Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
