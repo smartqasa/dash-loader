@@ -187,7 +187,7 @@ export class PanelCard extends LitElement {
     if (typeof window.fully === "undefined" || !this.hass) return;
 
     const activePhase = this.hass.states["input_select.location_phase"]?.state;
-    if (activePhase === this.phase) return;
+    if (!activePhase || activePhase === this.phase) return;
 
     try {
       const settings = SettingsStorage.read();
@@ -195,12 +195,8 @@ export class PanelCard extends LitElement {
 
       if (activePhase in brightnessMap) {
         const value = brightnessMap[activePhase];
-        console.log(
-          "[PanelCard] Updating brightness for phase",
-          activePhase,
-          value
-        );
         window.fully.setScreenBrightness(value);
+
         this.phase = activePhase;
       }
     } catch (err) {
