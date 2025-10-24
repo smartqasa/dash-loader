@@ -188,17 +188,16 @@ export class PanelCard extends LitElement {
 
     const activePhase =
       this.hass.states?.["input_select.location_phase"]?.state;
-    console.log(
-      "[PanelCard] Active phase:",
-      activePhase,
-      "Current phase:",
-      this.phase
-    );
     if (!activePhase || activePhase === this.phase) return;
 
     try {
       const settings = SettingsStorage.read();
       const brightnessMap = (settings?.brightnessMap ?? {}) as BrightnessMap;
+      console.log(
+        "Setting brightness for phase change:",
+        activePhase,
+        brightnessMap
+      );
 
       if (activePhase in brightnessMap) {
         const value = brightnessMap[activePhase];
