@@ -194,9 +194,8 @@ export class PanelCard extends LitElement {
       const settings = SettingsStorage.read();
       const brightnessMap = (settings?.brightnessMap ?? {}) as BrightnessMap;
       console.log(
-        "Setting brightness for phase change:",
-        activePhase,
-        brightnessMap
+        `[PanelCard] Setting brightness for phase change: ${activePhase}`,
+        JSON.stringify(brightnessMap)
       );
 
       if (activePhase in brightnessMap) {
