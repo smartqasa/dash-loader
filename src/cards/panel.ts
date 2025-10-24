@@ -183,7 +183,7 @@ export class PanelCard extends LitElement {
     this.isSaverActive = false;
   }
 
-  private async handlePhaseChange(): Promise<void> {
+  private handlePhaseChange(): void {
     if (!this.hass) return;
 
     const activePhase = this.hass.states["input_select.location_phase"]?.state;
@@ -194,11 +194,16 @@ export class PanelCard extends LitElement {
     if (typeof window.fully === "undefined") return;
 
     try {
-      const settings = await SettingsStorage.read();
+      const settings = SettingsStorage.read();
       const brightnessMap = (settings?.brightnessMap ?? {}) as BrightnessMap;
 
       if (activePhase in brightnessMap) {
         const value = brightnessMap[activePhase];
+        console.log(
+          "[PanelCard] Updating brightness for phase",
+          activePhase,
+          value
+        );
         window.fully.setScreenBrightness(value);
       }
     } catch (err) {
