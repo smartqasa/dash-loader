@@ -183,16 +183,10 @@ export class PanelCard extends LitElement {
     this.isSaverActive = false;
   }
 
-  private handlePhaseChange(): void {
+  private async handlePhaseChange(): Promise<void> {
     if (!this.hass) return;
 
     const activePhase = this.hass.states["input_select.location_phase"]?.state;
-    console.log(
-      "[PanelCard] Active phase:",
-      activePhase,
-      "Current phase:",
-      this.phase
-    );
     if (!activePhase || activePhase === this.phase) return;
 
     this.phase = activePhase;
@@ -200,7 +194,7 @@ export class PanelCard extends LitElement {
     if (typeof window.fully === "undefined") return;
 
     try {
-      const settings = SettingsStorage.read();
+      const settings = await SettingsStorage.read();
       const brightnessMap = (settings?.brightnessMap ?? {}) as BrightnessMap;
 
       if (activePhase in brightnessMap) {
