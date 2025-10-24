@@ -351,13 +351,10 @@ let PanelCard = class PanelCard extends i$1 {
         this.isSaverActive = false;
     }
     handlePhaseChange() {
-        if (!this.hass)
+        if (typeof window.fully === "undefined" || !this.hass)
             return;
         const activePhase = this.hass.states["input_select.location_phase"]?.state;
-        if (!activePhase || activePhase === this.phase)
-            return;
-        this.phase = activePhase;
-        if (typeof window.fully === "undefined")
+        if (activePhase === this.phase)
             return;
         try {
             const settings = SettingsStorage.read();
@@ -366,6 +363,7 @@ let PanelCard = class PanelCard extends i$1 {
                 const value = brightnessMap[activePhase];
                 console.log("[PanelCard] Updating brightness for phase", activePhase, value);
                 window.fully.setScreenBrightness(value);
+                this.phase = activePhase;
             }
         }
         catch (err) {
@@ -1191,5 +1189,5 @@ if (window.fully) {
     console.log("Device Model: " + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.34-beta.3"} (Built: ${"2025-10-24T10:13:18.096Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.34-beta.4"} (Built: ${"2025-10-24T10:20:09.763Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
