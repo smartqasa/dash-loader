@@ -151,7 +151,6 @@ class SettingsStorage {
         if (typeof window.fully === "undefined")
             return null;
         try {
-            // Rebuild file path if not yet initialized
             if (!this.settingsFile) {
                 const basePath = window.fully.getInternalAppSpecificStoragePath();
                 this.settingsFile = `${basePath}/sq-settings.json`;
@@ -366,11 +365,9 @@ let PanelCard = class PanelCard extends i$1 {
         try {
             const settings = SettingsStorage.read();
             const brightnessMap = (settings?.brightnessMap ?? {});
-            console.log(`[PanelCard] Setting brightness for phase change: ${activePhase}`, JSON.stringify(brightnessMap));
             if (activePhase in brightnessMap) {
                 const value = brightnessMap[activePhase];
                 window.fully.setScreenBrightness(value);
-                console.log(`[PanelCard] Set brightness to ${value} for phase ${activePhase}`);
                 this.phase = activePhase;
             }
         }
@@ -1197,5 +1194,5 @@ if (window.fully) {
     console.log("Device Model: " + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.34-beta.10"} (Built: ${"2025-10-24T10:53:21.838Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.34-beta.11"} (Built: ${"2025-10-24T10:57:58.108Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

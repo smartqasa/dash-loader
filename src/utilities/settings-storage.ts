@@ -84,7 +84,6 @@ export class SettingsStorage {
     if (typeof window.fully === "undefined") return null;
 
     try {
-      // Rebuild file path if not yet initialized
       if (!this.settingsFile) {
         const basePath = window.fully.getInternalAppSpecificStoragePath();
         this.settingsFile = `${basePath}/sq-settings.json`;
