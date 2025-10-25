@@ -1077,13 +1077,11 @@ let SettingsCard = class SettingsCard extends i$1 {
         this.mobile = getDeviceType() === "mobile";
     }
     handleModeChange(mode) {
-        this.displayMode = mode;
-        SettingsStorage.update({ displayMode: mode });
         try {
             if (typeof window.browser_mod !== "undefined") {
-                if (mode === "auto") {
-                    window.browser_mod.service("set_theme", { mode: mode });
-                }
+                window.browser_mod.service("set_theme", { dark: mode });
+                SettingsStorage.update({ displayMode: mode });
+                this.displayMode = mode;
             }
         }
         catch (err) {
@@ -1262,5 +1260,5 @@ if (window.fully) {
     console.log("Device Model: " + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.35-beta.7"} (Built: ${"2025-10-25T20:26:12.373Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.35-beta.8"} (Built: ${"2025-10-25T20:33:12.534Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

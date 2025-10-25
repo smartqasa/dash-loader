@@ -174,14 +174,11 @@ export class SettingsCard extends LitElement implements LovelaceCard {
   }
 
   private handleModeChange(mode: "auto" | "light" | "dark"): void {
-    this.displayMode = mode;
-    SettingsStorage.update({ displayMode: mode });
-
     try {
       if (typeof window.browser_mod !== "undefined") {
-        if (mode === "auto") {
-          window.browser_mod.service("set_theme", { mode: mode });
-        }
+        window.browser_mod.service("set_theme", { dark: mode });
+        SettingsStorage.update({ displayMode: mode });
+        this.displayMode = mode;
       }
     } catch (err) {
       console.warn("[SettingsCard] Failed to set theme mode:", err);
