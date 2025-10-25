@@ -290,7 +290,6 @@ export class SettingsCard extends LitElement implements LovelaceCard {
       .radio-option {
         display: flex;
         align-items: center;
-        gap: 0.4rem;
         cursor: pointer;
       }
 

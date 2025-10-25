@@ -1184,7 +1184,6 @@ let SettingsCard = class SettingsCard extends i$1 {
       .radio-option {
         display: flex;
         align-items: center;
-        gap: 0.4rem;
         cursor: pointer;
       }
 
@@ -1260,5 +1259,5 @@ if (window.fully) {
     console.log("Device Model: " + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.35-beta.8"} (Built: ${"2025-10-25T20:33:12.534Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.35-beta.9"} (Built: ${"2025-10-25T20:42:09.922Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
