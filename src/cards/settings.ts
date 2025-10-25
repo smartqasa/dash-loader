@@ -28,12 +28,7 @@ export class SettingsCard extends LitElement implements LovelaceCard {
 
   @state() displayMode: "light" | "dark" | "auto" = "auto";
   @state() volumeLevel: number = window.fully?.getAudioVolume(3) || 0;
-  @state() brightnessMap: BrightnessMap = {
-    Morning: 255,
-    Day: 255,
-    Evening: 255,
-    Night: 255,
-  };
+  @state() brightnessMap: BrightnessMap = {};
 
   private prevBrightness: number = window.fully?.getScreenBrightness() || 255;
 
@@ -68,9 +63,14 @@ export class SettingsCard extends LitElement implements LovelaceCard {
     const batteryLevel = window.fully?.getBatteryLevel() || 0;
     const isCharging = window.fully?.isPlugged() || false;
 
-    const phases = ["Morning", "Day", "Evening", "Night"];
-    const currentPhase =
-      this.hass?.states["input_select.phase_of_day"]?.state ?? "Unknown";
+    const phaseEntity = this.hass?.states["input_select.location_phase"];
+    const phases: string[] = phaseEntity?.attributes?.options ?? [];
+    const currentPhase = phaseEntity?.state ?? "Unknown";
+    for (const phase of phases) {
+      if (!(phase in this.brightnessMap)) {
+        this.brightnessMap = { ...this.brightnessMap, [phase]: 255 };
+      }
+    }
 
     return html`
       <div class="section">
@@ -121,32 +121,38 @@ export class SettingsCard extends LitElement implements LovelaceCard {
       </div>
       <div class="section">
         <div class="title">Brightness</div>
-        ${phases.map(
-          (phase) => html`
-            <div class="row">
-              <div class="info">
-                <span
-                  class="label ${phase === currentPhase ? "active-phase" : ""}"
-                >
-                  ${phase}
-                </span>
-                <span class="value">
-                  ${Math.round((this.brightnessMap[phase] / 255) * 100)}%
-                </span>
-              </div>
-              <sq-slider
-                .value=${this.brightnessMap[phase]}
-                .min=${0}
-                .max=${255}
-                .step=${1}
-                @sq-slider-render=${(e: CustomEvent) =>
-                  this.handleBrightnessRender(phase, e.detail.value)}
-                @sq-slider-change=${(e: CustomEvent) =>
-                  this.handleBrightnessChange(phase, e.detail.value)}
-              ></sq-slider>
-            </div>
-          `
-        )}
+        ${phases.length === 0
+          ? html`<div class="info">
+              <em>No phases defined in input_select.location_phase</em>
+            </div>`
+          : phases.map(
+              (phase) => html`
+                <div class="row">
+                  <div class="info">
+                    <span
+                      class="label ${phase === currentPhase
+                        ? "active-phase"
+                        : ""}"
+                    >
+                      ${phase}
+                    </span>
+                    <span class="value">
+                      ${Math.round((this.brightnessMap[phase] / 255) * 100)}%
+                    </span>
+                  </div>
+                  <sq-slider
+                    .value=${this.brightnessMap[phase]}
+                    .min=${0}
+                    .max=${255}
+                    .step=${1}
+                    @sq-slider-render=${(e: CustomEvent) =>
+                      this.handleBrightnessRender(phase, e.detail.value)}
+                    @sq-slider-change=${(e: CustomEvent) =>
+                      this.handleBrightnessChange(phase, e.detail.value)}
+                  ></sq-slider>
+                </div>
+              `
+            )}
       </div>
     `;
   }
@@ -215,12 +221,23 @@ export class SettingsCard extends LitElement implements LovelaceCard {
   }
 
   private initSettingsFile(): void {
+    const phaseEntity = this.hass?.states["input_select.location_phase"];
+    const phases: string[] = phaseEntity?.attributes?.options ?? [];
+
+    const defaultBrightness: BrightnessMap = {};
+    for (const phase of phases) defaultBrightness[phase] = 255;
+
     const defaults: SettingsData = {
-      brightnessMap: this.brightnessMap,
+      brightnessMap: defaultBrightness,
     };
 
     const settings = SettingsStorage.init(defaults);
-    this.brightnessMap = settings.brightnessMap;
+    // merge saved brightnessMap with new phase list
+    const merged: BrightnessMap = {
+      ...defaultBrightness,
+      ...settings.brightnessMap,
+    };
+    this.brightnessMap = merged;
   }
 
   static get styles(): CSSResult {

@@ -1,8 +1,4 @@
 export interface BrightnessMap {
-  Morning: number;
-  Day: number;
-  Evening: number;
-  Night: number;
   [key: string]: number;
 }
 

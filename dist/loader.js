@@ -955,12 +955,7 @@ let SettingsCard = class SettingsCard extends i$1 {
         this.mobile = getDeviceType() === "mobile";
         this.displayMode = "auto";
         this.volumeLevel = window.fully?.getAudioVolume(3) || 0;
-        this.brightnessMap = {
-            Morning: 255,
-            Day: 255,
-            Evening: 255,
-            Night: 255,
-        };
+        this.brightnessMap = {};
         this.prevBrightness = window.fully?.getScreenBrightness() || 255;
         this.boundHandleDeviceChanges = () => this.handleDeviceChanges();
     }
@@ -988,8 +983,14 @@ let SettingsCard = class SettingsCard extends i$1 {
         const wifiSsid = window.fully?.getWifiSsid() || "Unknown";
         const batteryLevel = window.fully?.getBatteryLevel() || 0;
         const isCharging = window.fully?.isPlugged() || false;
-        const phases = ["Morning", "Day", "Evening", "Night"];
-        const currentPhase = this.hass?.states["input_select.phase_of_day"]?.state ?? "Unknown";
+        const phaseEntity = this.hass?.states["input_select.location_phase"];
+        const phases = phaseEntity?.attributes?.options ?? [];
+        const currentPhase = phaseEntity?.state ?? "Unknown";
+        for (const phase of phases) {
+            if (!(phase in this.brightnessMap)) {
+                this.brightnessMap = { ...this.brightnessMap, [phase]: 255 };
+            }
+        }
         return x `
       <div class="section">
         <div class="title">Model: ${deviceModel}</div>
@@ -1035,28 +1036,34 @@ let SettingsCard = class SettingsCard extends i$1 {
       </div>
       <div class="section">
         <div class="title">Brightness</div>
-        ${phases.map((phase) => x `
-            <div class="row">
-              <div class="info">
-                <span
-                  class="label ${phase === currentPhase ? "active-phase" : ""}"
-                >
-                  ${phase}
-                </span>
-                <span class="value">
-                  ${Math.round((this.brightnessMap[phase] / 255) * 100)}%
-                </span>
-              </div>
-              <sq-slider
-                .value=${this.brightnessMap[phase]}
-                .min=${0}
-                .max=${255}
-                .step=${1}
-                @sq-slider-render=${(e) => this.handleBrightnessRender(phase, e.detail.value)}
-                @sq-slider-change=${(e) => this.handleBrightnessChange(phase, e.detail.value)}
-              ></sq-slider>
-            </div>
-          `)}
+        ${phases.length === 0
+            ? x `<div class="info">
+              <em>No phases defined in input_select.location_phase</em>
+            </div>`
+            : phases.map((phase) => x `
+                <div class="row">
+                  <div class="info">
+                    <span
+                      class="label ${phase === currentPhase
+                ? "active-phase"
+                : ""}"
+                    >
+                      ${phase}
+                    </span>
+                    <span class="value">
+                      ${Math.round((this.brightnessMap[phase] / 255) * 100)}%
+                    </span>
+                  </div>
+                  <sq-slider
+                    .value=${this.brightnessMap[phase]}
+                    .min=${0}
+                    .max=${255}
+                    .step=${1}
+                    @sq-slider-render=${(e) => this.handleBrightnessRender(phase, e.detail.value)}
+                    @sq-slider-change=${(e) => this.handleBrightnessChange(phase, e.detail.value)}
+                  ></sq-slider>
+                </div>
+              `)}
       </div>
     `;
     }
@@ -1117,11 +1124,21 @@ let SettingsCard = class SettingsCard extends i$1 {
         window.fully.setScreenBrightness(this.prevBrightness);
     }
     initSettingsFile() {
+        const phaseEntity = this.hass?.states["input_select.location_phase"];
+        const phases = phaseEntity?.attributes?.options ?? [];
+        const defaultBrightness = {};
+        for (const phase of phases)
+            defaultBrightness[phase] = 255;
         const defaults = {
-            brightnessMap: this.brightnessMap,
+            brightnessMap: defaultBrightness,
         };
         const settings = SettingsStorage.init(defaults);
-        this.brightnessMap = settings.brightnessMap;
+        // merge saved brightnessMap with new phase list
+        const merged = {
+            ...defaultBrightness,
+            ...settings.brightnessMap,
+        };
+        this.brightnessMap = merged;
     }
     static get styles() {
         return i$4 `
@@ -1228,5 +1245,5 @@ if (window.fully) {
     console.log("Device Model: " + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.35-beta.1"} (Built: ${"2025-10-25T14:52:48.854Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.35-beta.2"} (Built: ${"2025-10-25T15:27:07.300Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
