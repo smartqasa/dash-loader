@@ -953,6 +953,7 @@ let SettingsCard = class SettingsCard extends i$1 {
     constructor() {
         super(...arguments);
         this.mobile = getDeviceType() === "mobile";
+        this.displayMode = "auto";
         this.volumeLevel = window.fully?.getAudioVolume(3) || 0;
         this.brightnessMap = {
             Morning: 255,
@@ -1005,6 +1006,18 @@ let SettingsCard = class SettingsCard extends i$1 {
         </div>
       </div>
       <div class="section">
+        <div class="title">Display Mode</div>
+        <div class="info">
+          ${["light", "dark", "auto"].map((mode) => x `
+              <sq-button
+                .selected=${this.displayMode === mode}
+                .text=${mode.charAt(0).toUpperCase() + mode.slice(1)}
+                @sq-button-tap=${() => this.handleModeChange(mode)}
+              ></sq-button>
+            `)}
+        </div>
+      </div>
+      <div class="section">
         <div class="row">
           <div class="info">
             <span class="label">Volume</span>
@@ -1049,6 +1062,24 @@ let SettingsCard = class SettingsCard extends i$1 {
     }
     handleDeviceChanges() {
         this.mobile = getDeviceType() === "mobile";
+    }
+    handleModeChange(mode) {
+        this.displayMode = mode;
+        SettingsStorage.update({ displayMode: mode }); // persist to JSON file if desired
+        try {
+            if (typeof window.browser_mod !== "undefined") {
+                if (mode === "auto") {
+                    window.browser_mod.service("set_theme", { mode: "auto" });
+                }
+                else {
+                    // Home Assistant uses 'dark' boolean; true = dark, false = light
+                    window.browser_mod.service("set_theme", { dark: mode === "dark" });
+                }
+            }
+        }
+        catch (err) {
+            console.warn("[SettingsCard] Failed to set theme mode:", err);
+        }
     }
     handleVolumeRender(value) {
         this.volumeLevel = value;
@@ -1168,6 +1199,9 @@ __decorate([
 ], SettingsCard.prototype, "mobile", void 0);
 __decorate([
     r()
+], SettingsCard.prototype, "displayMode", void 0);
+__decorate([
+    r()
 ], SettingsCard.prototype, "volumeLevel", void 0);
 __decorate([
     r()
@@ -1194,5 +1228,5 @@ if (window.fully) {
     console.log("Device Model: " + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.34-beta.11"} (Built: ${"2025-10-24T10:57:58.108Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.35-beta.1"} (Built: ${"2025-10-25T14:52:48.854Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

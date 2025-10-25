@@ -8,9 +8,7 @@ export interface BrightnessMap {
 
 export interface SettingsData {
   brightnessMap: BrightnessMap;
-  // Add future settings here
-  // moveTimer?: number;
-  // theme?: string;
+  displayMode?: "light" | "dark" | "auto";
 }
 
 export class SettingsStorage {

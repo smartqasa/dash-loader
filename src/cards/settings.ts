@@ -26,6 +26,7 @@ export class SettingsCard extends LitElement implements LovelaceCard {
   @property({ type: Boolean, reflect: true }) mobile: boolean =
     getDeviceType() === "mobile";
 
+  @state() displayMode: "light" | "dark" | "auto" = "auto";
   @state() volumeLevel: number = window.fully?.getAudioVolume(3) || 0;
   @state() brightnessMap: BrightnessMap = {
     Morning: 255,
@@ -87,6 +88,20 @@ export class SettingsCard extends LitElement implements LovelaceCard {
         </div>
       </div>
       <div class="section">
+        <div class="title">Display Mode</div>
+        <div class="info">
+          ${(["light", "dark", "auto"] as const).map(
+            (mode) => html`
+              <sq-button
+                .selected=${this.displayMode === mode}
+                .text=${mode.charAt(0).toUpperCase() + mode.slice(1)}
+                @sq-button-tap=${() => this.handleModeChange(mode)}
+              ></sq-button>
+            `
+          )}
+        </div>
+      </div>
+      <div class="section">
         <div class="row">
           <div class="info">
             <span class="label">Volume</span>
@@ -138,6 +153,24 @@ export class SettingsCard extends LitElement implements LovelaceCard {
 
   private handleDeviceChanges(): void {
     this.mobile = getDeviceType() === "mobile";
+  }
+
+  private handleModeChange(mode: "light" | "dark" | "auto"): void {
+    this.displayMode = mode;
+    SettingsStorage.update({ displayMode: mode }); // persist to JSON file if desired
+
+    try {
+      if (typeof window.browser_mod !== "undefined") {
+        if (mode === "auto") {
+          window.browser_mod.service("set_theme", { mode: "auto" });
+        } else {
+          // Home Assistant uses 'dark' boolean; true = dark, false = light
+          window.browser_mod.service("set_theme", { dark: mode === "dark" });
+        }
+      }
+    } catch (err) {
+      console.warn("[SettingsCard] Failed to set theme mode:", err);
+    }
   }
 
   private handleVolumeRender(value: number) {
