@@ -180,9 +180,7 @@ export class SettingsCard extends LitElement implements LovelaceCard {
     try {
       if (typeof window.browser_mod !== "undefined") {
         if (mode === "auto") {
-          window.browser_mod.service("set_theme", { mode: "auto" });
-        } else {
-          window.browser_mod.service("set_theme", { dark: mode === "dark" });
+          window.browser_mod.service("set_theme", { mode: mode });
         }
       }
     } catch (err) {
