@@ -4,7 +4,7 @@ export interface BrightnessMap {
 
 export interface SettingsData {
   brightnessMap: BrightnessMap;
-  displayMode?: "light" | "dark" | "auto";
+  displayMode: "auto" | "light" | "dark";
 }
 
 export class SettingsStorage {

@@ -26,7 +26,7 @@ export class SettingsCard extends LitElement implements LovelaceCard {
   @property({ type: Boolean, reflect: true }) mobile: boolean =
     getDeviceType() === "mobile";
 
-  @state() displayMode: "light" | "dark" | "auto" = "auto";
+  @state() displayMode: "auto" | "light" | "dark" = "auto";
   @state() volumeLevel: number = window.fully?.getAudioVolume(3) || 0;
   @state() brightnessMap: BrightnessMap = {};
 
@@ -89,14 +89,26 @@ export class SettingsCard extends LitElement implements LovelaceCard {
       </div>
       <div class="section">
         <div class="title">Display Mode</div>
-        <div class="info">
-          ${(["light", "dark", "auto"] as const).map(
+        <div class="radio-group">
+          ${(["auto", "light", "dark"] as const).map(
             (mode) => html`
-              <sq-button
-                .selected=${this.displayMode === mode}
-                .text=${mode.charAt(0).toUpperCase() + mode.slice(1)}
-                @sq-button-tap=${() => this.handleModeChange(mode)}
-              ></sq-button>
+              <label class="radio-option">
+                <ha-radio
+                  .checked=${this.displayMode === mode}
+                  name="displayMode"
+                  value=${mode}
+                  @change=${(e: Event) =>
+                    this.handleModeChange(
+                      (e.currentTarget as HTMLInputElement).value as
+                        | "auto"
+                        | "light"
+                        | "dark"
+                    )}
+                ></ha-radio>
+                <span class="radio-label">
+                  ${mode.charAt(0).toUpperCase() + mode.slice(1)}
+                </span>
+              </label>
             `
           )}
         </div>
@@ -161,16 +173,15 @@ export class SettingsCard extends LitElement implements LovelaceCard {
     this.mobile = getDeviceType() === "mobile";
   }
 
-  private handleModeChange(mode: "light" | "dark" | "auto"): void {
+  private handleModeChange(mode: "auto" | "light" | "dark"): void {
     this.displayMode = mode;
-    SettingsStorage.update({ displayMode: mode }); // persist to JSON file if desired
+    SettingsStorage.update({ displayMode: mode });
 
     try {
       if (typeof window.browser_mod !== "undefined") {
         if (mode === "auto") {
           window.browser_mod.service("set_theme", { mode: "auto" });
         } else {
-          // Home Assistant uses 'dark' boolean; true = dark, false = light
           window.browser_mod.service("set_theme", { dark: mode === "dark" });
         }
       }
@@ -229,10 +240,10 @@ export class SettingsCard extends LitElement implements LovelaceCard {
 
     const defaults: SettingsData = {
       brightnessMap: defaultBrightness,
+      displayMode: "auto",
     };
 
     const settings = SettingsStorage.init(defaults);
-    // merge saved brightnessMap with new phase list
     const merged: BrightnessMap = {
       ...defaultBrightness,
       ...settings.brightnessMap,
@@ -271,6 +282,27 @@ export class SettingsCard extends LitElement implements LovelaceCard {
       .title {
         font-size: var(--primary-font-size);
         font-weight: var(--primary-font-weight);
+        color: var(--primary-text-color);
+      }
+
+      .radio-group {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-evenly;
+        gap: 1rem;
+        padding-top: 0.25rem;
+      }
+
+      .radio-option {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        cursor: pointer;
+      }
+
+      .radio-label {
+        font-size: var(--primary-font-size);
         color: var(--primary-text-color);
       }
 

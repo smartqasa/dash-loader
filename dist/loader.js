@@ -1008,13 +1008,19 @@ let SettingsCard = class SettingsCard extends i$1 {
       </div>
       <div class="section">
         <div class="title">Display Mode</div>
-        <div class="info">
-          ${["light", "dark", "auto"].map((mode) => x `
-              <sq-button
-                .selected=${this.displayMode === mode}
-                .text=${mode.charAt(0).toUpperCase() + mode.slice(1)}
-                @sq-button-tap=${() => this.handleModeChange(mode)}
-              ></sq-button>
+        <div class="radio-group">
+          ${["auto", "light", "dark"].map((mode) => x `
+              <label class="radio-option">
+                <ha-radio
+                  .checked=${this.displayMode === mode}
+                  name="displayMode"
+                  value=${mode}
+                  @change=${(e) => this.handleModeChange(e.currentTarget.value)}
+                ></ha-radio>
+                <span class="radio-label">
+                  ${mode.charAt(0).toUpperCase() + mode.slice(1)}
+                </span>
+              </label>
             `)}
         </div>
       </div>
@@ -1072,14 +1078,13 @@ let SettingsCard = class SettingsCard extends i$1 {
     }
     handleModeChange(mode) {
         this.displayMode = mode;
-        SettingsStorage.update({ displayMode: mode }); // persist to JSON file if desired
+        SettingsStorage.update({ displayMode: mode });
         try {
             if (typeof window.browser_mod !== "undefined") {
                 if (mode === "auto") {
                     window.browser_mod.service("set_theme", { mode: "auto" });
                 }
                 else {
-                    // Home Assistant uses 'dark' boolean; true = dark, false = light
                     window.browser_mod.service("set_theme", { dark: mode === "dark" });
                 }
             }
@@ -1131,9 +1136,9 @@ let SettingsCard = class SettingsCard extends i$1 {
             defaultBrightness[phase] = 255;
         const defaults = {
             brightnessMap: defaultBrightness,
+            displayMode: "auto",
         };
         const settings = SettingsStorage.init(defaults);
-        // merge saved brightnessMap with new phase list
         const merged = {
             ...defaultBrightness,
             ...settings.brightnessMap,
@@ -1171,6 +1176,27 @@ let SettingsCard = class SettingsCard extends i$1 {
       .title {
         font-size: var(--primary-font-size);
         font-weight: var(--primary-font-weight);
+        color: var(--primary-text-color);
+      }
+
+      .radio-group {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-evenly;
+        gap: 1rem;
+        padding-top: 0.25rem;
+      }
+
+      .radio-option {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        cursor: pointer;
+      }
+
+      .radio-label {
+        font-size: var(--primary-font-size);
         color: var(--primary-text-color);
       }
 
@@ -1245,5 +1271,5 @@ if (window.fully) {
     console.log("Device Model: " + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.35-beta.3"} (Built: ${"2025-10-25T15:33:15.261Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.35-beta.4"} (Built: ${"2025-10-25T19:12:52.630Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
