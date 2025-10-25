@@ -88,8 +88,8 @@ export class SettingsCard extends LitElement implements LovelaceCard {
         </div>
       </div>
       <div class="section">
-        <div class="title">Display Mode</div>
         <div class="radio-group">
+          <div class="title">Mode:</div>
           ${(["auto", "light", "dark"] as const).map(
             (mode) => html`
               <label class="radio-option">
@@ -289,9 +289,7 @@ export class SettingsCard extends LitElement implements LovelaceCard {
         display: flex;
         flex-direction: row;
         align-items: center;
-        justify-content: space-evenly;
         gap: 1rem;
-        padding-top: 0.25rem;
       }
 
       .radio-option {
@@ -303,6 +301,7 @@ export class SettingsCard extends LitElement implements LovelaceCard {
 
       .radio-label {
         font-size: var(--primary-font-size);
+        font-weight: var(--primary-font-weight);
         color: var(--primary-text-color);
       }
 
