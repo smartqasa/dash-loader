@@ -1017,7 +1017,7 @@ let SettingsCard = class SettingsCard extends i$1 {
                   value=${mode}
                   @change=${(e) => this.handleModeChange(e.currentTarget.value)}
                 ></ha-radio>
-                <span class="radio-label">
+                <span class="label">
                   ${mode.charAt(0).toUpperCase() + mode.slice(1)}
                 </span>
               </label>
@@ -1193,12 +1193,6 @@ let SettingsCard = class SettingsCard extends i$1 {
         cursor: pointer;
       }
 
-      .radio-label {
-        font-size: var(--primary-font-size);
-        font-weight: var(--primary-font-weight);
-        color: var(--primary-text-color);
-      }
-
       .row {
         display: flex;
         flex-direction: column;
@@ -1214,6 +1208,7 @@ let SettingsCard = class SettingsCard extends i$1 {
 
       .label {
         font-size: var(--primary-font-size);
+        font-weight: var(--primary-font-weight);
         color: var(--primary-text-color);
       }
 
@@ -1270,5 +1265,5 @@ if (window.fully) {
     console.log("Device Model: " + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.35-beta.5"} (Built: ${"2025-10-25T20:20:44.692Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.35-beta.6"} (Built: ${"2025-10-25T20:22:04.571Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

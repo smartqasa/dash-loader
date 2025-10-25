@@ -105,7 +105,7 @@ export class SettingsCard extends LitElement implements LovelaceCard {
                         | "dark"
                     )}
                 ></ha-radio>
-                <span class="radio-label">
+                <span class="label">
                   ${mode.charAt(0).toUpperCase() + mode.slice(1)}
                 </span>
               </label>
@@ -299,12 +299,6 @@ export class SettingsCard extends LitElement implements LovelaceCard {
         cursor: pointer;
       }
 
-      .radio-label {
-        font-size: var(--primary-font-size);
-        font-weight: var(--primary-font-weight);
-        color: var(--primary-text-color);
-      }
-
       .row {
         display: flex;
         flex-direction: column;
@@ -320,6 +314,7 @@ export class SettingsCard extends LitElement implements LovelaceCard {
 
       .label {
         font-size: var(--primary-font-size);
+        font-weight: var(--primary-font-weight);
         color: var(--primary-text-color);
       }
 
