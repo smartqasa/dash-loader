@@ -216,26 +216,38 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
     }
   };
 
+  // ---------- Watchdog ----------
+
   private startWatchdog(): void {
     if (this.watchdogId !== undefined) return;
-    this.watchdogId = window.setInterval(() => {
+
+    const check = () => {
       if (!this.isConnected) return;
 
       const now = this.now();
+      console.log(
+        `[ScreenSaver] Watchdog check at ${new Date().toISOString()}`
+      );
 
-      // Clock heartbeat
-      if (now - this.lastClockBeat > 5_000) {
+      // Clock check
+      if (now - this.lastClockBeat > 5000) {
+        console.warn("[ScreenSaver] Restarting stalled clock");
         this.stopClock();
         this.startClock();
       }
 
-      // Move heartbeat
+      // Move check
       const moveTimerMs = Math.max(1, this.config?.saver_interval ?? 30) * 1000;
       if (now - this.lastMoveBeat > moveTimerMs * 1.5) {
+        console.warn("[ScreenSaver] Restarting stalled move cycle");
         this.stopMoveCycle();
         this.cycleElement();
       }
-    }, 2_000);
+
+      this.watchdogId = window.setTimeout(check, 2000);
+    };
+
+    check();
   }
 
   private stopWatchdog(): void {
@@ -248,16 +260,25 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
   // ---------- Clock ----------
 
   private startClock(): void {
-    this.lastClockBeat = this.now();
     if (this.timeIntervalId !== undefined) return;
-    this.timeIntervalId = window.setInterval(() => {
-      if (!this.isConnected) {
-        this.stopClock();
-        return;
+
+    const tick = () => {
+      if (!this.isConnected) return;
+
+      const now = this.now();
+      if (now - this.lastClockBeat > 5000) {
+        console.warn(
+          `[ScreenSaver] Clock was stalled; restarting. Last beat: ${this.lastClockBeat}`
+        );
       }
+
       this.updateElement();
-      this.lastClockBeat = this.now();
-    }, 1000);
+      this.lastClockBeat = now;
+
+      this.timeIntervalId = window.setTimeout(tick, 1000);
+    };
+
+    tick();
   }
 
   private stopClock(): void {
@@ -281,6 +302,13 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
     const runCycle = () => {
       if (!this.isConnected) return;
 
+      const now = this.now();
+      if (now - this.lastMoveBeat > moveTimerMs * 1.5) {
+        console.warn(
+          `[ScreenSaver] Move cycle was stalled; restarting. Last beat: ${this.lastMoveBeat}`
+        );
+      }
+
       const element = this.elementEl;
       if (!element) {
         console.warn("[ScreenSaver] .element not found during cycle");
@@ -300,19 +328,13 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
         else console.warn("[ScreenSaver] .element missing during fade-in");
 
         this.lastMoveBeat = this.now();
+
+        // Chain the next cycle
+        this.moveTimerId = window.setTimeout(runCycle, moveTimerMs);
       }, 1000);
     };
 
     runCycle();
-
-    if (this.moveTimerId !== undefined) return;
-    this.moveTimerId = window.setInterval(() => {
-      if (!this.isConnected) {
-        this.stopMoveCycle();
-        return;
-      }
-      runCycle();
-    }, moveTimerMs);
   }
 
   private stopMoveCycle(): void {

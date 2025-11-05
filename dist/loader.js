@@ -666,25 +666,31 @@ let ScreenSaver = class ScreenSaver extends i$1 {
             this.refreshTime = refreshTime;
         }
     }
+    // ---------- Watchdog ----------
     startWatchdog() {
         if (this.watchdogId !== undefined)
             return;
-        this.watchdogId = window.setInterval(() => {
+        const check = () => {
             if (!this.isConnected)
                 return;
             const now = this.now();
-            // Clock heartbeat
-            if (now - this.lastClockBeat > 5_000) {
+            console.log(`[ScreenSaver] Watchdog check at ${new Date().toISOString()}`);
+            // Clock check
+            if (now - this.lastClockBeat > 5000) {
+                console.warn("[ScreenSaver] Restarting stalled clock");
                 this.stopClock();
                 this.startClock();
             }
-            // Move heartbeat
+            // Move check
             const moveTimerMs = Math.max(1, this.config?.saver_interval ?? 30) * 1000;
             if (now - this.lastMoveBeat > moveTimerMs * 1.5) {
+                console.warn("[ScreenSaver] Restarting stalled move cycle");
                 this.stopMoveCycle();
                 this.cycleElement();
             }
-        }, 2_000);
+            this.watchdogId = window.setTimeout(check, 2000);
+        };
+        check();
     }
     stopWatchdog() {
         if (this.watchdogId !== undefined) {
@@ -694,17 +700,20 @@ let ScreenSaver = class ScreenSaver extends i$1 {
     }
     // ---------- Clock ----------
     startClock() {
-        this.lastClockBeat = this.now();
         if (this.timeIntervalId !== undefined)
             return;
-        this.timeIntervalId = window.setInterval(() => {
-            if (!this.isConnected) {
-                this.stopClock();
+        const tick = () => {
+            if (!this.isConnected)
                 return;
+            const now = this.now();
+            if (now - this.lastClockBeat > 5000) {
+                console.warn(`[ScreenSaver] Clock was stalled; restarting. Last beat: ${this.lastClockBeat}`);
             }
             this.updateElement();
-            this.lastClockBeat = this.now();
-        }, 1000);
+            this.lastClockBeat = now;
+            this.timeIntervalId = window.setTimeout(tick, 1000);
+        };
+        tick();
     }
     stopClock() {
         if (this.timeIntervalId !== undefined) {
@@ -723,6 +732,10 @@ let ScreenSaver = class ScreenSaver extends i$1 {
         const runCycle = () => {
             if (!this.isConnected)
                 return;
+            const now = this.now();
+            if (now - this.lastMoveBeat > moveTimerMs * 1.5) {
+                console.warn(`[ScreenSaver] Move cycle was stalled; restarting. Last beat: ${this.lastMoveBeat}`);
+            }
             const element = this.elementEl;
             if (!element) {
                 console.warn("[ScreenSaver] .element not found during cycle");
@@ -740,18 +753,11 @@ let ScreenSaver = class ScreenSaver extends i$1 {
                 else
                     console.warn("[ScreenSaver] .element missing during fade-in");
                 this.lastMoveBeat = this.now();
+                // Chain the next cycle
+                this.moveTimerId = window.setTimeout(runCycle, moveTimerMs);
             }, 1000);
         };
         runCycle();
-        if (this.moveTimerId !== undefined)
-            return;
-        this.moveTimerId = window.setInterval(() => {
-            if (!this.isConnected) {
-                this.stopMoveCycle();
-                return;
-            }
-            runCycle();
-        }, moveTimerMs);
     }
     stopMoveCycle() {
         if (this.moveTimerId !== undefined) {
@@ -1259,5 +1265,5 @@ if (window.fully) {
     console.log("Device Model: " + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.35-beta.9"} (Built: ${"2025-10-25T20:42:09.922Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.36-beta.1"} (Built: ${"2025-11-05T13:35:37.826Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
