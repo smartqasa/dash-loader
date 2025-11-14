@@ -1152,6 +1152,7 @@ let SettingsCard = class SettingsCard extends i$1 {
             brightnessMap: defaultBrightness,
         };
         const settings = SettingsStorage.init(defaults);
+        console.log('[SettingsCard] Loaded settings:', settings);
         this.displayMode = settings.displayMode ?? 'auto';
         const merged = {
             ...defaultBrightness,
@@ -1278,5 +1279,5 @@ if (window.fully) {
     console.log("Device Model: " + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.37-beta.1"} (Built: ${"2025-11-14T23:25:19.704Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.37-beta.2"} (Built: ${"2025-11-14T23:29:24.922Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

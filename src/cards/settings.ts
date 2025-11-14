@@ -258,6 +258,8 @@ export class SettingsCard extends LitElement implements LovelaceCard {
 
     const settings = SettingsStorage.init(defaults);
 
+    console.log('[SettingsCard] Loaded settings:', settings);
+
     this.displayMode = settings.displayMode ?? 'auto';
 
     const merged: BrightnessMap = {
