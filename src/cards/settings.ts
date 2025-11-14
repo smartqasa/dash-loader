@@ -1,22 +1,22 @@
-import { css, CSSResult, html, LitElement, nothing, TemplateResult } from "lit";
-import { customElement, property, state } from "lit/decorators.js";
-import { HomeAssistant, LovelaceCard } from "custom-card-helpers";
-import { getDeviceType } from "../utilities/get-device-info";
+import { css, CSSResult, html, LitElement, nothing, TemplateResult } from 'lit';
+import { customElement, property, state } from 'lit/decorators.js';
+import { HomeAssistant, LovelaceCard } from 'custom-card-helpers';
+import { getDeviceType } from '../utilities/get-device-info';
 import {
   SettingsStorage,
   SettingsData,
   BrightnessMap,
-} from "../utilities/settings-storage";
-import clickSound from "../assets/click.mp3";
+} from '../utilities/settings-storage';
+import clickSound from '../assets/click.mp3';
 
 window.customCards.push({
-  type: "settings-card",
-  name: "Settings Card",
+  type: 'settings-card',
+  name: 'Settings Card',
   preview: false,
-  description: "A SmartQasa card for tablet audio and brightness per phase.",
+  description: 'A SmartQasa card for tablet audio and brightness per phase.',
 });
 
-@customElement("settings-card")
+@customElement('settings-card')
 export class SettingsCard extends LitElement implements LovelaceCard {
   public getCardSize(): number {
     return 10;
@@ -24,9 +24,9 @@ export class SettingsCard extends LitElement implements LovelaceCard {
 
   @property({ attribute: false }) hass?: HomeAssistant;
   @property({ type: Boolean, reflect: true }) mobile: boolean =
-    getDeviceType() === "mobile";
+    getDeviceType() === 'mobile';
 
-  @state() displayMode: "auto" | "light" | "dark" = "auto";
+  @state() displayMode: 'auto' | 'light' | 'dark' = 'auto';
   @state() volumeLevel: number = window.fully?.getAudioVolume(3) || 0;
   @state() brightnessMap: BrightnessMap = {};
 
@@ -37,35 +37,35 @@ export class SettingsCard extends LitElement implements LovelaceCard {
   public connectedCallback(): void {
     super.connectedCallback();
 
-    window.addEventListener("resize", this.boundHandleDeviceChanges);
+    window.addEventListener('resize', this.boundHandleDeviceChanges);
     this.handleDeviceChanges();
     this.initSettingsFile();
   }
 
   public disconnectedCallback(): void {
-    window.removeEventListener("resize", this.boundHandleDeviceChanges);
+    window.removeEventListener('resize', this.boundHandleDeviceChanges);
     super.disconnectedCallback();
   }
 
   public setConfig(): void {}
 
   protected render(): TemplateResult | typeof nothing {
-    const deviceModel = window.fully?.getDeviceModel() || "Unknown";
+    const deviceModel = window.fully?.getDeviceModel() || 'Unknown';
 
-    const androidVer = window.fully?.getAndroidVersion() || "Unknown";
-    const fullyVer = window.fully?.getFullyVersion() || "Unknown";
+    const androidVer = window.fully?.getAndroidVersion() || 'Unknown';
+    const fullyVer = window.fully?.getFullyVersion() || 'Unknown';
 
     const isConnected = window.fully?.isNetworkConnected() ?? false;
-    const ipAddress = window.fully?.getIp4Address() || "Unknown";
+    const ipAddress = window.fully?.getIp4Address() || 'Unknown';
     const isWifiConnect = window.fully?.isWifiConnected() ?? false;
-    const wifiSsid = window.fully?.getWifiSsid() || "Unknown";
+    const wifiSsid = window.fully?.getWifiSsid() || 'Unknown';
 
     const batteryLevel = window.fully?.getBatteryLevel() || 0;
     const isCharging = window.fully?.isPlugged() || false;
 
-    const phaseEntity = this.hass?.states["input_select.location_phase"];
+    const phaseEntity = this.hass?.states['input_select.location_phase'];
     const phases: string[] = phaseEntity?.attributes?.options ?? [];
-    const currentPhase = phaseEntity?.state ?? "Unknown";
+    const currentPhase = phaseEntity?.state ?? 'Unknown';
     for (const phase of phases) {
       if (!(phase in this.brightnessMap)) {
         this.brightnessMap = { ...this.brightnessMap, [phase]: 255 };
@@ -80,17 +80,19 @@ export class SettingsCard extends LitElement implements LovelaceCard {
         </div>
         <div class="title">
           ${isConnected
-            ? `Connected: ${isWifiConnect ? `${wifiSsid}` : "Ethernet"} (${ipAddress})`
-            : "Disconnected"}
+            ? `Connected: ${
+                isWifiConnect ? `${wifiSsid}` : 'Ethernet'
+              } (${ipAddress})`
+            : 'Disconnected'}
         </div>
         <div class="title">
-          Batttery ${isCharging ? "Charging" : "Discharging"}: ${batteryLevel}%
+          Batttery ${isCharging ? 'Charging' : 'Discharging'}: ${batteryLevel}%
         </div>
       </div>
       <div class="section">
         <div class="radio-group">
           <div class="title">Mode:</div>
-          ${(["auto", "light", "dark"] as const).map(
+          ${(['auto', 'light', 'dark'] as const).map(
             (mode) => html`
               <label class="radio-option">
                 <ha-radio
@@ -100,9 +102,9 @@ export class SettingsCard extends LitElement implements LovelaceCard {
                   @change=${(e: Event) =>
                     this.handleModeChange(
                       (e.currentTarget as HTMLInputElement).value as
-                        | "auto"
-                        | "light"
-                        | "dark"
+                        | 'auto'
+                        | 'light'
+                        | 'dark'
                     )}
                 ></ha-radio>
                 <span class="label">
@@ -143,8 +145,8 @@ export class SettingsCard extends LitElement implements LovelaceCard {
                   <div class="info">
                     <span
                       class="label ${phase === currentPhase
-                        ? "active-phase"
-                        : ""}"
+                        ? 'active-phase'
+                        : ''}"
                     >
                       ${phase}
                     </span>
@@ -170,18 +172,34 @@ export class SettingsCard extends LitElement implements LovelaceCard {
   }
 
   private handleDeviceChanges(): void {
-    this.mobile = getDeviceType() === "mobile";
+    this.mobile = getDeviceType() === 'mobile';
   }
 
-  private handleModeChange(mode: "auto" | "light" | "dark"): void {
+  private getHaDisplayMode(): 'auto' | 'light' | 'dark' {
+    const theme = this.hass?.selectedTheme;
+
+    if (!theme || typeof theme !== 'string') return 'auto';
+
+    if (theme.toLowerCase().includes('dark')) {
+      return 'dark';
+    }
+
+    if (theme.toLowerCase().includes('light')) {
+      return 'light';
+    }
+
+    return 'auto';
+  }
+
+  private handleModeChange(mode: 'auto' | 'light' | 'dark'): void {
     try {
-      if (typeof window.browser_mod !== "undefined") {
-        window.browser_mod.service("set_theme", { dark: mode });
+      if (typeof window.browser_mod !== 'undefined') {
+        window.browser_mod.service('set_theme', { dark: mode });
         SettingsStorage.update({ displayMode: mode });
         this.displayMode = mode;
       }
     } catch (err) {
-      console.warn("[SettingsCard] Failed to set theme mode:", err);
+      console.warn('[SettingsCard] Failed to set theme mode:', err);
     }
   }
 
@@ -190,20 +208,20 @@ export class SettingsCard extends LitElement implements LovelaceCard {
   }
 
   private handleVolumeChange(value: number) {
-    if (typeof window.fully === "undefined") return;
+    if (typeof window.fully === 'undefined') return;
 
     try {
       window.fully.setAudioVolume(value, 3);
       this.volumeLevel = value;
     } catch (err) {
-      console.warn("[SettingsCard] setAudioVolume error:", err);
+      console.warn('[SettingsCard] setAudioVolume error:', err);
     }
 
     try {
       const soundUrl = `${window.location.origin}${clickSound}`;
       window.fully.playSound(soundUrl, false, 3);
     } catch (err) {
-      console.warn("[SettingsCard] click sound failed:", err);
+      console.warn('[SettingsCard] click sound failed:', err);
     }
   }
 
@@ -214,31 +232,34 @@ export class SettingsCard extends LitElement implements LovelaceCard {
   }
 
   private handleBrightnessChange(phase: string, value: number) {
-    if (typeof window.fully === "undefined") return;
+    if (typeof window.fully === 'undefined') return;
 
     this.brightnessMap = { ...this.brightnessMap, [phase]: value };
     SettingsStorage.update({ brightnessMap: this.brightnessMap });
 
     const currentPhase =
-      this.hass?.states["input_select.location_phase"]?.state ?? "Unknown";
+      this.hass?.states['input_select.location_phase']?.state ?? 'Unknown';
     if (phase === currentPhase) this.prevBrightness = value;
 
     window.fully.setScreenBrightness(this.prevBrightness);
   }
 
   private initSettingsFile(): void {
-    const phaseEntity = this.hass?.states["input_select.location_phase"];
+    const phaseEntity = this.hass?.states['input_select.location_phase'];
     const phases: string[] = phaseEntity?.attributes?.options ?? [];
 
     const defaultBrightness: BrightnessMap = {};
     for (const phase of phases) defaultBrightness[phase] = 255;
 
     const defaults: SettingsData = {
+      displayMode: 'auto',
       brightnessMap: defaultBrightness,
-      displayMode: "auto",
     };
 
     const settings = SettingsStorage.init(defaults);
+
+    this.displayMode = settings.displayMode ?? 'auto';
+
     const merged: BrightnessMap = {
       ...defaultBrightness,
       ...settings.brightnessMap,

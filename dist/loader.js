@@ -950,16 +950,16 @@ const getDeviceType = () => {
 var clickSound = "/local/community/dash-loader/assets/fe677659d3c02c03.mp3";
 
 window.customCards.push({
-    type: "settings-card",
-    name: "Settings Card",
+    type: 'settings-card',
+    name: 'Settings Card',
     preview: false,
-    description: "A SmartQasa card for tablet audio and brightness per phase.",
+    description: 'A SmartQasa card for tablet audio and brightness per phase.',
 });
 let SettingsCard = class SettingsCard extends i$1 {
     constructor() {
         super(...arguments);
-        this.mobile = getDeviceType() === "mobile";
-        this.displayMode = "auto";
+        this.mobile = getDeviceType() === 'mobile';
+        this.displayMode = 'auto';
         this.volumeLevel = window.fully?.getAudioVolume(3) || 0;
         this.brightnessMap = {};
         this.prevBrightness = window.fully?.getScreenBrightness() || 255;
@@ -970,28 +970,28 @@ let SettingsCard = class SettingsCard extends i$1 {
     }
     connectedCallback() {
         super.connectedCallback();
-        window.addEventListener("resize", this.boundHandleDeviceChanges);
+        window.addEventListener('resize', this.boundHandleDeviceChanges);
         this.handleDeviceChanges();
         this.initSettingsFile();
     }
     disconnectedCallback() {
-        window.removeEventListener("resize", this.boundHandleDeviceChanges);
+        window.removeEventListener('resize', this.boundHandleDeviceChanges);
         super.disconnectedCallback();
     }
     setConfig() { }
     render() {
-        const deviceModel = window.fully?.getDeviceModel() || "Unknown";
-        const androidVer = window.fully?.getAndroidVersion() || "Unknown";
-        const fullyVer = window.fully?.getFullyVersion() || "Unknown";
+        const deviceModel = window.fully?.getDeviceModel() || 'Unknown';
+        const androidVer = window.fully?.getAndroidVersion() || 'Unknown';
+        const fullyVer = window.fully?.getFullyVersion() || 'Unknown';
         const isConnected = window.fully?.isNetworkConnected() ?? false;
-        const ipAddress = window.fully?.getIp4Address() || "Unknown";
+        const ipAddress = window.fully?.getIp4Address() || 'Unknown';
         const isWifiConnect = window.fully?.isWifiConnected() ?? false;
-        const wifiSsid = window.fully?.getWifiSsid() || "Unknown";
+        const wifiSsid = window.fully?.getWifiSsid() || 'Unknown';
         const batteryLevel = window.fully?.getBatteryLevel() || 0;
         const isCharging = window.fully?.isPlugged() || false;
-        const phaseEntity = this.hass?.states["input_select.location_phase"];
+        const phaseEntity = this.hass?.states['input_select.location_phase'];
         const phases = phaseEntity?.attributes?.options ?? [];
-        const currentPhase = phaseEntity?.state ?? "Unknown";
+        const currentPhase = phaseEntity?.state ?? 'Unknown';
         for (const phase of phases) {
             if (!(phase in this.brightnessMap)) {
                 this.brightnessMap = { ...this.brightnessMap, [phase]: 255 };
@@ -1005,17 +1005,17 @@ let SettingsCard = class SettingsCard extends i$1 {
         </div>
         <div class="title">
           ${isConnected
-            ? `Connected: ${isWifiConnect ? `${wifiSsid}` : "Ethernet"} (${ipAddress})`
-            : "Disconnected"}
+            ? `Connected: ${isWifiConnect ? `${wifiSsid}` : 'Ethernet'} (${ipAddress})`
+            : 'Disconnected'}
         </div>
         <div class="title">
-          Batttery ${isCharging ? "Charging" : "Discharging"}: ${batteryLevel}%
+          Batttery ${isCharging ? 'Charging' : 'Discharging'}: ${batteryLevel}%
         </div>
       </div>
       <div class="section">
         <div class="radio-group">
           <div class="title">Mode:</div>
-          ${["auto", "light", "dark"].map((mode) => x `
+          ${['auto', 'light', 'dark'].map((mode) => x `
               <label class="radio-option">
                 <ha-radio
                   .checked=${this.displayMode === mode}
@@ -1057,8 +1057,8 @@ let SettingsCard = class SettingsCard extends i$1 {
                   <div class="info">
                     <span
                       class="label ${phase === currentPhase
-                ? "active-phase"
-                : ""}"
+                ? 'active-phase'
+                : ''}"
                     >
                       ${phase}
                     </span>
@@ -1080,39 +1080,51 @@ let SettingsCard = class SettingsCard extends i$1 {
     `;
     }
     handleDeviceChanges() {
-        this.mobile = getDeviceType() === "mobile";
+        this.mobile = getDeviceType() === 'mobile';
+    }
+    getHaDisplayMode() {
+        const theme = this.hass?.selectedTheme;
+        if (!theme || typeof theme !== 'string')
+            return 'auto';
+        if (theme.toLowerCase().includes('dark')) {
+            return 'dark';
+        }
+        if (theme.toLowerCase().includes('light')) {
+            return 'light';
+        }
+        return 'auto';
     }
     handleModeChange(mode) {
         try {
-            if (typeof window.browser_mod !== "undefined") {
-                window.browser_mod.service("set_theme", { dark: mode });
+            if (typeof window.browser_mod !== 'undefined') {
+                window.browser_mod.service('set_theme', { dark: mode });
                 SettingsStorage.update({ displayMode: mode });
                 this.displayMode = mode;
             }
         }
         catch (err) {
-            console.warn("[SettingsCard] Failed to set theme mode:", err);
+            console.warn('[SettingsCard] Failed to set theme mode:', err);
         }
     }
     handleVolumeRender(value) {
         this.volumeLevel = value;
     }
     handleVolumeChange(value) {
-        if (typeof window.fully === "undefined")
+        if (typeof window.fully === 'undefined')
             return;
         try {
             window.fully.setAudioVolume(value, 3);
             this.volumeLevel = value;
         }
         catch (err) {
-            console.warn("[SettingsCard] setAudioVolume error:", err);
+            console.warn('[SettingsCard] setAudioVolume error:', err);
         }
         try {
             const soundUrl = `${window.location.origin}${clickSound}`;
             window.fully.playSound(soundUrl, false, 3);
         }
         catch (err) {
-            console.warn("[SettingsCard] click sound failed:", err);
+            console.warn('[SettingsCard] click sound failed:', err);
         }
     }
     handleBrightnessRender(phase, value) {
@@ -1120,26 +1132,27 @@ let SettingsCard = class SettingsCard extends i$1 {
         window.fully?.setScreenBrightness(value);
     }
     handleBrightnessChange(phase, value) {
-        if (typeof window.fully === "undefined")
+        if (typeof window.fully === 'undefined')
             return;
         this.brightnessMap = { ...this.brightnessMap, [phase]: value };
         SettingsStorage.update({ brightnessMap: this.brightnessMap });
-        const currentPhase = this.hass?.states["input_select.location_phase"]?.state ?? "Unknown";
+        const currentPhase = this.hass?.states['input_select.location_phase']?.state ?? 'Unknown';
         if (phase === currentPhase)
             this.prevBrightness = value;
         window.fully.setScreenBrightness(this.prevBrightness);
     }
     initSettingsFile() {
-        const phaseEntity = this.hass?.states["input_select.location_phase"];
+        const phaseEntity = this.hass?.states['input_select.location_phase'];
         const phases = phaseEntity?.attributes?.options ?? [];
         const defaultBrightness = {};
         for (const phase of phases)
             defaultBrightness[phase] = 255;
         const defaults = {
+            displayMode: 'auto',
             brightnessMap: defaultBrightness,
-            displayMode: "auto",
         };
         const settings = SettingsStorage.init(defaults);
+        this.displayMode = settings.displayMode ?? 'auto';
         const merged = {
             ...defaultBrightness,
             ...settings.brightnessMap,
@@ -1244,7 +1257,7 @@ __decorate([
     r()
 ], SettingsCard.prototype, "brightnessMap", void 0);
 SettingsCard = __decorate([
-    t("settings-card")
+    t('settings-card')
 ], SettingsCard);
 
 window.customCards = window.customCards || [];
@@ -1265,5 +1278,5 @@ if (window.fully) {
     console.log("Device Model: " + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.36-beta.3"} (Built: ${"2025-11-14T21:10:55.291Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.37-beta.1"} (Built: ${"2025-11-14T23:25:19.704Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
