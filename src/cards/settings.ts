@@ -175,22 +175,6 @@ export class SettingsCard extends LitElement implements LovelaceCard {
     this.mobile = getDeviceType() === 'mobile';
   }
 
-  private getHaDisplayMode(): 'auto' | 'light' | 'dark' {
-    const theme = this.hass?.selectedTheme;
-
-    if (!theme || typeof theme !== 'string') return 'auto';
-
-    if (theme.toLowerCase().includes('dark')) {
-      return 'dark';
-    }
-
-    if (theme.toLowerCase().includes('light')) {
-      return 'light';
-    }
-
-    return 'auto';
-  }
-
   private handleModeChange(mode: 'auto' | 'light' | 'dark'): void {
     try {
       if (typeof window.browser_mod !== 'undefined') {
