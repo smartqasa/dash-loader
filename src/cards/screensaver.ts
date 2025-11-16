@@ -6,15 +6,15 @@ import {
   nothing,
   PropertyValues,
   TemplateResult,
-} from "lit";
-import { customElement, property, state } from "lit/decorators.js";
-import { HomeAssistant, LovelaceCard, LovelaceCardConfig } from "../types";
-import { formattedDate, formattedTime } from "../utilities/format-date-time";
-import { deviceRefresh, deviceReboot } from "../utilities/device-actions";
-import logoImage from "../assets/logo.png";
+} from 'lit';
+import { customElement, property, state } from 'lit/decorators.js';
+import { HomeAssistant, LovelaceCard, LovelaceCardConfig } from '../types';
+import { formattedDate, formattedTime } from '../utilities/format-date-time';
+import { deviceRefresh, deviceReboot } from '../utilities/device-actions';
+import logoImage from '../assets/logo.png';
 
 interface Config extends LovelaceCardConfig {
-  saver_type?: "time" | "logo";
+  saver_type?: 'time' | 'logo';
   saver_title?: string;
   saver_interval?: number; // seconds
 }
@@ -28,7 +28,7 @@ window.customCards.push({
 });
 */
 
-@customElement("screensaver-card")
+@customElement('screensaver-card')
 export class ScreenSaver extends LitElement implements LovelaceCard {
   public getCardSize(): number | Promise<number> {
     return 20;
@@ -37,8 +37,8 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
   @property({ attribute: false }) config?: Config;
   @property({ attribute: false }) hass?: HomeAssistant;
 
-  @state() time: string = "Loading...";
-  @state() date: string = "Loading...";
+  @state() time: string = 'Loading...';
+  @state() date: string = 'Loading...';
 
   private rebootTime?: string;
   private refreshTime?: string;
@@ -60,10 +60,10 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
   // ---------- Utils ----------
 
   private get containerEl(): HTMLElement | null {
-    return this.shadowRoot?.querySelector(".container") as HTMLElement | null;
+    return this.shadowRoot?.querySelector('.container') as HTMLElement | null;
   }
   private get elementEl(): HTMLElement | null {
-    return this.shadowRoot?.querySelector(".element") as HTMLElement | null;
+    return this.shadowRoot?.querySelector('.element') as HTMLElement | null;
   }
 
   private clamp(n: number, min: number, max: number): number {
@@ -93,11 +93,26 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
     if (this.timeIntervalId === undefined) this.startClock();
     if (this.moveTimerId === undefined) this.cycleElement();
 
+    // Wake lock
+    if (
+      navigator.wakeLock &&
+      typeof navigator.wakeLock.request === 'function'
+    ) {
+      navigator.wakeLock
+        .request('screen')
+        .then((wakeLock) => {
+          console.log('[ScreenSaver] Wake lock acquired:', wakeLock);
+        })
+        .catch((err) => {
+          console.error('[ScreenSaver] Wake lock request failed:', err);
+        });
+    }
+
     // Page visibility / focus
-    document.addEventListener("visibilitychange", this.handleVisibility, {
+    document.addEventListener('visibilitychange', this.handleVisibility, {
       passive: true,
     });
-    window.addEventListener("focus", this.handleVisibility, { passive: true });
+    window.addEventListener('focus', this.handleVisibility, { passive: true });
 
     // Keep element in-bounds on layout changes
     this.resizeObs = new ResizeObserver(() => this.ensureInBounds());
@@ -110,7 +125,7 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
         const entry = entries[0];
         if (!entry?.isIntersecting) {
           this.recenterElement();
-          this.elementEl?.classList.remove("hidden");
+          this.elementEl?.classList.remove('hidden');
         }
       },
       { root: null, threshold: 0.01 }
@@ -120,14 +135,21 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
 
     // Start watchdog
     this.startWatchdog();
+
+    setInterval(() => {
+      if (window.fully && typeof window.fully.isInForeground === 'function') {
+        // This call is harmless but marks the WebView as "active"
+        window.fully.getScreenBrightness();
+      }
+    }, 15000);
   }
 
   public disconnectedCallback(): void {
     document.removeEventListener(
-      "visibilitychange",
+      'visibilitychange',
       this.handleVisibility as any
     );
-    window.removeEventListener("focus", this.handleVisibility as any);
+    window.removeEventListener('focus', this.handleVisibility as any);
 
     this.stopClock();
     this.stopMoveCycle();
@@ -148,7 +170,7 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
     return html`
       <div class="container">
         <div class="element">
-          ${this.config?.saver_type === "logo"
+          ${this.config?.saver_type === 'logo'
             ? html`
                 <div class="logo">
                   <img
@@ -176,15 +198,15 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
   }
 
   protected updated(changedProps: PropertyValues): void {
-    if (changedProps.has("hass") && this.hass) {
-      const rebootTime = this.hass.states["input_button.reboot_devices"]?.state;
+    if (changedProps.has('hass') && this.hass) {
+      const rebootTime = this.hass.states['input_button.reboot_devices']?.state;
       if (this.rebootTime !== undefined && this.rebootTime !== rebootTime) {
         deviceReboot();
       }
       this.rebootTime = rebootTime;
 
       const refreshTime =
-        this.hass.states["input_button.refresh_devices"]?.state;
+        this.hass.states['input_button.refresh_devices']?.state;
       if (this.refreshTime !== undefined && this.refreshTime !== refreshTime) {
         deviceRefresh();
       }
@@ -195,7 +217,7 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
   // ---------- Visibility / Watchdog ----------
 
   private handleVisibility = (): void => {
-    if (document.visibilityState === "visible") {
+    if (document.visibilityState === 'visible') {
       const now = this.now();
 
       // Clock stale? Restart.
@@ -231,7 +253,7 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
 
       // Clock check
       if (now - this.lastClockBeat > 5000) {
-        console.warn("[ScreenSaver] Restarting stalled clock");
+        console.warn('[ScreenSaver] Restarting stalled clock');
         this.stopClock();
         this.startClock();
       }
@@ -239,7 +261,7 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
       // Move check
       const moveTimerMs = Math.max(1, this.config?.saver_interval ?? 30) * 1000;
       if (now - this.lastMoveBeat > moveTimerMs * 1.5) {
-        console.warn("[ScreenSaver] Restarting stalled move cycle");
+        console.warn('[ScreenSaver] Restarting stalled move cycle');
         this.stopMoveCycle();
         this.cycleElement();
       }
@@ -311,11 +333,11 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
 
       const element = this.elementEl;
       if (!element) {
-        console.warn("[ScreenSaver] .element not found during cycle");
+        console.warn('[ScreenSaver] .element not found during cycle');
         return;
       }
 
-      element.classList.add("hidden");
+      element.classList.add('hidden');
 
       this.fadeTimeoutId = window.setTimeout(() => {
         if (!this.isConnected) return;
@@ -324,8 +346,8 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
         this.ensureInBounds();
 
         const el = this.elementEl;
-        if (el) el.classList.remove("hidden");
-        else console.warn("[ScreenSaver] .element missing during fade-in");
+        if (el) el.classList.remove('hidden');
+        else console.warn('[ScreenSaver] .element missing during fade-in');
 
         this.lastMoveBeat = this.now();
 
@@ -383,8 +405,8 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
     const maxX = Math.max(0, cw - ew);
     const maxY = Math.max(0, ch - eh);
 
-    const currentX = parseFloat(element.style.left || "0") || 0;
-    const currentY = parseFloat(element.style.top || "0") || 0;
+    const currentX = parseFloat(element.style.left || '0') || 0;
+    const currentY = parseFloat(element.style.top || '0') || 0;
 
     const safeX = this.clamp(currentX, 0, maxX);
     const safeY = this.clamp(currentY, 0, maxY);
@@ -420,7 +442,7 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
   }
 
   private handleImageError(): void {
-    console.error("Failed to load image.");
+    console.error('Failed to load image.');
   }
 
   // ---------- Styles ----------
@@ -457,6 +479,7 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
         overflow: hidden;
         opacity: 1;
         transition: opacity 1000ms ease-in-out;
+        animation: nudge 2s infinite linear;
       }
 
       .element.hidden {
@@ -508,6 +531,18 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
         border-radius: 0.25rem;
         word-wrap: break-word;
         width: 100%;
+      }
+
+      @keyframes nudge {
+        0% {
+          transform: translate3d(0, 0, 0);
+        }
+        50% {
+          transform: translate3d(0.001px, 0, 0);
+        }
+        100% {
+          transform: translate3d(0, 0, 0);
+        }
       }
     `;
   }

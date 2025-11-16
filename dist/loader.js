@@ -525,14 +525,14 @@ window.customCards.push({
 let ScreenSaver = class ScreenSaver extends i$1 {
     constructor() {
         super(...arguments);
-        this.time = "Loading...";
-        this.date = "Loading...";
+        this.time = 'Loading...';
+        this.date = 'Loading...';
         // Heartbeats
         this.lastClockBeat = 0;
         this.lastMoveBeat = 0;
         // ---------- Visibility / Watchdog ----------
         this.handleVisibility = () => {
-            if (document.visibilityState === "visible") {
+            if (document.visibilityState === 'visible') {
                 const now = this.now();
                 // Clock stale? Restart.
                 if (now - this.lastClockBeat > 5_000) {
@@ -555,10 +555,10 @@ let ScreenSaver = class ScreenSaver extends i$1 {
     }
     // ---------- Utils ----------
     get containerEl() {
-        return this.shadowRoot?.querySelector(".container");
+        return this.shadowRoot?.querySelector('.container');
     }
     get elementEl() {
-        return this.shadowRoot?.querySelector(".element");
+        return this.shadowRoot?.querySelector('.element');
     }
     clamp(n, min, max) {
         if (Number.isNaN(n))
@@ -584,11 +584,23 @@ let ScreenSaver = class ScreenSaver extends i$1 {
             this.startClock();
         if (this.moveTimerId === undefined)
             this.cycleElement();
+        // Wake lock
+        if (navigator.wakeLock &&
+            typeof navigator.wakeLock.request === 'function') {
+            navigator.wakeLock
+                .request('screen')
+                .then((wakeLock) => {
+                console.log('[ScreenSaver] Wake lock acquired:', wakeLock);
+            })
+                .catch((err) => {
+                console.error('[ScreenSaver] Wake lock request failed:', err);
+            });
+        }
         // Page visibility / focus
-        document.addEventListener("visibilitychange", this.handleVisibility, {
+        document.addEventListener('visibilitychange', this.handleVisibility, {
             passive: true,
         });
-        window.addEventListener("focus", this.handleVisibility, { passive: true });
+        window.addEventListener('focus', this.handleVisibility, { passive: true });
         // Keep element in-bounds on layout changes
         this.resizeObs = new ResizeObserver(() => this.ensureInBounds());
         const container = this.containerEl;
@@ -599,7 +611,7 @@ let ScreenSaver = class ScreenSaver extends i$1 {
             const entry = entries[0];
             if (!entry?.isIntersecting) {
                 this.recenterElement();
-                this.elementEl?.classList.remove("hidden");
+                this.elementEl?.classList.remove('hidden');
             }
         }, { root: null, threshold: 0.01 });
         const el = this.elementEl;
@@ -607,10 +619,16 @@ let ScreenSaver = class ScreenSaver extends i$1 {
             this.interObs.observe(el);
         // Start watchdog
         this.startWatchdog();
+        setInterval(() => {
+            if (window.fully && typeof window.fully.isInForeground === 'function') {
+                // This call is harmless but marks the WebView as "active"
+                window.fully.getScreenBrightness();
+            }
+        }, 15000);
     }
     disconnectedCallback() {
-        document.removeEventListener("visibilitychange", this.handleVisibility);
-        window.removeEventListener("focus", this.handleVisibility);
+        document.removeEventListener('visibilitychange', this.handleVisibility);
+        window.removeEventListener('focus', this.handleVisibility);
         this.stopClock();
         this.stopMoveCycle();
         this.stopWatchdog();
@@ -626,7 +644,7 @@ let ScreenSaver = class ScreenSaver extends i$1 {
         return x `
       <div class="container">
         <div class="element">
-          ${this.config?.saver_type === "logo"
+          ${this.config?.saver_type === 'logo'
             ? x `
                 <div class="logo">
                   <img
@@ -653,13 +671,13 @@ let ScreenSaver = class ScreenSaver extends i$1 {
             this.cycleElement();
     }
     updated(changedProps) {
-        if (changedProps.has("hass") && this.hass) {
-            const rebootTime = this.hass.states["input_button.reboot_devices"]?.state;
+        if (changedProps.has('hass') && this.hass) {
+            const rebootTime = this.hass.states['input_button.reboot_devices']?.state;
             if (this.rebootTime !== undefined && this.rebootTime !== rebootTime) {
                 deviceReboot();
             }
             this.rebootTime = rebootTime;
-            const refreshTime = this.hass.states["input_button.refresh_devices"]?.state;
+            const refreshTime = this.hass.states['input_button.refresh_devices']?.state;
             if (this.refreshTime !== undefined && this.refreshTime !== refreshTime) {
                 deviceRefresh();
             }
@@ -677,14 +695,14 @@ let ScreenSaver = class ScreenSaver extends i$1 {
             console.log(`[ScreenSaver] Watchdog check at ${new Date().toISOString()}`);
             // Clock check
             if (now - this.lastClockBeat > 5000) {
-                console.warn("[ScreenSaver] Restarting stalled clock");
+                console.warn('[ScreenSaver] Restarting stalled clock');
                 this.stopClock();
                 this.startClock();
             }
             // Move check
             const moveTimerMs = Math.max(1, this.config?.saver_interval ?? 30) * 1000;
             if (now - this.lastMoveBeat > moveTimerMs * 1.5) {
-                console.warn("[ScreenSaver] Restarting stalled move cycle");
+                console.warn('[ScreenSaver] Restarting stalled move cycle');
                 this.stopMoveCycle();
                 this.cycleElement();
             }
@@ -738,10 +756,10 @@ let ScreenSaver = class ScreenSaver extends i$1 {
             }
             const element = this.elementEl;
             if (!element) {
-                console.warn("[ScreenSaver] .element not found during cycle");
+                console.warn('[ScreenSaver] .element not found during cycle');
                 return;
             }
-            element.classList.add("hidden");
+            element.classList.add('hidden');
             this.fadeTimeoutId = window.setTimeout(() => {
                 if (!this.isConnected)
                     return;
@@ -749,9 +767,9 @@ let ScreenSaver = class ScreenSaver extends i$1 {
                 this.ensureInBounds();
                 const el = this.elementEl;
                 if (el)
-                    el.classList.remove("hidden");
+                    el.classList.remove('hidden');
                 else
-                    console.warn("[ScreenSaver] .element missing during fade-in");
+                    console.warn('[ScreenSaver] .element missing during fade-in');
                 this.lastMoveBeat = this.now();
                 // Chain the next cycle
                 this.moveTimerId = window.setTimeout(runCycle, moveTimerMs);
@@ -798,8 +816,8 @@ let ScreenSaver = class ScreenSaver extends i$1 {
         const eh = Math.max(0, element.clientHeight);
         const maxX = Math.max(0, cw - ew);
         const maxY = Math.max(0, ch - eh);
-        const currentX = parseFloat(element.style.left || "0") || 0;
-        const currentY = parseFloat(element.style.top || "0") || 0;
+        const currentX = parseFloat(element.style.left || '0') || 0;
+        const currentY = parseFloat(element.style.top || '0') || 0;
         const safeX = this.clamp(currentX, 0, maxX);
         const safeY = this.clamp(currentY, 0, maxY);
         if (safeX !== currentX)
@@ -828,7 +846,7 @@ let ScreenSaver = class ScreenSaver extends i$1 {
         element.style.top = `${this.clamp(cy - eh / 2, 0, Math.max(0, ch - eh))}px`;
     }
     handleImageError() {
-        console.error("Failed to load image.");
+        console.error('Failed to load image.');
     }
     // ---------- Styles ----------
     static get styles() {
@@ -863,6 +881,7 @@ let ScreenSaver = class ScreenSaver extends i$1 {
         overflow: hidden;
         opacity: 1;
         transition: opacity 1000ms ease-in-out;
+        animation: nudge 2s infinite linear;
       }
 
       .element.hidden {
@@ -915,6 +934,18 @@ let ScreenSaver = class ScreenSaver extends i$1 {
         word-wrap: break-word;
         width: 100%;
       }
+
+      @keyframes nudge {
+        0% {
+          transform: translate3d(0, 0, 0);
+        }
+        50% {
+          transform: translate3d(0.001px, 0, 0);
+        }
+        100% {
+          transform: translate3d(0, 0, 0);
+        }
+      }
     `;
     }
 };
@@ -931,7 +962,7 @@ __decorate([
     r()
 ], ScreenSaver.prototype, "date", void 0);
 ScreenSaver = __decorate([
-    t("screensaver-card")
+    t('screensaver-card')
 ], ScreenSaver);
 
 const getDeviceType = () => {
@@ -1081,18 +1112,6 @@ let SettingsCard = class SettingsCard extends i$1 {
     }
     handleDeviceChanges() {
         this.mobile = getDeviceType() === 'mobile';
-    }
-    getHaDisplayMode() {
-        const theme = this.hass?.selectedTheme;
-        if (!theme || typeof theme !== 'string')
-            return 'auto';
-        if (theme.toLowerCase().includes('dark')) {
-            return 'dark';
-        }
-        if (theme.toLowerCase().includes('light')) {
-            return 'light';
-        }
-        return 'auto';
     }
     handleModeChange(mode) {
         try {
@@ -1279,5 +1298,5 @@ if (window.fully) {
     console.log("Device Model: " + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.37-beta.2"} (Built: ${"2025-11-14T23:29:24.922Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.38-beta.1"} (Built: ${"2025-11-16T13:12:08.553Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
