@@ -1,7 +1,7 @@
 {
   "name": "dash-loader",
-  "version": "6.1.40-beta.0",
-  "description": "Dashboard Loader xx",
+  "version": "6.1.40-beta.1",
+  "description": "Dashboard Loader",
   "type": "module",
   "author": "Tom Bruno",
   "repository": {
