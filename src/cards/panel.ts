@@ -5,31 +5,32 @@ import {
   LitElement,
   PropertyValues,
   TemplateResult,
-} from "lit";
-import { cache } from "lit/directives/cache.js";
-import { customElement, property, state } from "lit/decorators.js";
+} from 'lit';
+import { cache } from 'lit/directives/cache.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import {
   HomeAssistant,
   LovelaceCardConfig,
   PopupDialogElement,
-} from "../types";
-import { SettingsStorage, BrightnessMap } from "../utilities/settings-storage";
+} from '../types';
+import { SettingsStorage, BrightnessMap } from '../utilities/settings-storage';
 import {
   deviceFlash,
   deviceRefresh,
   deviceReboot,
-} from "../utilities/device-actions";
+} from '../utilities/device-actions';
 
 const SCREENSAVER_TIMEOUT = 5 * 60 * 1000;
 
+window.customCards = window.customCards || [];
 window.customCards.push({
-  type: "panel-card",
-  name: "Panel Card",
+  type: 'panel-card',
+  name: 'Panel Card',
   preview: true,
-  description: "A SmartQasa card for displaying the Main panel card.",
+  description: 'A SmartQasa card for displaying the Main panel card.',
 });
 
-@customElement("panel-card")
+@customElement('panel-card')
 export class PanelCard extends LitElement {
   @property({ attribute: false }) config?: LovelaceCardConfig;
   @property({ attribute: false }) hass?: HomeAssistant;
@@ -57,15 +58,15 @@ export class PanelCard extends LitElement {
     super.connectedCallback();
 
     if (window.fully) {
-      window.addEventListener("touchstart", this.boundTouchHandler, {
+      window.addEventListener('touchstart', this.boundTouchHandler, {
         passive: true,
       });
-      window.addEventListener("mousemove", this.boundMouseHandler);
-      window.addEventListener("keydown", this.boundKeyHandler);
+      window.addEventListener('mousemove', this.boundMouseHandler);
+      window.addEventListener('keydown', this.boundKeyHandler);
 
       (window as any).onFullyMotion = () => this.resetSaver();
       if (window.fully.bind) {
-        window.fully.bind("onMotion", "onFullyMotion()");
+        window.fully.bind('onMotion', 'onFullyMotion()');
       }
 
       this.resetSaver();
@@ -74,9 +75,9 @@ export class PanelCard extends LitElement {
 
   public disconnectedCallback(): void {
     if (window.fully) {
-      window.removeEventListener("touchstart", this.boundTouchHandler);
-      window.removeEventListener("mousemove", this.boundMouseHandler);
-      window.removeEventListener("keydown", this.boundKeyHandler);
+      window.removeEventListener('touchstart', this.boundTouchHandler);
+      window.removeEventListener('mousemove', this.boundMouseHandler);
+      window.removeEventListener('keydown', this.boundKeyHandler);
     }
 
     if (this.saverTimer) {
@@ -92,16 +93,16 @@ export class PanelCard extends LitElement {
   }
 
   protected willUpdate(changedProps: PropertyValues): void {
-    if (changedProps.has("hass") && this.hass) {
+    if (changedProps.has('hass') && this.hass) {
       const isAdmin = this.hass?.user?.is_admin || false;
       const isAdminMode =
-        this.hass.states?.["input_boolean.admin_mode"]?.state === "on" || false;
+        this.hass.states?.['input_boolean.admin_mode']?.state === 'on' || false;
       this.isAdminView = isAdmin || isAdminMode;
     }
   }
 
   protected render(): TemplateResult {
-    this.classList.toggle("admin-view", this.isAdminView);
+    this.classList.toggle('admin-view', this.isAdminView);
 
     if (!this.isMainLoaded) {
       return html`
@@ -129,7 +130,7 @@ export class PanelCard extends LitElement {
   protected updated(changedProps: PropertyValues): void {
     if (!this.isMainLoaded) this.loadMainCard();
 
-    if (changedProps.has("hass") && this.hass) {
+    if (changedProps.has('hass') && this.hass) {
       this.syncPopups();
       this.checkDeviceTriggers();
       this.handlePhaseChange();
@@ -138,9 +139,9 @@ export class PanelCard extends LitElement {
 
   private async loadMainCard(retries = 5): Promise<void> {
     try {
-      await customElements.whenDefined("main-card");
+      await customElements.whenDefined('main-card');
     } catch (err) {
-      console.error("[PanelCard] whenDefined failed:", err);
+      console.error('[PanelCard] whenDefined failed:', err);
       if (retries > 0) {
         setTimeout(() => this.loadMainCard(retries - 1), 1000);
       }
@@ -153,7 +154,7 @@ export class PanelCard extends LitElement {
   private syncPopups(): void {
     if (!this.hass) return;
 
-    document.querySelectorAll("popup-dialog").forEach((popup) => {
+    document.querySelectorAll('popup-dialog').forEach((popup) => {
       if ((popup as PopupDialogElement).hass !== undefined) {
         (popup as PopupDialogElement).hass = this.hass;
       }
@@ -184,10 +185,10 @@ export class PanelCard extends LitElement {
   }
 
   private handlePhaseChange(): void {
-    if (typeof window.fully === "undefined" || !this.hass) return;
+    if (typeof window.fully === 'undefined' || !this.hass) return;
 
     const activePhase =
-      this.hass.states?.["input_select.location_phase"]?.state;
+      this.hass.states?.['input_select.location_phase']?.state;
     if (!activePhase || activePhase === this.phase) return;
 
     try {
@@ -200,7 +201,7 @@ export class PanelCard extends LitElement {
       }
     } catch (err) {
       console.warn(
-        "[PanelCard] Failed to update brightness on phase change:",
+        '[PanelCard] Failed to update brightness on phase change:',
         err
       );
     }
@@ -211,18 +212,18 @@ export class PanelCard extends LitElement {
 
     const triggers = [
       {
-        key: "flash",
-        entity: "input_button.flash_devices",
+        key: 'flash',
+        entity: 'input_button.flash_devices',
         action: deviceFlash,
       },
       {
-        key: "reboot",
-        entity: "input_button.reboot_devices",
+        key: 'reboot',
+        entity: 'input_button.reboot_devices',
         action: deviceReboot,
       },
       {
-        key: "refresh",
-        entity: "input_button.refresh_devices",
+        key: 'refresh',
+        entity: 'input_button.refresh_devices',
         action: deviceRefresh,
       },
     ];

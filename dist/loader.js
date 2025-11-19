@@ -222,11 +222,12 @@ function deviceReboot() {
 }
 
 const SCREENSAVER_TIMEOUT = 5 * 60 * 1000;
+window.customCards = window.customCards || [];
 window.customCards.push({
-    type: "panel-card",
-    name: "Panel Card",
+    type: 'panel-card',
+    name: 'Panel Card',
     preview: true,
-    description: "A SmartQasa card for displaying the Main panel card.",
+    description: 'A SmartQasa card for displaying the Main panel card.',
 });
 let PanelCard = class PanelCard extends i$1 {
     constructor() {
@@ -249,23 +250,23 @@ let PanelCard = class PanelCard extends i$1 {
     connectedCallback() {
         super.connectedCallback();
         if (window.fully) {
-            window.addEventListener("touchstart", this.boundTouchHandler, {
+            window.addEventListener('touchstart', this.boundTouchHandler, {
                 passive: true,
             });
-            window.addEventListener("mousemove", this.boundMouseHandler);
-            window.addEventListener("keydown", this.boundKeyHandler);
+            window.addEventListener('mousemove', this.boundMouseHandler);
+            window.addEventListener('keydown', this.boundKeyHandler);
             window.onFullyMotion = () => this.resetSaver();
             if (window.fully.bind) {
-                window.fully.bind("onMotion", "onFullyMotion()");
+                window.fully.bind('onMotion', 'onFullyMotion()');
             }
             this.resetSaver();
         }
     }
     disconnectedCallback() {
         if (window.fully) {
-            window.removeEventListener("touchstart", this.boundTouchHandler);
-            window.removeEventListener("mousemove", this.boundMouseHandler);
-            window.removeEventListener("keydown", this.boundKeyHandler);
+            window.removeEventListener('touchstart', this.boundTouchHandler);
+            window.removeEventListener('mousemove', this.boundMouseHandler);
+            window.removeEventListener('keydown', this.boundKeyHandler);
         }
         if (this.saverTimer) {
             clearTimeout(this.saverTimer);
@@ -277,14 +278,14 @@ let PanelCard = class PanelCard extends i$1 {
         this.config = config;
     }
     willUpdate(changedProps) {
-        if (changedProps.has("hass") && this.hass) {
+        if (changedProps.has('hass') && this.hass) {
             const isAdmin = this.hass?.user?.is_admin || false;
-            const isAdminMode = this.hass.states?.["input_boolean.admin_mode"]?.state === "on" || false;
+            const isAdminMode = this.hass.states?.['input_boolean.admin_mode']?.state === 'on' || false;
             this.isAdminView = isAdmin || isAdminMode;
         }
     }
     render() {
-        this.classList.toggle("admin-view", this.isAdminView);
+        this.classList.toggle('admin-view', this.isAdminView);
         if (!this.isMainLoaded) {
             return x `
         <div class="loader">
@@ -309,7 +310,7 @@ let PanelCard = class PanelCard extends i$1 {
     updated(changedProps) {
         if (!this.isMainLoaded)
             this.loadMainCard();
-        if (changedProps.has("hass") && this.hass) {
+        if (changedProps.has('hass') && this.hass) {
             this.syncPopups();
             this.checkDeviceTriggers();
             this.handlePhaseChange();
@@ -317,10 +318,10 @@ let PanelCard = class PanelCard extends i$1 {
     }
     async loadMainCard(retries = 5) {
         try {
-            await customElements.whenDefined("main-card");
+            await customElements.whenDefined('main-card');
         }
         catch (err) {
-            console.error("[PanelCard] whenDefined failed:", err);
+            console.error('[PanelCard] whenDefined failed:', err);
             if (retries > 0) {
                 setTimeout(() => this.loadMainCard(retries - 1), 1000);
             }
@@ -331,7 +332,7 @@ let PanelCard = class PanelCard extends i$1 {
     syncPopups() {
         if (!this.hass)
             return;
-        document.querySelectorAll("popup-dialog").forEach((popup) => {
+        document.querySelectorAll('popup-dialog').forEach((popup) => {
             if (popup.hass !== undefined) {
                 popup.hass = this.hass;
             }
@@ -357,9 +358,9 @@ let PanelCard = class PanelCard extends i$1 {
         this.isSaverActive = false;
     }
     handlePhaseChange() {
-        if (typeof window.fully === "undefined" || !this.hass)
+        if (typeof window.fully === 'undefined' || !this.hass)
             return;
-        const activePhase = this.hass.states?.["input_select.location_phase"]?.state;
+        const activePhase = this.hass.states?.['input_select.location_phase']?.state;
         if (!activePhase || activePhase === this.phase)
             return;
         try {
@@ -372,7 +373,7 @@ let PanelCard = class PanelCard extends i$1 {
             }
         }
         catch (err) {
-            console.warn("[PanelCard] Failed to update brightness on phase change:", err);
+            console.warn('[PanelCard] Failed to update brightness on phase change:', err);
         }
     }
     checkDeviceTriggers() {
@@ -380,18 +381,18 @@ let PanelCard = class PanelCard extends i$1 {
             return;
         const triggers = [
             {
-                key: "flash",
-                entity: "input_button.flash_devices",
+                key: 'flash',
+                entity: 'input_button.flash_devices',
                 action: deviceFlash,
             },
             {
-                key: "reboot",
-                entity: "input_button.reboot_devices",
+                key: 'reboot',
+                entity: 'input_button.reboot_devices',
                 action: deviceReboot,
             },
             {
-                key: "refresh",
-                entity: "input_button.refresh_devices",
+                key: 'refresh',
+                entity: 'input_button.refresh_devices',
                 action: deviceRefresh,
             },
         ];
@@ -486,7 +487,7 @@ __decorate([
     r()
 ], PanelCard.prototype, "isSaverActive", void 0);
 PanelCard = __decorate([
-    t("panel-card")
+    t('panel-card')
 ], PanelCard);
 
 const formattedDate = (date = new Date()) => {
@@ -1298,5 +1299,5 @@ if (window.fully) {
     console.log("Device Model: " + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.41-beta.1"} (Built: ${"2025-11-19T20:40:08.121Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.41-beta.2"} (Built: ${"2025-11-19T20:45:08.453Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
