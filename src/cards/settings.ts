@@ -1,4 +1,12 @@
-import { css, CSSResult, html, LitElement, nothing, TemplateResult } from 'lit';
+import {
+  css,
+  CSSResult,
+  html,
+  LitElement,
+  PropertyValues,
+  nothing,
+  TemplateResult,
+} from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { HomeAssistant, LovelaceCard } from 'custom-card-helpers';
 import { getDeviceType } from '../utilities/get-device-info';
@@ -25,6 +33,7 @@ export class SettingsCard extends LitElement implements LovelaceCard {
   @property({ attribute: false }) hass?: HomeAssistant;
   @property({ type: Boolean, reflect: true }) mobile: boolean =
     getDeviceType() === 'mobile';
+  @state() isAdminMode: boolean = false;
 
   @state() displayMode: 'auto' | 'light' | 'dark' = 'auto';
   @state() volumeLevel: number = window.fully?.getAudioVolume(3) || 0;
@@ -51,6 +60,14 @@ export class SettingsCard extends LitElement implements LovelaceCard {
   }
 
   public setConfig(): void {}
+
+  protected willUpdate(changedProps: PropertyValues): void {
+    if (changedProps.has('hass') && this.hass) {
+      const isAdminMode =
+        this.hass.states['input_boolean.admin_mode']?.state === 'on';
+      this.isAdminMode = (this.hass.user?.is_admin ?? false) || isAdminMode;
+    }
+  }
 
   protected render(): TemplateResult | typeof nothing {
     const deviceModel = window.fully?.getDeviceModel() || 'Unknown';
@@ -171,47 +188,52 @@ export class SettingsCard extends LitElement implements LovelaceCard {
               `
             )}
       </div>
-      <div class="section">
-        <div class="radio-group">
-          <div class="title">Channel:</div>
-          ${(['main', 'beta'] as const).map(
-            (channel) => html`
-              <label class="radio-option">
-                <ha-radio
-                  .checked=${this.channel === channel}
-                  name="displayMode"
-                  value=${channel}
-                  @change=${(e: Event) =>
-                    this.handleChannelChange(
-                      (e.currentTarget as HTMLInputElement).value as
-                        | 'main'
-                        | 'beta'
-                    )}
-                ></ha-radio>
-                <span class="label">
-                  ${channel.charAt(0).toUpperCase() + channel.slice(1)}
-                </span>
-              </label>
-            `
-          )}
-        </div>
-      </div>
-      <div class="section">
-        <div class="row">
-          <div class="info">
-            <span class="label">Automatic Updates</span>
-            <span class="value">${this.autoUpdate ? 'On' : 'Off'}</span>
-          </div>
+      ${this.isAdminMode
+        ? html`
+            <div class="section">
+              <div class="radio-group">
+                <div class="title">Channel:</div>
+                ${(['main', 'beta'] as const).map(
+                  (channel) => html`
+                    <label class="radio-option">
+                      <ha-radio
+                        .checked=${this.channel === channel}
+                        name="displayMode"
+                        value=${channel}
+                        @change=${(e: Event) =>
+                          this.handleChannelChange(
+                            (e.currentTarget as HTMLInputElement).value as
+                              | 'main'
+                              | 'beta'
+                          )}
+                      ></ha-radio>
+                      <span class="label">
+                        ${channel.charAt(0).toUpperCase() + channel.slice(1)}
+                      </span>
+                    </label>
+                  `
+                )}
+              </div>
+            </div>
 
-          <ha-switch
-            .checked=${this.autoUpdate}
-            @change=${(e: Event) =>
-              this.handleAutoUpdateChange(
-                (e.currentTarget as HTMLInputElement).checked
-              )}
-          ></ha-switch>
-        </div>
-      </div>
+            <div class="section">
+              <div class="row">
+                <div class="info">
+                  <span class="label">Automatic Updates</span>
+                  <span class="value">${this.autoUpdate ? 'On' : 'Off'}</span>
+                </div>
+
+                <ha-switch
+                  .checked=${this.autoUpdate}
+                  @change=${(e: Event) =>
+                    this.handleAutoUpdateChange(
+                      (e.currentTarget as HTMLInputElement).checked
+                    )}
+                ></ha-switch>
+              </div>
+            </div>
+          `
+        : nothing}
     `;
   }
 
@@ -350,8 +372,8 @@ export class SettingsCard extends LitElement implements LovelaceCard {
       const result = await (this.hass as any).callService(
         'smartqasa',
         'config_write',
-        undefined,
         payload,
+        undefined,
         undefined,
         true
       );

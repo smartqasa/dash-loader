@@ -991,6 +991,7 @@ let SettingsCard = class SettingsCard extends i$1 {
     constructor() {
         super(...arguments);
         this.mobile = getDeviceType() === 'mobile';
+        this.isAdminMode = false;
         this.displayMode = 'auto';
         this.volumeLevel = window.fully?.getAudioVolume(3) || 0;
         this.brightnessMap = {};
@@ -1014,6 +1015,12 @@ let SettingsCard = class SettingsCard extends i$1 {
         super.disconnectedCallback();
     }
     setConfig() { }
+    willUpdate(changedProps) {
+        if (changedProps.has('hass') && this.hass) {
+            const isAdminMode = this.hass.states['input_boolean.admin_mode']?.state === 'on';
+            this.isAdminMode = (this.hass.user?.is_admin ?? false) || isAdminMode;
+        }
+    }
     render() {
         const deviceModel = window.fully?.getDeviceModel() || 'Unknown';
         const androidVer = window.fully?.getAndroidVersion() || 'Unknown';
@@ -1112,37 +1119,42 @@ let SettingsCard = class SettingsCard extends i$1 {
                 </div>
               `)}
       </div>
-      <div class="section">
-        <div class="radio-group">
-          <div class="title">Channel:</div>
-          ${['main', 'beta'].map((channel) => x `
-              <label class="radio-option">
-                <ha-radio
-                  .checked=${this.channel === channel}
-                  name="displayMode"
-                  value=${channel}
-                  @change=${(e) => this.handleChannelChange(e.currentTarget.value)}
-                ></ha-radio>
-                <span class="label">
-                  ${channel.charAt(0).toUpperCase() + channel.slice(1)}
-                </span>
-              </label>
-            `)}
-        </div>
-      </div>
-      <div class="section">
-        <div class="row">
-          <div class="info">
-            <span class="label">Automatic Updates</span>
-            <span class="value">${this.autoUpdate ? 'On' : 'Off'}</span>
-          </div>
+      ${this.isAdminMode
+            ? x `
+            <div class="section">
+              <div class="radio-group">
+                <div class="title">Channel:</div>
+                ${['main', 'beta'].map((channel) => x `
+                    <label class="radio-option">
+                      <ha-radio
+                        .checked=${this.channel === channel}
+                        name="displayMode"
+                        value=${channel}
+                        @change=${(e) => this.handleChannelChange(e.currentTarget.value)}
+                      ></ha-radio>
+                      <span class="label">
+                        ${channel.charAt(0).toUpperCase() + channel.slice(1)}
+                      </span>
+                    </label>
+                  `)}
+              </div>
+            </div>
 
-          <ha-switch
-            .checked=${this.autoUpdate}
-            @change=${(e) => this.handleAutoUpdateChange(e.currentTarget.checked)}
-          ></ha-switch>
-        </div>
-      </div>
+            <div class="section">
+              <div class="row">
+                <div class="info">
+                  <span class="label">Automatic Updates</span>
+                  <span class="value">${this.autoUpdate ? 'On' : 'Off'}</span>
+                </div>
+
+                <ha-switch
+                  .checked=${this.autoUpdate}
+                  @change=${(e) => this.handleAutoUpdateChange(e.currentTarget.checked)}
+                ></ha-switch>
+              </div>
+            </div>
+          `
+            : E}
     `;
     }
     handleDeviceChanges() {
@@ -1248,7 +1260,7 @@ let SettingsCard = class SettingsCard extends i$1 {
                 channel: this.channel,
                 autoUpdate: this.autoUpdate,
             };
-            const result = await this.hass.callService('smartqasa', 'config_write', undefined, payload, undefined, true);
+            const result = await this.hass.callService('smartqasa', 'config_write', payload, undefined, undefined, true);
             if (result?.error) {
                 console.warn('[SettingsCard] config_write error:', result);
             }
@@ -1350,6 +1362,9 @@ __decorate([
 ], SettingsCard.prototype, "mobile", void 0);
 __decorate([
     r()
+], SettingsCard.prototype, "isAdminMode", void 0);
+__decorate([
+    r()
 ], SettingsCard.prototype, "displayMode", void 0);
 __decorate([
     r()
@@ -1385,5 +1400,5 @@ if (window.fully) {
     console.log("Device Model: " + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.41-beta.6"} (Built: ${"2025-11-20T21:54:52.655Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.41-beta.7"} (Built: ${"2025-11-20T22:07:32.724Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
