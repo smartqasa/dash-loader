@@ -349,7 +349,7 @@ export class SettingsCard extends LitElement implements LovelaceCard {
       }
 
       this.channel = result.channel === 'beta' ? 'beta' : 'main';
-      this.autoUpdate = Boolean(result.autoUpdate);
+      this.autoUpdate = Boolean(result.auto_update);
 
       console.log('[SettingsCard] Loaded SmartQasa config:', result);
     } catch (err) {
@@ -366,7 +366,7 @@ export class SettingsCard extends LitElement implements LovelaceCard {
     try {
       const payload = {
         channel: this.channel,
-        autoUpdate: this.autoUpdate,
+        auto_update: this.autoUpdate,
       };
 
       const result = await (this.hass as any).callService(
