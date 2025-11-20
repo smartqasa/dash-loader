@@ -994,6 +994,8 @@ let SettingsCard = class SettingsCard extends i$1 {
         this.displayMode = 'auto';
         this.volumeLevel = window.fully?.getAudioVolume(3) || 0;
         this.brightnessMap = {};
+        this.channel = 'main';
+        this.autoUpdate = true;
         this.prevBrightness = window.fully?.getScreenBrightness() || 255;
         this.boundHandleDeviceChanges = () => this.handleDeviceChanges();
     }
@@ -1005,6 +1007,7 @@ let SettingsCard = class SettingsCard extends i$1 {
         window.addEventListener('resize', this.boundHandleDeviceChanges);
         this.handleDeviceChanges();
         this.initSettingsFile();
+        this.loadSqConfig();
     }
     disconnectedCallback() {
         window.removeEventListener('resize', this.boundHandleDeviceChanges);
@@ -1109,6 +1112,24 @@ let SettingsCard = class SettingsCard extends i$1 {
                 </div>
               `)}
       </div>
+      <div class="section">
+        <div class="radio-group">
+          <div class="title">Channel:</div>
+          ${['main', 'beta'].map((channel) => x `
+              <label class="radio-option">
+                <ha-radio
+                  .checked=${this.channel === channel}
+                  name="displayMode"
+                  value=${channel}
+                  @change=${(e) => this.handleChannelChange(e.currentTarget.value)}
+                ></ha-radio>
+                <span class="label">
+                  ${channel.charAt(0).toUpperCase() + channel.slice(1)}
+                </span>
+              </label>
+            `)}
+        </div>
+      </div>
     `;
     }
     handleDeviceChanges() {
@@ -1161,6 +1182,8 @@ let SettingsCard = class SettingsCard extends i$1 {
             this.prevBrightness = value;
         window.fully.setScreenBrightness(this.prevBrightness);
     }
+    handleChannelChange(channel) {
+    }
     initSettingsFile() {
         const phaseEntity = this.hass?.states['input_select.location_phase'];
         const phases = phaseEntity?.attributes?.options ?? [];
@@ -1179,6 +1202,24 @@ let SettingsCard = class SettingsCard extends i$1 {
             ...settings.brightnessMap,
         };
         this.brightnessMap = merged;
+    }
+    async loadSqConfig() {
+        if (!this.hass)
+            return;
+        let result;
+        try {
+            result = await this.hass.callService('smartqasa', 'config_read', undefined, undefined, undefined, true);
+            if (!result || result.error) {
+                console.warn('[SettingsCard] config_read returned error:', result);
+                return;
+            }
+            this.channel = result.channel === 'beta' ? 'beta' : 'main';
+            this.autoUpdate = Boolean(result.autoUpdate);
+            console.log('[SettingsCard] Loaded SmartQasa config:', result);
+        }
+        catch (err) {
+            console.error('[SettingsCard] Failed to call smartqasa.config_read:', err);
+        }
     }
     static get styles() {
         return i$4 `
@@ -1277,6 +1318,12 @@ __decorate([
 __decorate([
     r()
 ], SettingsCard.prototype, "brightnessMap", void 0);
+__decorate([
+    r()
+], SettingsCard.prototype, "channel", void 0);
+__decorate([
+    r()
+], SettingsCard.prototype, "autoUpdate", void 0);
 SettingsCard = __decorate([
     t('settings-card')
 ], SettingsCard);
@@ -1299,5 +1346,5 @@ if (window.fully) {
     console.log("Device Model: " + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.41-beta.2"} (Built: ${"2025-11-19T20:45:08.453Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.41-beta.5"} (Built: ${"2025-11-20T21:45:51.832Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

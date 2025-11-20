@@ -29,6 +29,8 @@ export class SettingsCard extends LitElement implements LovelaceCard {
   @state() displayMode: 'auto' | 'light' | 'dark' = 'auto';
   @state() volumeLevel: number = window.fully?.getAudioVolume(3) || 0;
   @state() brightnessMap: BrightnessMap = {};
+  @state() channel: 'main' | 'beta' = 'main';
+  @state() autoUpdate: boolean = true;
 
   private prevBrightness: number = window.fully?.getScreenBrightness() || 255;
 
@@ -40,6 +42,7 @@ export class SettingsCard extends LitElement implements LovelaceCard {
     window.addEventListener('resize', this.boundHandleDeviceChanges);
     this.handleDeviceChanges();
     this.initSettingsFile();
+    this.loadSqConfig();
   }
 
   public disconnectedCallback(): void {
@@ -168,6 +171,31 @@ export class SettingsCard extends LitElement implements LovelaceCard {
               `
             )}
       </div>
+      <div class="section">
+        <div class="radio-group">
+          <div class="title">Channel:</div>
+          ${(['main', 'beta'] as const).map(
+            (channel) => html`
+              <label class="radio-option">
+                <ha-radio
+                  .checked=${this.channel === channel}
+                  name="displayMode"
+                  value=${channel}
+                  @change=${(e: Event) =>
+                    this.handleChannelChange(
+                      (e.currentTarget as HTMLInputElement).value as
+                        | 'main'
+                        | 'beta'
+                    )}
+                ></ha-radio>
+                <span class="label">
+                  ${channel.charAt(0).toUpperCase() + channel.slice(1)}
+                </span>
+              </label>
+            `
+          )}
+        </div>
+      </div>
     `;
   }
 
@@ -228,6 +256,13 @@ export class SettingsCard extends LitElement implements LovelaceCard {
     window.fully.setScreenBrightness(this.prevBrightness);
   }
 
+  private handleChannelChange(channel: 'main' | 'beta'): void {
+    try {
+    } catch (err) {
+      console.warn('[SettingsCard] Failed to set theme mode:', err);
+    }
+  }
+
   private initSettingsFile(): void {
     const phaseEntity = this.hass?.states['input_select.location_phase'];
     const phases: string[] = phaseEntity?.attributes?.options ?? [];
@@ -251,6 +286,37 @@ export class SettingsCard extends LitElement implements LovelaceCard {
       ...settings.brightnessMap,
     };
     this.brightnessMap = merged;
+  }
+
+  private async loadSqConfig(): Promise<void> {
+    if (!this.hass) return;
+
+    let result: any;
+    try {
+      result = await (this.hass as any).callService(
+        'smartqasa',
+        'config_read',
+        undefined,
+        undefined,
+        undefined,
+        true
+      );
+
+      if (!result || result.error) {
+        console.warn('[SettingsCard] config_read returned error:', result);
+        return;
+      }
+
+      this.channel = result.channel === 'beta' ? 'beta' : 'main';
+      this.autoUpdate = Boolean(result.autoUpdate);
+
+      console.log('[SettingsCard] Loaded SmartQasa config:', result);
+    } catch (err) {
+      console.error(
+        '[SettingsCard] Failed to call smartqasa.config_read:',
+        err
+      );
+    }
   }
 
   static get styles(): CSSResult {

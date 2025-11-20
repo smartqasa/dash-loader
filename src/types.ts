@@ -7,13 +7,13 @@ import type {
   HassServices,
   HassServiceTarget,
   MessageBase,
-} from "home-assistant-js-websocket";
+} from 'home-assistant-js-websocket';
 
 declare global {
   // For fire event compatibility
   interface HASSDomEvents {
     /** Fired when a value changes */
-    "value-changed": {
+    'value-changed': {
       value: unknown;
     };
     /** Fired when a change event occurs */
@@ -28,7 +28,7 @@ declare global {
 export type ActionItem =
   | {
       /** Service call (legacy: "action" is also accepted in automations/scripts) */
-      type: "service" | "action";
+      type: 'service' | 'action';
       /** e.g., "light.turn_on" */
       service: string;
       /** Data payload for the service */
@@ -38,7 +38,7 @@ export type ActionItem =
     }
   | {
       /** Custom function reference */
-      type: "function";
+      type: 'function';
       /** Function name */
       function: string;
       /** Arguments to pass to the function */
@@ -49,12 +49,10 @@ export type ActionItem =
  * Configuration for confirmation dialogs.
  */
 export type ConfirmConfig = {
-  title: string;
-  message: string;
-  button1?: string;
-  action1?: ActionItem[];
-  button2?: string;
-  action2?: ActionItem[];
+  header?: string;
+  message?: string;
+  cancel?: string;
+  proceed?: string;
 };
 
 /**
@@ -63,6 +61,7 @@ export type ConfirmConfig = {
 export interface ConfirmElement extends LovelaceCard {
   config: ConfirmConfig;
   isOpen: boolean;
+  open(config: ConfirmConfig): void;
 }
 
 /**
@@ -118,8 +117,8 @@ export interface DeviceRegistryEntry {
   area_id: string | null;
   name_by_user: string | null;
   /** Device type */
-  entry_type: "service" | "device" | null;
-  disabled_by: "user" | "integration" | "config_entry" | null;
+  entry_type: 'service' | 'device' | null;
+  disabled_by: 'user' | 'integration' | 'config_entry' | null;
   configuration_url: string | null;
 }
 
@@ -136,7 +135,7 @@ export interface DialogTable {
   [key: string]: DialogEntry;
 }
 
-type EntityCategory = "config" | "diagnostic";
+type EntityCategory = 'config' | 'diagnostic';
 
 /** Entity registry entry used for display in UI. */
 export interface EntityRegistryDisplayEntry {
@@ -200,7 +199,7 @@ export interface HomeAssistant {
   suspendWhenHidden: boolean;
   enableShortcuts: boolean;
   vibrate: boolean;
-  dockedSidebar: "docked" | "always_hidden" | "auto";
+  dockedSidebar: 'docked' | 'always_hidden' | 'auto';
   defaultPanel: string;
   /** Currently open "more info" entity */
   moreInfoEntityId: string | null;
@@ -209,19 +208,19 @@ export interface HomeAssistant {
   /** Locale and formatting information */
   locale?: {
     language: string;
-    number_format: "comma_decimal" | "decimal_comma" | "space_comma" | "system";
-    time_format: "12" | "24" | "system";
-    first_weekday: 0 | 1 | "language";
+    number_format: 'comma_decimal' | 'decimal_comma' | 'space_comma' | 'system';
+    time_format: '12' | '24' | 'system';
+    first_weekday: 0 | 1 | 'language';
   };
 
   /**
    * Call a backend service.
    */
   callService(
-    domain: ServiceCallRequest["domain"],
-    service: ServiceCallRequest["service"],
-    serviceData?: ServiceCallRequest["serviceData"],
-    target?: ServiceCallRequest["target"],
+    domain: ServiceCallRequest['domain'],
+    service: ServiceCallRequest['service'],
+    serviceData?: ServiceCallRequest['serviceData'],
+    target?: ServiceCallRequest['target'],
     cache?: boolean,
     returnResponse?: boolean
   ): Promise<any>;
@@ -230,7 +229,7 @@ export interface HomeAssistant {
    * Call a REST API endpoint.
    */
   callApi<T>(
-    method: "GET" | "POST" | "PUT" | "DELETE",
+    method: 'GET' | 'POST' | 'PUT' | 'DELETE',
     path: string,
     parameters?: Record<string, any>,
     headers?: Record<string, string>
@@ -316,8 +315,8 @@ export interface LovelaceGenericElementEditor<C = any> extends HTMLElement {
 
 /** Grid layout options for cards. */
 export interface LovelaceGridOptions {
-  columns?: number | "full";
-  rows?: number | "auto";
+  columns?: number | 'full';
+  rows?: number | 'auto';
   max_columns?: number;
   min_columns?: number;
   min_rows?: number;
@@ -326,8 +325,8 @@ export interface LovelaceGridOptions {
 
 /** Deprecated grid layout options (legacy). */
 export interface LovelaceLayoutOptions {
-  grid_columns?: number | "full";
-  grid_rows?: number | "auto";
+  grid_columns?: number | 'full';
+  grid_rows?: number | 'auto';
   grid_max_columns?: number;
   grid_min_columns?: number;
   grid_min_rows?: number;
@@ -344,11 +343,11 @@ export interface MFAModule {
 /** Configuration for popup dialogs. */
 export type PopupConfig = {
   title?: string;
-  size?: "normal" | "fullscreen";
+  size?: 'normal' | 'fullscreen';
   dismissable?: boolean;
   timeout?: number;
   scrollable?: boolean;
-  orientation?: "auto" | "landscape" | "portrait";
+  orientation?: 'auto' | 'landscape' | 'portrait';
   card: LovelaceCardConfig & { type: string };
   hass?: HomeAssistant;
   button1?: string;
@@ -359,14 +358,14 @@ export type PopupConfig = {
   action3?: ActionItem[];
 };
 
+export interface PopupDialogElement extends HTMLElement {
+  hass?: HomeAssistant;
+}
+
 /** Custom popup element. */
 export interface PopupElement extends LovelaceCard {
   config: PopupConfig;
   isOpen: boolean;
-}
-
-export interface PopupDialogElement extends HTMLElement {
-  hass?: HomeAssistant;
 }
 
 /** Translation resources */
