@@ -1130,6 +1130,19 @@ let SettingsCard = class SettingsCard extends i$1 {
             `)}
         </div>
       </div>
+      <div class="section">
+        <div class="row">
+          <div class="info">
+            <span class="label">Automatic Updates</span>
+            <span class="value">${this.autoUpdate ? 'On' : 'Off'}</span>
+          </div>
+
+          <ha-switch
+            .checked=${this.autoUpdate}
+            @change=${(e) => this.handleAutoUpdateChange(e.currentTarget.checked)}
+          ></ha-switch>
+        </div>
+      </div>
     `;
     }
     handleDeviceChanges() {
@@ -1183,6 +1196,12 @@ let SettingsCard = class SettingsCard extends i$1 {
         window.fully.setScreenBrightness(this.prevBrightness);
     }
     handleChannelChange(channel) {
+        this.channel = channel;
+        this.saveSqConfig();
+    }
+    handleAutoUpdateChange(enabled) {
+        this.autoUpdate = enabled;
+        this.saveSqConfig();
     }
     initSettingsFile() {
         const phaseEntity = this.hass?.states['input_select.location_phase'];
@@ -1219,6 +1238,26 @@ let SettingsCard = class SettingsCard extends i$1 {
         }
         catch (err) {
             console.error('[SettingsCard] Failed to call smartqasa.config_read:', err);
+        }
+    }
+    async saveSqConfig() {
+        if (!this.hass)
+            return;
+        try {
+            const payload = {
+                channel: this.channel,
+                autoUpdate: this.autoUpdate,
+            };
+            const result = await this.hass.callService('smartqasa', 'config_write', undefined, payload, undefined, true);
+            if (result?.error) {
+                console.warn('[SettingsCard] config_write error:', result);
+            }
+            else {
+                console.log('[SettingsCard] Saved SmartQasa config:', payload);
+            }
+        }
+        catch (err) {
+            console.error('[SettingsCard] Failed to call config_write:', err);
         }
     }
     static get styles() {
@@ -1346,5 +1385,5 @@ if (window.fully) {
     console.log("Device Model: " + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.41-beta.5"} (Built: ${"2025-11-20T21:45:51.832Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.41-beta.6"} (Built: ${"2025-11-20T21:54:52.655Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

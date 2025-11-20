@@ -196,6 +196,22 @@ export class SettingsCard extends LitElement implements LovelaceCard {
           )}
         </div>
       </div>
+      <div class="section">
+        <div class="row">
+          <div class="info">
+            <span class="label">Automatic Updates</span>
+            <span class="value">${this.autoUpdate ? 'On' : 'Off'}</span>
+          </div>
+
+          <ha-switch
+            .checked=${this.autoUpdate}
+            @change=${(e: Event) =>
+              this.handleAutoUpdateChange(
+                (e.currentTarget as HTMLInputElement).checked
+              )}
+          ></ha-switch>
+        </div>
+      </div>
     `;
   }
 
@@ -257,10 +273,13 @@ export class SettingsCard extends LitElement implements LovelaceCard {
   }
 
   private handleChannelChange(channel: 'main' | 'beta'): void {
-    try {
-    } catch (err) {
-      console.warn('[SettingsCard] Failed to set theme mode:', err);
-    }
+    this.channel = channel;
+    this.saveSqConfig();
+  }
+
+  private handleAutoUpdateChange(enabled: boolean): void {
+    this.autoUpdate = enabled;
+    this.saveSqConfig();
   }
 
   private initSettingsFile(): void {
@@ -316,6 +335,34 @@ export class SettingsCard extends LitElement implements LovelaceCard {
         '[SettingsCard] Failed to call smartqasa.config_read:',
         err
       );
+    }
+  }
+
+  private async saveSqConfig(): Promise<void> {
+    if (!this.hass) return;
+
+    try {
+      const payload = {
+        channel: this.channel,
+        autoUpdate: this.autoUpdate,
+      };
+
+      const result = await (this.hass as any).callService(
+        'smartqasa',
+        'config_write',
+        undefined,
+        payload,
+        undefined,
+        true
+      );
+
+      if (result?.error) {
+        console.warn('[SettingsCard] config_write error:', result);
+      } else {
+        console.log('[SettingsCard] Saved SmartQasa config:', payload);
+      }
+    } catch (err) {
+      console.error('[SettingsCard] Failed to call config_write:', err);
     }
   }
 
