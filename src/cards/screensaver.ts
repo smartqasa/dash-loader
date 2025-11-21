@@ -274,7 +274,7 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
 
   private stopWatchdog(): void {
     if (this.watchdogId !== undefined) {
-      window.clearInterval(this.watchdogId);
+      window.clearTimeout(this.watchdogId);
       this.watchdogId = undefined;
     }
   }
@@ -305,7 +305,7 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
 
   private stopClock(): void {
     if (this.timeIntervalId !== undefined) {
-      window.clearInterval(this.timeIntervalId);
+      window.clearTimeout(this.timeIntervalId);
       this.timeIntervalId = undefined;
     }
   }
@@ -361,7 +361,7 @@ export class ScreenSaver extends LitElement implements LovelaceCard {
 
   private stopMoveCycle(): void {
     if (this.moveTimerId !== undefined) {
-      window.clearInterval(this.moveTimerId);
+      window.clearTimeout(this.moveTimerId);
       this.moveTimerId = undefined;
     }
     if (this.fadeTimeoutId !== undefined) {
