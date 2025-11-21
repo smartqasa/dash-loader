@@ -94,11 +94,6 @@ export class SettingsCard extends LitElement implements LovelaceCard {
       }
     }
 
-    console.log('[SettingsCard] Rendering with state:', {
-      channel: this.channel,
-      autoUpdate: this.autoUpdate,
-    });
-
     return html`
       <div class="section">
         <div class="title">Model: ${deviceModel}</div>
@@ -344,15 +339,13 @@ export class SettingsCard extends LitElement implements LovelaceCard {
         true
       );
 
-      if (!result || result.error) {
+      if (!result || !result.response || result.error) {
         console.warn('[SettingsCard] config_read returned error:', result);
         return;
       }
 
-      this.channel = result.channel === 'beta' ? 'beta' : 'main';
-      this.autoUpdate = Boolean(result.auto_update);
-
-      console.log('[SettingsCard] Loaded SmartQasa config:', result);
+      this.channel = result.response.channel === 'beta' ? 'beta' : 'main';
+      this.autoUpdate = Boolean(result.response.auto_update);
     } catch (err) {
       console.error(
         '[SettingsCard] Failed to call smartqasa.config_read:',

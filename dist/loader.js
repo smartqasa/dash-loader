@@ -1041,10 +1041,6 @@ let SettingsCard = class SettingsCard extends i$1 {
                 this.brightnessMap = { ...this.brightnessMap, [phase]: 255 };
             }
         }
-        console.log('[SettingsCard] Rendering with state:', {
-            channel: this.channel,
-            autoUpdate: this.autoUpdate,
-        });
         return x `
       <div class="section">
         <div class="title">Model: ${deviceModel}</div>
@@ -1241,13 +1237,12 @@ let SettingsCard = class SettingsCard extends i$1 {
         let result;
         try {
             result = await this.hass.callService('smartqasa', 'config_read', undefined, undefined, undefined, true);
-            if (!result || result.error) {
+            if (!result || !result.response || result.error) {
                 console.warn('[SettingsCard] config_read returned error:', result);
                 return;
             }
-            this.channel = result.channel === 'beta' ? 'beta' : 'main';
-            this.autoUpdate = Boolean(result.auto_update);
-            console.log('[SettingsCard] Loaded SmartQasa config:', result);
+            this.channel = result.response.channel === 'beta' ? 'beta' : 'main';
+            this.autoUpdate = Boolean(result.response.auto_update);
         }
         catch (err) {
             console.error('[SettingsCard] Failed to call smartqasa.config_read:', err);
@@ -1399,5 +1394,5 @@ if (window.fully) {
     console.log("Device Model: " + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.41-beta.15"} (Built: ${"2025-11-21T01:07:04.542Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.41-beta.16"} (Built: ${"2025-11-21T01:12:01.819Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
