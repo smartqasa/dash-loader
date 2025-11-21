@@ -1224,7 +1224,6 @@ let SettingsCard = class SettingsCard extends i$1 {
             brightnessMap: defaultBrightness,
         };
         const settings = SettingsStorage.init(defaults);
-        console.log('[SettingsCard] Loaded settings:', settings);
         this.displayMode = settings.displayMode ?? 'auto';
         const merged = {
             ...defaultBrightness,
@@ -1262,9 +1261,6 @@ let SettingsCard = class SettingsCard extends i$1 {
             const result = await this.hass.callService('smartqasa', 'config_write', payload, undefined, undefined, true);
             if (result?.error) {
                 console.warn('[SettingsCard] config_write error:', result);
-            }
-            else {
-                console.log('[SettingsCard] Saved SmartQasa config:', payload);
             }
         }
         catch (err) {
@@ -1399,5 +1395,5 @@ if (window.fully) {
     console.log("Device Model: " + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.41-beta.13"} (Built: ${"2025-11-21T00:29:22.961Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.41-beta.14"} (Built: ${"2025-11-21T00:30:53.358Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

@@ -316,8 +316,6 @@ export class SettingsCard extends LitElement implements LovelaceCard {
 
     const settings = SettingsStorage.init(defaults);
 
-    console.log('[SettingsCard] Loaded settings:', settings);
-
     this.displayMode = settings.displayMode ?? 'auto';
 
     const merged: BrightnessMap = {
@@ -380,8 +378,6 @@ export class SettingsCard extends LitElement implements LovelaceCard {
 
       if (result?.error) {
         console.warn('[SettingsCard] config_write error:', result);
-      } else {
-        console.log('[SettingsCard] Saved SmartQasa config:', payload);
       }
     } catch (err) {
       console.error('[SettingsCard] Failed to call config_write:', err);
