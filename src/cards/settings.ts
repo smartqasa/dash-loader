@@ -216,12 +216,9 @@ export class SettingsCard extends LitElement implements LovelaceCard {
               </div>
             </div>
 
-            <div class="section">
-              <div class="row">
-                <div class="info">
-                  <span class="label">Automatic Updates</span>
-                  <span class="value">${this.autoUpdate ? 'On' : 'Off'}</span>
-                </div>
+            <div class="row">
+              <div class="info">
+                <span class="label">Automatic Updates</span>
 
                 <ha-switch
                   .checked=${this.autoUpdate}
