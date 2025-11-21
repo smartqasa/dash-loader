@@ -997,6 +997,7 @@ let SettingsCard = class SettingsCard extends i$1 {
         this.brightnessMap = {};
         this.channel = 'main';
         this.autoUpdate = true;
+        this.sqConfigLoaded = false;
         this.prevBrightness = window.fully?.getScreenBrightness() || 255;
         this.boundHandleDeviceChanges = () => this.handleDeviceChanges();
     }
@@ -1008,7 +1009,6 @@ let SettingsCard = class SettingsCard extends i$1 {
         window.addEventListener('resize', this.boundHandleDeviceChanges);
         this.handleDeviceChanges();
         this.initSettingsFile();
-        this.loadSqConfig();
     }
     disconnectedCallback() {
         window.removeEventListener('resize', this.boundHandleDeviceChanges);
@@ -1020,6 +1020,8 @@ let SettingsCard = class SettingsCard extends i$1 {
             const isAdminMode = this.hass.states['input_boolean.admin_mode']?.state === 'on';
             this.isAdminMode = (this.hass.user?.is_admin ?? false) || isAdminMode;
         }
+        if (!this.sqConfigLoaded)
+            this.loadSqConfig();
     }
     render() {
         const deviceModel = window.fully?.getDeviceModel() || 'Unknown';
@@ -1247,6 +1249,7 @@ let SettingsCard = class SettingsCard extends i$1 {
         catch (err) {
             console.error('[SettingsCard] Failed to call smartqasa.config_read:', err);
         }
+        this.sqConfigLoaded = true;
     }
     async saveSqConfig() {
         if (!this.hass)
@@ -1396,5 +1399,5 @@ if (window.fully) {
     console.log("Device Model: " + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.41-beta.11"} (Built: ${"2025-11-21T00:15:41.931Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.41-beta.12"} (Built: ${"2025-11-21T00:25:08.885Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

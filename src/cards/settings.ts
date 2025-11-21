@@ -41,6 +41,7 @@ export class SettingsCard extends LitElement implements LovelaceCard {
   @state() channel: 'main' | 'beta' = 'main';
   @state() autoUpdate: boolean = true;
 
+  private sqConfigLoaded = false;
   private prevBrightness: number = window.fully?.getScreenBrightness() || 255;
 
   private boundHandleDeviceChanges = () => this.handleDeviceChanges();
@@ -51,7 +52,6 @@ export class SettingsCard extends LitElement implements LovelaceCard {
     window.addEventListener('resize', this.boundHandleDeviceChanges);
     this.handleDeviceChanges();
     this.initSettingsFile();
-    this.loadSqConfig();
   }
 
   public disconnectedCallback(): void {
@@ -67,6 +67,8 @@ export class SettingsCard extends LitElement implements LovelaceCard {
         this.hass.states['input_boolean.admin_mode']?.state === 'on';
       this.isAdminMode = (this.hass.user?.is_admin ?? false) || isAdminMode;
     }
+
+    if (!this.sqConfigLoaded) this.loadSqConfig();
   }
 
   protected render(): TemplateResult | typeof nothing {
@@ -354,6 +356,8 @@ export class SettingsCard extends LitElement implements LovelaceCard {
         err
       );
     }
+
+    this.sqConfigLoaded = true;
   }
 
   private async saveSqConfig(): Promise<void> {
