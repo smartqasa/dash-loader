@@ -4,26 +4,25 @@ window.smartqasa = window.smartqasa || {
   chipsConfig: [],
   confirm: () => {},
   confirmClose: () => {},
-  deviceModel: "",
+  deviceModel: '',
   menuTab: 0,
   popupStack: [],
   popup: () => {},
   popupClose: () => {},
   popupReset: () => {},
   service: () => {},
-  startArea: location.pathname.split("/").pop(),
+  startArea: location.pathname.split('/').pop(),
 };
 
 if (window.fully) {
-  console.log("Device Model: " + window.fully.getDeviceModel());
+  console.log('Device Model: ' + window.fully.getDeviceModel());
   window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
 
-import "./cards/panel";
-import "./cards/screensaver";
-import "./cards/settings";
+import './cards/panel';
+import './cards/screensaver';
 
 console.info(
   `%c SmartQasa Loader ⏏ ${__BUILD_VERSION__} (Built: ${__BUILD_TIMESTAMP__}) `,
-  "background-color: #0000ff; color: #ffffff; font-weight: 700;"
+  'background-color: #0000ff; color: #ffffff; font-weight: 700;'
 );

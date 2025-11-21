@@ -1,28 +1,28 @@
 declare const __BUILD_VERSION__: string;
 declare const __BUILD_TIMESTAMP__: string;
 
-declare module "*.css" {
-  import { CSSResult } from "lit";
+declare module '*.css' {
+  import { CSSResult } from 'lit';
   const styles: CSSResult;
   export default styles;
 }
 
-declare module "*.jpg" {
+declare module '*.jpg' {
   const value: string;
   export default value;
 }
 
-declare module "*.mp3" {
+declare module '*.mp3' {
   const value: string;
   export default value;
 }
 
-declare module "*.png" {
+declare module '*.png' {
   const value: string;
   export default value;
 }
 
-declare module "*.webp" {
+declare module '*.webp' {
   const value: string;
   export default value;
 }
@@ -64,7 +64,6 @@ declare interface Window {
     stopScreensaver: () => void;
     turnScreenOff: (keepAlive: boolean) => void;
     turnScreenOn: () => void;
-
     writeFile: (path: string, content: string) => void;
   };
 
