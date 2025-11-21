@@ -1140,15 +1140,15 @@ let SettingsCard = class SettingsCard extends i$1 {
                     </label>
                   `)}
               </div>
-            </div>
 
-            <div class="row">
-              <div class="info">
-                <span class="label">Automatic Updates</span>
-                <ha-switch
-                  .checked=${this.autoUpdate}
-                  @change=${(e) => this.handleAutoUpdateChange(e.currentTarget.checked)}
-                ></ha-switch>
+              <div class="row">
+                <div class="info">
+                  <span class="label">Automatic Updates</span>
+                  <ha-switch
+                    .checked=${this.autoUpdate}
+                    @change=${(e) => this.handleAutoUpdateChange(e.currentTarget.checked)}
+                  ></ha-switch>
+                </div>
               </div>
             </div>
           `
@@ -1399,5 +1399,5 @@ if (window.fully) {
     console.log("Device Model: " + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.41-beta.12"} (Built: ${"2025-11-21T00:25:08.885Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.41-beta.13"} (Built: ${"2025-11-21T00:29:22.961Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
