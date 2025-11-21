@@ -1041,6 +1041,10 @@ let SettingsCard = class SettingsCard extends i$1 {
                 this.brightnessMap = { ...this.brightnessMap, [phase]: 255 };
             }
         }
+        console.log('[SettingsCard] Rendering with state:', {
+            channel: this.channel,
+            autoUpdate: this.autoUpdate,
+        });
         return x `
       <div class="section">
         <div class="title">Model: ${deviceModel}</div>
@@ -1395,5 +1399,5 @@ if (window.fully) {
     console.log("Device Model: " + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.41-beta.14"} (Built: ${"2025-11-21T00:30:53.358Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.41-beta.15"} (Built: ${"2025-11-21T01:07:04.542Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map

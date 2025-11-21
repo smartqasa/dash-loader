@@ -94,6 +94,11 @@ export class SettingsCard extends LitElement implements LovelaceCard {
       }
     }
 
+    console.log('[SettingsCard] Rendering with state:', {
+      channel: this.channel,
+      autoUpdate: this.autoUpdate,
+    });
+
     return html`
       <div class="section">
         <div class="title">Model: ${deviceModel}</div>
