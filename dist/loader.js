@@ -1245,7 +1245,7 @@ let SettingsCard = class SettingsCard extends i$1 {
                 return;
             }
             this.channel = result.channel === 'beta' ? 'beta' : 'main';
-            this.autoUpdate = Boolean(result.autoUpdate);
+            this.autoUpdate = Boolean(result.auto_update);
             console.log('[SettingsCard] Loaded SmartQasa config:', result);
         }
         catch (err) {
@@ -1258,7 +1258,7 @@ let SettingsCard = class SettingsCard extends i$1 {
         try {
             const payload = {
                 channel: this.channel,
-                autoUpdate: this.autoUpdate,
+                auto_update: this.autoUpdate,
             };
             const result = await this.hass.callService('smartqasa', 'config_write', payload, undefined, undefined, true);
             if (result?.error) {
@@ -1400,5 +1400,5 @@ if (window.fully) {
     console.log("Device Model: " + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.41-beta.8"} (Built: ${"2025-11-20T23:34:37.740Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.41-beta.9"} (Built: ${"2025-11-21T00:07:24.789Z"}) `, "background-color: #0000ff; color: #ffffff; font-weight: 700;");
 //# sourceMappingURL=loader.js.map
