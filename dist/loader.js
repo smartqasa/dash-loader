@@ -284,14 +284,14 @@ let PanelCard = class PanelCard extends i {
         const activePhase = this.hass.states?.['input_select.location_phase']?.state;
         if (!activePhase || activePhase === this.phase)
             return;
-        console.log('[panel-card] [handlePhaseChange] Post Phase Check', activePhase);
+        console.log('[panel-card] [handlePhaseChange] Post Phase Check ', activePhase);
         try {
             const settings = SettingsStorage.read();
             const brightnessMap = (settings?.brightnessMap ?? {});
             if (activePhase in brightnessMap) {
                 const value = brightnessMap[activePhase];
                 window.fully.setScreenBrightness(value);
-                window.fully.setStringSetting('screensaverBrightness', String(value));
+                //window.fully.setStringSetting('screensaverBrightness', String(value));
                 this.phase = activePhase;
                 console.log('[panel-card] Set brightnesss for ', this.phase, ' to ', value);
             }
@@ -433,5 +433,5 @@ if (window.fully) {
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
 //import './cards/screensaver';
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.44-beta.8"} (Built: ${"2025-11-24T13:46:40.221Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.44-beta.9"} (Built: ${"2025-11-24T13:50:30.341Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
 //# sourceMappingURL=loader.js.map
