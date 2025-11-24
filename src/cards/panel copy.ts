@@ -6,6 +6,7 @@ import {
   PropertyValues,
   TemplateResult,
 } from 'lit';
+import { cache } from 'lit/directives/cache.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import {
   HomeAssistant,
@@ -18,6 +19,8 @@ import {
   deviceRefresh,
   deviceReboot,
 } from '../utilities/device-actions';
+
+const SCREENSAVER_TIMEOUT = 5 * 60 * 1000;
 
 window.customCards = window.customCards || [];
 window.customCards.push({
@@ -41,8 +44,48 @@ export class PanelCard extends LitElement {
   private rebootTime: string | null = null;
   private refreshTime: string | null = null;
 
+  private boundTouchHandler = () => this.resetSaver();
+  private boundMouseHandler = () => this.resetSaver();
+  private boundKeyHandler = () => this.resetSaver();
+
+  private saverTimer: ReturnType<typeof setTimeout> | null = null;
+
   public getCardSize(): number | Promise<number> {
     return 20;
+  }
+
+  public connectedCallback(): void {
+    super.connectedCallback();
+
+    if (window.fully) {
+      window.addEventListener('touchstart', this.boundTouchHandler, {
+        passive: true,
+      });
+      window.addEventListener('mousemove', this.boundMouseHandler);
+      window.addEventListener('keydown', this.boundKeyHandler);
+
+      (window as any).onFullyMotion = () => this.resetSaver();
+      if (window.fully.bind) {
+        window.fully.bind('onMotion', 'onFullyMotion()');
+      }
+
+      this.resetSaver();
+    }
+  }
+
+  public disconnectedCallback(): void {
+    if (window.fully) {
+      window.removeEventListener('touchstart', this.boundTouchHandler);
+      window.removeEventListener('mousemove', this.boundMouseHandler);
+      window.removeEventListener('keydown', this.boundKeyHandler);
+    }
+
+    if (this.saverTimer) {
+      clearTimeout(this.saverTimer);
+      this.saverTimer = null;
+    }
+
+    super.disconnectedCallback();
   }
 
   public setConfig(config: LovelaceCardConfig): void {
@@ -71,7 +114,16 @@ export class PanelCard extends LitElement {
     }
 
     return html`
-      <main-card .config=${this.config} .hass=${this.hass}></main-card>
+      ${this.isSaverActive
+        ? cache(html`
+            <screensaver-card
+              .config=${this.config}
+              .hass=${this.hass}
+            ></screensaver-card>
+          `)
+        : cache(html`
+            <main-card .config=${this.config} .hass=${this.hass}></main-card>
+          `)}
     `;
   }
 
@@ -107,6 +159,29 @@ export class PanelCard extends LitElement {
         (popup as PopupDialogElement).hass = this.hass;
       }
     });
+  }
+
+  private resetSaver(): void {
+    if (!window.fully) return;
+
+    if (this.isSaverActive) this.exitSaver();
+
+    if (this.saverTimer) {
+      clearTimeout(this.saverTimer);
+      this.saverTimer = null;
+    }
+
+    this.saverTimer = setTimeout(() => {
+      this.showSaver();
+    }, SCREENSAVER_TIMEOUT);
+  }
+
+  private showSaver(): void {
+    this.isSaverActive = true;
+  }
+
+  private exitSaver(): void {
+    this.isSaverActive = false;
   }
 
   private handlePhaseChange(): void {

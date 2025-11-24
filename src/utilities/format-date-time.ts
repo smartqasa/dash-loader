@@ -1,10 +1,10 @@
 export const formattedDate = (date: Date = new Date()): string => {
-  if (isNaN(date.getTime())) return "Unknown";
+  if (isNaN(date.getTime())) return 'Unknown';
 
   const options: Intl.DateTimeFormatOptions = {
-    weekday: "long",
-    month: "short",
-    day: "numeric",
+    weekday: 'long',
+    month: 'short',
+    day: 'numeric',
   };
 
   try {
@@ -15,9 +15,9 @@ export const formattedDate = (date: Date = new Date()): string => {
 };
 
 export const formattedTime = (date: Date = new Date()): string => {
-  if (isNaN(date.getTime())) return "Unknown";
+  if (isNaN(date.getTime())) return 'Unknown';
 
   const hours = date.getHours();
   const minutes = date.getMinutes();
-  return `${hours % 12 || 12}:${minutes < 10 ? "0" + minutes : minutes}`;
+  return `${hours % 12 || 12}:${minutes < 10 ? '0' + minutes : minutes}`;
 };

@@ -20,7 +20,7 @@ if (window.fully) {
 }
 
 import './cards/panel';
-import './cards/screensaver';
+//import './cards/screensaver';
 
 console.info(
   `%c SmartQasa Loader ⏏ ${__BUILD_VERSION__} (Built: ${__BUILD_TIMESTAMP__}) `,
