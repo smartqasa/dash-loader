@@ -19,7 +19,7 @@ import {
   deviceReboot,
 } from '../utilities/device-actions';
 
-window.customCards = window.customCards || [];
+window.customCards ??= [];
 window.customCards.push({
   type: 'panel-card',
   name: 'Panel Card',

@@ -202,7 +202,7 @@ function deviceReboot() {
     }
 }
 
-window.customCards = window.customCards || [];
+window.customCards ??= [];
 window.customCards.push({
     type: 'panel-card',
     name: 'Panel Card',
@@ -430,5 +430,5 @@ if (window.fully) {
     console.log('Device Model: ' + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.45-beta.2"} (Built: ${"2025-11-24T19:59:06.652Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.45-beta.3"} (Built: ${"2025-11-24T20:20:21.177Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
 //# sourceMappingURL=loader.js.map
