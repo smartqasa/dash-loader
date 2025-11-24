@@ -123,7 +123,7 @@ export class PanelCard extends LitElement {
         const value = brightnessMap[activePhase];
         //window.fully.setScreenBrightness(value);
         window.fully.setStringSetting('screenBrightness', String(value));
-        //window.fully.setStringSetting('screensaverBrightness', String(value));
+        window.fully.setStringSetting('screensaverBrightness', String(value));
         this.phase = activePhase;
       }
     } catch (err) {
