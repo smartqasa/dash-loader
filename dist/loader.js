@@ -279,13 +279,12 @@ let PanelCard = class PanelCard extends i {
         });
     }
     handlePhaseChange() {
-        console.log('[panel-card] [handlePhaseChange] Pre Fully check');
         if (typeof window.fully === 'undefined' || !this.hass)
             return;
-        console.log('[panel-card] [handlePhaseChange] Post Fully check');
         const activePhase = this.hass.states?.['input_select.location_phase']?.state;
         if (!activePhase || activePhase === this.phase)
             return;
+        console.log('[panel-card] [handlePhaseChange] Post Phase Check', activePhase);
         try {
             const settings = SettingsStorage.read();
             const brightnessMap = (settings?.brightnessMap ?? {});
@@ -434,5 +433,5 @@ if (window.fully) {
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
 //import './cards/screensaver';
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.44-beta.7"} (Built: ${"2025-11-24T13:40:41.127Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.44-beta.8"} (Built: ${"2025-11-24T13:46:40.221Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
 //# sourceMappingURL=loader.js.map
