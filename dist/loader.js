@@ -290,7 +290,7 @@ let PanelCard = class PanelCard extends i {
             if (activePhase in brightnessMap) {
                 const value = brightnessMap[activePhase];
                 //window.fully.setScreenBrightness(value);
-                window.fully.setStringSetting('screenbrightness', String(value));
+                window.fully.setStringSetting('screenBrightness', String(value));
                 //window.fully.setStringSetting('screensaverBrightness', String(value));
                 this.phase = activePhase;
             }
@@ -432,5 +432,5 @@ if (window.fully) {
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
 //import './cards/screensaver';
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.44-beta.10"} (Built: ${"2025-11-24T14:42:52.355Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.44-beta.11"} (Built: ${"2025-11-24T14:43:25.526Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
 //# sourceMappingURL=loader.js.map
