@@ -431,5 +431,5 @@ if (window.fully) {
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
 //import './cards/screensaver';
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.44-beta.13"} (Built: ${"2025-11-24T17:06:24.463Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.45-beta.1"} (Built: ${"2025-11-24T19:58:07.605Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
 //# sourceMappingURL=loader.js.map
