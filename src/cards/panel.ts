@@ -121,7 +121,6 @@ export class PanelCard extends LitElement {
       const brightnessMap = (settings?.brightnessMap ?? {}) as BrightnessMap;
       if (activePhase in brightnessMap) {
         const value = brightnessMap[activePhase];
-        //window.fully.setScreenBrightness(value);
         window.fully.setStringSetting('screenBrightness', String(value));
         window.fully.setStringSetting('screensaverBrightness', String(value));
         this.phase = activePhase;
