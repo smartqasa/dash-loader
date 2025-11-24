@@ -124,6 +124,12 @@ export class PanelCard extends LitElement {
         window.fully.setScreenBrightness(value);
         window.fully.setStringSetting('screensaverBrightness', String(value));
         this.phase = activePhase;
+        console.log(
+          '[panel-card] Set brightnesss for ',
+          this.phase,
+          ' to ',
+          value
+        );
       }
     } catch (err) {
       console.warn(
