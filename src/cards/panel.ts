@@ -110,7 +110,9 @@ export class PanelCard extends LitElement {
   }
 
   private handlePhaseChange(): void {
+    console.log('[panel-card] [handlePhaseChange] Pre Fully check');
     if (typeof window.fully === 'undefined' || !this.hass) return;
+    console.log('[panel-card] [handlePhaseChange] Post Fully check');
 
     const activePhase =
       this.hass.states?.['input_select.location_phase']?.state;
