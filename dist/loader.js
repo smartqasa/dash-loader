@@ -150,7 +150,7 @@ class SettingsStorage {
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 async function executeFullyAction(action) {
-    if (typeof window.fully === "undefined")
+    if (typeof window.fully === 'undefined')
         return;
     const timings = {
         bringToFore: 500,
@@ -161,7 +161,7 @@ async function executeFullyAction(action) {
         window.fully.bringToForeground();
         await delay(timings.bringToFore);
     }
-    window.fully.setStringSetting("timeToRegainFocus", "0");
+    window.fully.setStringSetting('timeToRegainFocus', '0');
     await delay(timings.regainFocus);
     window.fully.clearCache();
     await delay(timings.clearCache);
@@ -169,36 +169,36 @@ async function executeFullyAction(action) {
 }
 function bustCacheAndReload() {
     const url = new URL(window.location.href);
-    url.searchParams.set("nocache", Date.now().toString());
-    window.history.replaceState(null, "", url.toString());
+    url.searchParams.set('nocache', Date.now().toString());
+    window.history.replaceState(null, '', url.toString());
     window.location.reload();
 }
 async function deviceFlash() {
-    if (typeof window.fully === "undefined")
+    if (typeof window.fully === 'undefined')
         return;
     try {
         window.fully.turnScreenOff(true);
-        await delay(1000);
+        await delay(2000);
         window.fully.turnScreenOn();
     }
     catch (err) {
-        console.error("[deviceFlash] Error:", err);
+        console.error('[deviceFlash] Error:', err);
     }
 }
 function deviceRefresh() {
-    if (typeof window.fully === "undefined") {
+    if (typeof window.fully === 'undefined') {
         bustCacheAndReload();
     }
     else {
-        void executeFullyAction("restartApp");
+        void executeFullyAction('restartApp');
     }
 }
 function deviceReboot() {
-    if (typeof window.fully === "undefined") {
+    if (typeof window.fully === 'undefined') {
         bustCacheAndReload();
     }
     else {
-        void executeFullyAction("reboot");
+        void executeFullyAction('reboot');
     }
 }
 
@@ -430,5 +430,5 @@ if (window.fully) {
     console.log('Device Model: ' + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.45-beta.6"} (Built: ${"2025-11-26T19:49:58.385Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.46-beta.1"} (Built: ${"2025-11-26T23:57:58.947Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
 //# sourceMappingURL=loader.js.map
