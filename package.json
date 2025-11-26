@@ -1,6 +1,6 @@
 {
   "name": "dash-loader",
-  "version": "6.1.45-beta.6",
+  "version": "6.1.45",
   "description": "Dashboard Loader",
   "type": "module",
   "author": "Tom Bruno",
