@@ -46,14 +46,21 @@ export class PanelCard extends LitElement {
     if (typeof window.fully !== 'undefined') {
       try {
         (window as any).fullySaverStop = () => {
-          console.log('[FullyDiag] Screensaver STOP', {
-            ts: new Date().toISOString(),
-            innerWidth: window.innerWidth,
-            innerHeight: window.innerHeight,
-            availWidth: window.screen.availWidth,
-            availHeight: window.screen.availHeight,
-            ratio: window.devicePixelRatio,
-          });
+          console.log(
+            '[PANEL-CARD] Screensaver STOP',
+            'TimeStamp',
+            new Date().toISOString(),
+            'innerWidth',
+            window.innerWidth,
+            'innerHeight',
+            window.innerHeight,
+            'availWidth',
+            window.screen.availWidth,
+            'availHeight',
+            window.screen.availHeight,
+            'ratio',
+            window.devicePixelRatio
+          );
         };
 
         window.fully.bind('onScreensaverStop', 'fullySaverStop();');

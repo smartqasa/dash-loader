@@ -224,14 +224,7 @@ let PanelCard = class PanelCard extends i {
         if (typeof window.fully !== 'undefined') {
             try {
                 window.fullySaverStop = () => {
-                    console.log('[FullyDiag] Screensaver STOP', {
-                        ts: new Date().toISOString(),
-                        innerWidth: window.innerWidth,
-                        innerHeight: window.innerHeight,
-                        availWidth: window.screen.availWidth,
-                        availHeight: window.screen.availHeight,
-                        ratio: window.devicePixelRatio,
-                    });
+                    console.log('[PANEL-CARD] Screensaver STOP', 'TimeStamp', new Date().toISOString(), 'innerWidth', window.innerWidth, 'innerHeight', window.innerHeight, 'availWidth', window.screen.availWidth, 'availHeight', window.screen.availHeight, 'ratio', window.devicePixelRatio);
                 };
                 window.fully.bind('onScreensaverStop', 'fullySaverStop();');
                 console.log('[FullyDiag] Bound Fully onScreensaverStop');
@@ -448,5 +441,5 @@ if (window.fully) {
     console.log('Device Model: ' + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.50-beta.1"} (Built: ${"2025-12-08T13:22:07.063Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.50-beta.2"} (Built: ${"2025-12-08T14:57:23.418Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
 //# sourceMappingURL=loader.js.map
