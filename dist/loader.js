@@ -213,12 +213,33 @@ let PanelCard = class PanelCard extends i {
     constructor() {
         super(...arguments);
         this.isMainLoaded = false;
-        this.isSaverActive = false;
         this.isAdminView = false;
         this.phase = null;
         this.flashTime = null;
         this.rebootTime = null;
         this.refreshTime = null;
+    }
+    connectedCallback() {
+        super.connectedCallback();
+        if (typeof window.fully !== 'undefined') {
+            try {
+                window.fullySaverStop = () => {
+                    console.log('[FullyDiag] Screensaver STOP', {
+                        ts: new Date().toISOString(),
+                        innerWidth: window.innerWidth,
+                        innerHeight: window.innerHeight,
+                        availWidth: window.screen.availWidth,
+                        availHeight: window.screen.availHeight,
+                        ratio: window.devicePixelRatio,
+                    });
+                };
+                window.fully.bind('onScreensaverStop', 'fullySaverStop();');
+                console.log('[FullyDiag] Bound Fully onScreensaverStop');
+            }
+            catch (err) {
+                console.error('[FullyDiag] Bind failed:', err);
+            }
+        }
     }
     getCardSize() {
         return 20;
@@ -405,9 +426,6 @@ __decorate([
 __decorate([
     r()
 ], PanelCard.prototype, "isMainLoaded", void 0);
-__decorate([
-    r()
-], PanelCard.prototype, "isSaverActive", void 0);
 PanelCard = __decorate([
     t('panel-card')
 ], PanelCard);
@@ -430,5 +448,5 @@ if (window.fully) {
     console.log('Device Model: ' + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.48-beta.1"} (Built: ${"2025-11-28T14:39:14.790Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.50-beta.1"} (Built: ${"2025-12-08T13:22:07.063Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
 //# sourceMappingURL=loader.js.map

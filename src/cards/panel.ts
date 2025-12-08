@@ -33,13 +33,36 @@ export class PanelCard extends LitElement {
   @property({ attribute: false }) hass?: HomeAssistant;
 
   @state() isMainLoaded = false;
-  @state() isSaverActive = false;
 
   private isAdminView = false;
   private phase: string | null = null;
   private flashTime: string | null = null;
   private rebootTime: string | null = null;
   private refreshTime: string | null = null;
+
+  public connectedCallback(): void {
+    super.connectedCallback();
+
+    if (typeof window.fully !== 'undefined') {
+      try {
+        (window as any).fullySaverStop = () => {
+          console.log('[FullyDiag] Screensaver STOP', {
+            ts: new Date().toISOString(),
+            innerWidth: window.innerWidth,
+            innerHeight: window.innerHeight,
+            availWidth: window.screen.availWidth,
+            availHeight: window.screen.availHeight,
+            ratio: window.devicePixelRatio,
+          });
+        };
+
+        window.fully.bind('onScreensaverStop', 'fullySaverStop();');
+        console.log('[FullyDiag] Bound Fully onScreensaverStop');
+      } catch (err) {
+        console.error('[FullyDiag] Bind failed:', err);
+      }
+    }
+  }
 
   public getCardSize(): number | Promise<number> {
     return 20;
