@@ -178,8 +178,10 @@ async function deviceFlash() {
         return;
     try {
         window.fully.turnScreenOff(true);
-        await delay(3000);
+        await delay(1000);
         window.fully.turnScreenOn();
+        await delay(1000);
+        window.location.reload();
     }
     catch (err) {
         console.error('[deviceFlash] Error:', err);
@@ -441,5 +443,5 @@ if (window.fully) {
     console.log('Device Model: ' + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.51-beta.3"} (Built: ${"2025-12-10T05:41:13.606Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.52-beta.1"} (Built: ${"2025-12-11T12:07:04.123Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
 //# sourceMappingURL=loader.js.map
