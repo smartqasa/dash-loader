@@ -21,7 +21,7 @@ if (window.fully) {
 
 import './cards/panel';
 
-window.smartqasa.versionElements = __BUILD_VERSION__;
+window.smartqasa.versionLoader = __BUILD_VERSION__;
 
 console.info(
   `%c SmartQasa Loader ⏏ ${__BUILD_VERSION__} (Built: ${__BUILD_TIMESTAMP__}) `,
