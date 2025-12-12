@@ -260,7 +260,7 @@ let PanelCard = class PanelCard extends i {
       `;
         }
         return x `
-      <main-card .config=${this.config} .hass=${this.hass}></main-card>
+      <main-card-x .config=${this.config} .hass=${this.hass}></main-card-x>
     `;
     }
     updated(changedProps) {
@@ -443,5 +443,5 @@ if (window.fully) {
     console.log('Device Model: ' + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.52-beta.1"} (Built: ${"2025-12-11T12:07:04.123Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.52-beta.2"} (Built: ${"2025-12-12T01:12:56.102Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
 //# sourceMappingURL=loader.js.map
