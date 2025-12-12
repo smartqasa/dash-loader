@@ -82,7 +82,7 @@ export class PanelCard extends LitElement {
       this.syncPopups();
       this.checkDeviceTriggers();
       this.handlePhaseChange();
-      this.handleSunChange();
+      //this.handleSunChange();
     }
   }
 
