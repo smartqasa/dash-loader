@@ -221,21 +221,6 @@ let PanelCard = class PanelCard extends i {
         this.rebootTime = null;
         this.refreshTime = null;
     }
-    connectedCallback() {
-        super.connectedCallback();
-        if (typeof window.fully !== 'undefined') {
-            try {
-                window.fullySaverStop = () => {
-                    console.log('[PANEL-CARD] Screensaver STOP', 'TimeStamp', new Date().toISOString(), 'innerWidth', window.innerWidth, 'innerHeight', window.innerHeight, 'availWidth', window.screen.availWidth, 'availHeight', window.screen.availHeight, 'ratio', window.devicePixelRatio);
-                };
-                window.fully.bind('onScreensaverStop', 'fullySaverStop();');
-                console.log('[FullyDiag] Bound Fully onScreensaverStop');
-            }
-            catch (err) {
-                console.error('[FullyDiag] Bind failed:', err);
-            }
-        }
-    }
     getCardSize() {
         return 20;
     }
@@ -443,5 +428,5 @@ if (window.fully) {
     console.log('Device Model: ' + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.52-beta.4"} (Built: ${"2025-12-12T01:41:11.454Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.52-beta.5"} (Built: ${"2025-12-12T11:58:45.615Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
 //# sourceMappingURL=loader.js.map
