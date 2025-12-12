@@ -101,7 +101,7 @@ export class PanelCard extends LitElement {
     }
 
     return html`
-      <main-card-x .config=${this.config} .hass=${this.hass}></main-card-x>
+      <main-card .config=${this.config} .hass=${this.hass}></main-card>
     `;
   }
 
