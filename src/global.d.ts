@@ -79,5 +79,7 @@ declare interface Window {
     popupStack: any[];
     startArea: string | undefined;
     service: (service: string, data?: object) => void;
+    versionElements: string;
+    versionLoader: string;
   };
 }

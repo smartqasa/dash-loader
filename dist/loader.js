@@ -460,5 +460,6 @@ if (window.fully) {
     console.log('Device Model: ' + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.52-beta.9"} (Built: ${"2025-12-12T19:09:35.462Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
+window.smartqasa.versionElements = "6.1.52-beta.10";
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.52-beta.10"} (Built: ${"2025-12-12T19:12:07.267Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
 //# sourceMappingURL=loader.js.map
