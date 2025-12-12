@@ -18,6 +18,7 @@ import {
   deviceRefresh,
   deviceReboot,
 } from '../utilities/device-actions';
+import { setDisplayMode } from '../utilities/set-display-mode';
 
 window.customCards ??= [];
 window.customCards.push({
@@ -81,6 +82,7 @@ export class PanelCard extends LitElement {
       this.syncPopups();
       this.checkDeviceTriggers();
       this.handlePhaseChange();
+      this.handleSunChange();
     }
   }
 
@@ -129,6 +131,14 @@ export class PanelCard extends LitElement {
         '[PanelCard] Failed to update brightness on phase change:',
         err
       );
+    }
+  }
+
+  private handleSunChange(): void {
+    const sun = this.hass?.states['sun.sun'];
+    if (sun) {
+      const isDay = sun.state === 'above_horizon';
+      setDisplayMode(isDay ? 'light' : 'dark');
     }
   }
 

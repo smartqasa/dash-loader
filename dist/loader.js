@@ -178,9 +178,9 @@ async function deviceFlash() {
         return;
     try {
         window.fully.turnScreenOff(true);
-        await delay(1000);
+        await delay(800);
         window.fully.turnScreenOn();
-        await delay(1000);
+        await delay(1200);
         window.location.reload();
     }
     catch (err) {
@@ -201,6 +201,28 @@ function deviceReboot() {
     }
     else {
         void executeFullyAction('reboot');
+    }
+}
+
+function setDisplayMode(mode) {
+    // 1️⃣ Apply HA theme via browser_mod
+    try {
+        if (typeof window.browser_mod !== 'undefined') {
+            window.browser_mod?.service('set_theme', { dark: mode === 'dark' });
+        }
+    }
+    catch (err) {
+        console.error('[setDisplayMode] Failed to set browser_mod theme:', err);
+    }
+    // 2️⃣ Apply dark/light mode via Fully Kiosk Browser
+    try {
+        if (typeof window.fully !== 'undefined') {
+            const appDarkMode = mode === 'light' ? 0 : 2;
+            window.fully.setStringSetting('appDarkMode', String(appDarkMode));
+        }
+    }
+    catch (err) {
+        console.error('[setDisplayMode] Failed to set Fully appDarkMode:', err);
     }
 }
 
@@ -255,6 +277,7 @@ let PanelCard = class PanelCard extends i {
             this.syncPopups();
             this.checkDeviceTriggers();
             this.handlePhaseChange();
+            this.handleSunChange();
         }
     }
     async loadMainCard(retries = 5) {
@@ -297,6 +320,13 @@ let PanelCard = class PanelCard extends i {
         }
         catch (err) {
             console.warn('[PanelCard] Failed to update brightness on phase change:', err);
+        }
+    }
+    handleSunChange() {
+        const sun = this.hass?.states['sun.sun'];
+        if (sun) {
+            const isDay = sun.state === 'above_horizon';
+            setDisplayMode(isDay ? 'light' : 'dark');
         }
     }
     checkDeviceTriggers() {
@@ -428,5 +458,5 @@ if (window.fully) {
     console.log('Device Model: ' + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.52-beta.5"} (Built: ${"2025-12-12T11:58:45.615Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.52-beta.6"} (Built: ${"2025-12-12T15:00:02.947Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
 //# sourceMappingURL=loader.js.map

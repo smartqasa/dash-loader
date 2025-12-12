@@ -40,9 +40,9 @@ export async function deviceFlash(): Promise<void> {
 
   try {
     window.fully.turnScreenOff(true);
-    await delay(1000);
+    await delay(800);
     window.fully.turnScreenOn();
-    await delay(1000);
+    await delay(1200);
     window.location.reload();
   } catch (err) {
     console.error('[deviceFlash] Error:', err);
