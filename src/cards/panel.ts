@@ -37,6 +37,7 @@ export class PanelCard extends LitElement {
 
   private isAdminView = false;
   private phase: string | null = null;
+  private sun: string | null = null;
   private flashTime: string | null = null;
   private rebootTime: string | null = null;
   private refreshTime: string | null = null;
@@ -82,7 +83,7 @@ export class PanelCard extends LitElement {
       this.syncPopups();
       this.checkDeviceTriggers();
       this.handlePhaseChange();
-      //this.handleSunChange();
+      this.handleSunChange();
     }
   }
 
@@ -136,10 +137,11 @@ export class PanelCard extends LitElement {
 
   private handleSunChange(): void {
     const sun = this.hass?.states['sun.sun'];
-    if (sun) {
-      const isDay = sun.state === 'above_horizon';
-      setDisplayMode(isDay ? 'light' : 'dark');
-    }
+    if (!sun || sun.state === this.sun) return;
+
+    const isDay = sun.state === 'above_horizon';
+    setDisplayMode(isDay ? 'light' : 'dark');
+    this.sun = sun.state;
   }
 
   private checkDeviceTriggers(): void {
