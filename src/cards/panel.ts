@@ -7,12 +7,7 @@ import {
   TemplateResult,
 } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import {
-  HomeAssistant,
-  LovelaceCardConfig,
-  PopupDialogElement,
-} from '../types';
-import { SettingsStorage, BrightnessMap } from '../utilities/settings-storage';
+import { HomeAssistant, LovelaceCardConfig } from '../types';
 
 window.customCards ??= [];
 window.customCards.push({
@@ -30,8 +25,6 @@ export class PanelCard extends LitElement {
   @state() isMainLoaded = false;
 
   private isAdminView = false;
-  private phase: string | null = null;
-  private sunState: string | null = null;
 
   public getCardSize(): number | Promise<number> {
     return 20;
@@ -67,16 +60,6 @@ export class PanelCard extends LitElement {
     `;
   }
 
-  protected updated(changedProps: PropertyValues): void {
-    if (!this.isMainLoaded) this.loadMainCard();
-
-    if (changedProps.has('hass') && this.hass) {
-      this.syncPopups();
-      this.handlePhaseChange();
-      this.handleSunChange();
-    }
-  }
-
   private async loadMainCard(retries = 5): Promise<void> {
     try {
       await customElements.whenDefined('main-card');
@@ -89,55 +72,6 @@ export class PanelCard extends LitElement {
     }
 
     this.isMainLoaded = true;
-  }
-
-  private syncPopups(): void {
-    if (!this.hass) return;
-
-    document.querySelectorAll('popup-dialog').forEach((popup) => {
-      if ((popup as PopupDialogElement).hass !== undefined) {
-        (popup as PopupDialogElement).hass = this.hass;
-      }
-    });
-  }
-
-  private handlePhaseChange(): void {
-    if (typeof window.fully === 'undefined' || !this.hass) return;
-
-    const activePhase =
-      this.hass.states?.['input_select.location_phase']?.state;
-    if (!activePhase || activePhase === this.phase) return;
-
-    try {
-      const settings = SettingsStorage.read();
-      const brightnessMap = (settings?.brightnessMap ?? {}) as BrightnessMap;
-      if (activePhase in brightnessMap) {
-        const value = brightnessMap[activePhase];
-        window.fully.setStringSetting('screenBrightness', String(value));
-        window.fully.setStringSetting('screensaverBrightness', String(value));
-        this.phase = activePhase;
-      }
-    } catch (err) {
-      console.warn(
-        '[PanelCard] Failed to update brightness on phase change:',
-        err
-      );
-    }
-  }
-
-  private handleSunChange(): void {
-    if (!this.hass || typeof window.fully === 'undefined') return;
-
-    const sun = this.hass.states['sun.sun'];
-    if (!sun || sun.state === this.sunState) return;
-    this.sunState = sun.state;
-
-    const dark = this.hass?.selectedTheme?.dark;
-    if (dark === undefined) {
-      const isDay = sun.state === 'above_horizon';
-      const appDarkMode = isDay ? 0 : 2;
-      window.fully.setStringSetting('appDarkMode', String(appDarkMode));
-    }
   }
 
   static get styles(): CSSResult {

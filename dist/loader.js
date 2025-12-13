@@ -72,82 +72,6 @@ const t=t=>(e,o)=>{ void 0!==o?o.addInitializer((()=>{customElements.define(t,e)
  * SPDX-License-Identifier: BSD-3-Clause
  */function r(r){return n({...r,state:true,attribute:false})}
 
-class SettingsStorage {
-    static { this.settingsFile = null; }
-    /** Initialize settings file and ensure it exists */
-    static init(defaultSettings) {
-        if (typeof window.fully === "undefined")
-            return defaultSettings;
-        try {
-            const basePath = window.fully.getInternalAppSpecificStoragePath();
-            this.settingsFile = `${basePath}/sq-settings.json`;
-            const text = window.fully.readFile(this.settingsFile);
-            if (text) {
-                const loaded = JSON.parse(text);
-                const merged = {
-                    ...defaultSettings,
-                    ...loaded,
-                    brightnessMap: {
-                        ...defaultSettings.brightnessMap,
-                        ...(loaded.brightnessMap || {}),
-                    },
-                };
-                // Re-save merged structure to keep file consistent
-                window.fully.writeFile(this.settingsFile, JSON.stringify(merged, null, 2));
-                return merged;
-            }
-            else {
-                window.fully.writeFile(this.settingsFile, JSON.stringify(defaultSettings, null, 2));
-                return defaultSettings;
-            }
-        }
-        catch (e) {
-            console.warn("[SettingsStorage] init error:", e);
-            return defaultSettings;
-        }
-    }
-    /** Update a property and save back to file */
-    static update(partial) {
-        if (typeof window.fully === "undefined" || !this.settingsFile)
-            return;
-        try {
-            const text = window.fully.readFile(this.settingsFile);
-            const data = text ? JSON.parse(text) : {};
-            const merged = {
-                ...data,
-                ...partial,
-                brightnessMap: {
-                    ...(data.brightnessMap || {}),
-                    ...(partial.brightnessMap || {}),
-                },
-            };
-            window.fully.writeFile(this.settingsFile, JSON.stringify(merged, null, 2));
-        }
-        catch (e) {
-            console.warn("[SettingsStorage] update error:", e);
-        }
-    }
-    /** Read the current settings file */
-    static read() {
-        if (typeof window.fully === "undefined")
-            return null;
-        try {
-            if (!this.settingsFile) {
-                const basePath = window.fully.getInternalAppSpecificStoragePath();
-                this.settingsFile = `${basePath}/sq-settings.json`;
-            }
-            const text = window.fully.readFile(this.settingsFile);
-            if (!text)
-                return null;
-            return JSON.parse(text);
-        }
-        catch (e) {
-            console.warn("[SettingsStorage] read error:", e);
-            return null;
-        }
-    }
-}
-
 window.customCards ??= [];
 window.customCards.push({
     type: 'panel-card',
@@ -160,8 +84,6 @@ let PanelCard = class PanelCard extends i {
         super(...arguments);
         this.isMainLoaded = false;
         this.isAdminView = false;
-        this.phase = null;
-        this.sunState = null;
     }
     getCardSize() {
         return 20;
@@ -190,15 +112,6 @@ let PanelCard = class PanelCard extends i {
       <main-card .config=${this.config} .hass=${this.hass}></main-card>
     `;
     }
-    updated(changedProps) {
-        if (!this.isMainLoaded)
-            this.loadMainCard();
-        if (changedProps.has('hass') && this.hass) {
-            this.syncPopups();
-            this.handlePhaseChange();
-            this.handleSunChange();
-        }
-    }
     async loadMainCard(retries = 5) {
         try {
             await customElements.whenDefined('main-card');
@@ -211,49 +124,6 @@ let PanelCard = class PanelCard extends i {
             return;
         }
         this.isMainLoaded = true;
-    }
-    syncPopups() {
-        if (!this.hass)
-            return;
-        document.querySelectorAll('popup-dialog').forEach((popup) => {
-            if (popup.hass !== undefined) {
-                popup.hass = this.hass;
-            }
-        });
-    }
-    handlePhaseChange() {
-        if (typeof window.fully === 'undefined' || !this.hass)
-            return;
-        const activePhase = this.hass.states?.['input_select.location_phase']?.state;
-        if (!activePhase || activePhase === this.phase)
-            return;
-        try {
-            const settings = SettingsStorage.read();
-            const brightnessMap = (settings?.brightnessMap ?? {});
-            if (activePhase in brightnessMap) {
-                const value = brightnessMap[activePhase];
-                window.fully.setStringSetting('screenBrightness', String(value));
-                window.fully.setStringSetting('screensaverBrightness', String(value));
-                this.phase = activePhase;
-            }
-        }
-        catch (err) {
-            console.warn('[PanelCard] Failed to update brightness on phase change:', err);
-        }
-    }
-    handleSunChange() {
-        if (!this.hass || typeof window.fully === 'undefined')
-            return;
-        const sun = this.hass.states['sun.sun'];
-        if (!sun || sun.state === this.sunState)
-            return;
-        this.sunState = sun.state;
-        const dark = this.hass?.selectedTheme?.dark;
-        if (dark === undefined) {
-            const isDay = sun.state === 'above_horizon';
-            const appDarkMode = isDay ? 0 : 2;
-            window.fully.setStringSetting('appDarkMode', String(appDarkMode));
-        }
     }
     static get styles() {
         return i$3 `
@@ -350,8 +220,8 @@ if (window.fully) {
     console.log('Device Model: ' + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-window.smartqasa.versionLoader = "6.1.53-beta.5";
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.53-beta.5"} (Built: ${"2025-12-13T17:47:23.399Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
+window.smartqasa.versionLoader = "6.1.53-beta.6";
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.53-beta.6"} (Built: ${"2025-12-13T17:59:11.763Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
 // Dynamically load dash-elements with version-based cache busting
 function loadElements() {
     const version = '6.1.80';
