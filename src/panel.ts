@@ -7,7 +7,7 @@ import {
   TemplateResult,
 } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { HomeAssistant, LovelaceCardConfig } from '../types';
+import { HomeAssistant, LovelaceCardConfig } from './types';
 
 window.customCards ??= [];
 window.customCards.push({

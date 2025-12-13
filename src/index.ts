@@ -19,7 +19,7 @@ if (window.fully) {
   window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
 
-import './cards/panel';
+import './panel';
 
 window.smartqasa.versionLoader = __BUILD_VERSION__;
 
@@ -30,7 +30,7 @@ console.info(
 
 // Dynamically load dash-elements with version-based cache busting
 function loadElements(): void {
-  const version = '6.1.80';
+  const version = '6.1.80a';
 
   const script = document.createElement('script');
   script.type = 'module';

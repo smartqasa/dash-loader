@@ -220,11 +220,11 @@ if (window.fully) {
     console.log('Device Model: ' + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-window.smartqasa.versionLoader = "6.1.53-beta.6";
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.53-beta.6"} (Built: ${"2025-12-13T17:59:11.763Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
+window.smartqasa.versionLoader = "6.1.53-beta.7";
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.53-beta.7"} (Built: ${"2025-12-13T18:04:13.193Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
 // Dynamically load dash-elements with version-based cache busting
 function loadElements() {
-    const version = '6.1.80';
+    const version = '6.1.80a';
     const script = document.createElement('script');
     script.type = 'module';
     script.src = `/local/smartqasa/dash-elements/elements.js?v=${version}`;
