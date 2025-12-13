@@ -130,7 +130,6 @@ export class PanelCard extends LitElement {
 
     const sun = this.hass.states['sun.sun'];
     if (!sun || sun.state === this.sunState) return;
-
     this.sunState = sun.state;
 
     const dark = this.hass?.selectedTheme?.dark;
