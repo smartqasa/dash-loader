@@ -206,23 +206,24 @@ function deviceReboot() {
 
 function setDisplayMode(mode) {
     // 1️⃣ Apply HA theme via browser_mod
+    /*
     try {
-        if (typeof window.browser_mod !== 'undefined') {
-            window.browser_mod?.service('set_theme', { dark: mode === 'dark' });
-        }
+      if (typeof window.browser_mod !== 'undefined') {
+        window.browser_mod?.service('set_theme', { dark: mode === 'dark' });
+      }
+    } catch (err) {
+      console.error('[setDisplayMode] Failed to set browser_mod theme:', err);
     }
-    catch (err) {
-        console.error('[setDisplayMode] Failed to set browser_mod theme:', err);
-    }
+    */
     // 2️⃣ Apply dark/light mode via Fully Kiosk Browser
-    try {
-        if (typeof window.fully !== 'undefined') {
+    if (typeof window.fully !== 'undefined') {
+        try {
             const appDarkMode = mode === 'light' ? 0 : 2;
             window.fully.setStringSetting('appDarkMode', String(appDarkMode));
         }
-    }
-    catch (err) {
-        console.error('[setDisplayMode] Failed to set Fully appDarkMode:', err);
+        catch (err) {
+            console.error('[setDisplayMode] Failed to set Fully appDarkMode:', err);
+        }
     }
 }
 
@@ -460,8 +461,8 @@ if (window.fully) {
     console.log('Device Model: ' + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-window.smartqasa.versionLoader = "6.1.53-beta.1";
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.53-beta.1"} (Built: ${"2025-12-13T13:49:05.203Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
+window.smartqasa.versionLoader = "6.1.53-beta.2";
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.53-beta.2"} (Built: ${"2025-12-13T15:01:33.042Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
 // Dynamically load dash-elements with version-based cache busting
 function loadDashElements() {
     const version = window.smartqasa.versionElements || Date.now().toString();
