@@ -148,29 +148,6 @@ class SettingsStorage {
     }
 }
 
-function setDisplayMode(mode) {
-    // 1️⃣ Apply HA theme via browser_mod
-    /*
-    try {
-      if (typeof window.browser_mod !== 'undefined') {
-        window.browser_mod?.service('set_theme', { dark: mode === 'dark' });
-      }
-    } catch (err) {
-      console.error('[setDisplayMode] Failed to set browser_mod theme:', err);
-    }
-    */
-    // 2️⃣ Apply dark/light mode via Fully Kiosk Browser
-    if (typeof window.fully !== 'undefined') {
-        try {
-            const appDarkMode = mode === 'light' ? 0 : 2;
-            window.fully.setStringSetting('appDarkMode', String(appDarkMode));
-        }
-        catch (err) {
-            console.error('[setDisplayMode] Failed to set Fully appDarkMode:', err);
-        }
-    }
-}
-
 window.customCards ??= [];
 window.customCards.push({
     type: 'panel-card',
@@ -184,7 +161,7 @@ let PanelCard = class PanelCard extends i {
         this.isMainLoaded = false;
         this.isAdminView = false;
         this.phase = null;
-        this.sun = null;
+        this.sunState = null;
     }
     getCardSize() {
         return 20;
@@ -265,12 +242,18 @@ let PanelCard = class PanelCard extends i {
         }
     }
     handleSunChange() {
-        const sun = this.hass?.states['sun.sun'];
-        if (!sun || sun.state === this.sun)
+        if (!this.hass || typeof window.fully === 'undefined')
             return;
-        const isDay = sun.state === 'above_horizon';
-        setDisplayMode(isDay ? 'light' : 'dark');
-        this.sun = sun.state;
+        const sun = this.hass.states['sun.sun'];
+        if (!sun || sun.state === this.sunState)
+            return;
+        this.sunState = sun.state;
+        const dark = this.hass?.selectedTheme?.dark;
+        if (dark === undefined) {
+            const isDay = sun.state === 'above_horizon';
+            const appDarkMode = isDay ? 0 : 2;
+            window.fully.setStringSetting('appDarkMode', String(appDarkMode));
+        }
     }
     static get styles() {
         return i$3 `
@@ -367,11 +350,11 @@ if (window.fully) {
     console.log('Device Model: ' + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-window.smartqasa.versionLoader = "6.1.53-beta.3";
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.53-beta.3"} (Built: ${"2025-12-13T15:11:32.797Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
+window.smartqasa.versionLoader = "6.1.53-beta.4";
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.53-beta.4"} (Built: ${"2025-12-13T16:14:25.614Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
 // Dynamically load dash-elements with version-based cache busting
-function loadDashElements() {
-    const version = window.smartqasa.versionElements || Date.now().toString();
+function loadElements() {
+    const version = '6.1.80';
     const script = document.createElement('script');
     script.type = 'module';
     script.src = `/local/smartqasa/dash-elements/elements.js?v=${version}`;
@@ -380,5 +363,5 @@ function loadDashElements() {
     };
     document.head.appendChild(script);
 }
-loadDashElements();
+loadElements();
 //# sourceMappingURL=loader.js.map

@@ -13,7 +13,6 @@ import {
   PopupDialogElement,
 } from '../types';
 import { SettingsStorage, BrightnessMap } from '../utilities/settings-storage';
-import { setDisplayMode } from '../utilities/set-display-mode';
 
 window.customCards ??= [];
 window.customCards.push({
@@ -32,7 +31,7 @@ export class PanelCard extends LitElement {
 
   private isAdminView = false;
   private phase: string | null = null;
-  private sun: string | null = null;
+  private sunState: string | null = null;
 
   public getCardSize(): number | Promise<number> {
     return 20;
@@ -127,12 +126,19 @@ export class PanelCard extends LitElement {
   }
 
   private handleSunChange(): void {
-    const sun = this.hass?.states['sun.sun'];
-    if (!sun || sun.state === this.sun) return;
+    if (!this.hass || typeof window.fully === 'undefined') return;
 
-    const isDay = sun.state === 'above_horizon';
-    setDisplayMode(isDay ? 'light' : 'dark');
-    this.sun = sun.state;
+    const sun = this.hass.states['sun.sun'];
+    if (!sun || sun.state === this.sunState) return;
+
+    this.sunState = sun.state;
+
+    const dark = this.hass?.selectedTheme?.dark;
+    if (dark === undefined) {
+      const isDay = sun.state === 'above_horizon';
+      const appDarkMode = isDay ? 0 : 2;
+      window.fully.setStringSetting('appDarkMode', String(appDarkMode));
+    }
   }
 
   static get styles(): CSSResult {

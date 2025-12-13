@@ -29,8 +29,8 @@ console.info(
 );
 
 // Dynamically load dash-elements with version-based cache busting
-function loadDashElements(): void {
-  const version = window.smartqasa.versionElements || Date.now().toString();
+function loadElements(): void {
+  const version = '6.1.80';
 
   const script = document.createElement('script');
   script.type = 'module';
@@ -42,4 +42,4 @@ function loadDashElements(): void {
   document.head.appendChild(script);
 }
 
-loadDashElements();
+loadElements();
