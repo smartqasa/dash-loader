@@ -27,3 +27,19 @@ console.info(
   `%c SmartQasa Loader ⏏ ${__BUILD_VERSION__} (Built: ${__BUILD_TIMESTAMP__}) `,
   'background-color: #0000ff; color: #ffffff; font-weight: 700;'
 );
+
+// Dynamically load dash-elements with version-based cache busting
+function loadDashElements(): void {
+  const version = window.smartqasa.versionElements || Date.now().toString();
+
+  const script = document.createElement('script');
+  script.type = 'module';
+  script.src = `/local/smartqasa/dash-elements/elements.js?v=${version}`;
+  script.onerror = () => {
+    console.error('[Loader] Failed to load dash-elements');
+  };
+
+  document.head.appendChild(script);
+}
+
+loadDashElements();
