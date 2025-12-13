@@ -82,8 +82,8 @@ window.customCards.push({
 let PanelCard = class PanelCard extends i {
     constructor() {
         super(...arguments);
+        this.adminView = false;
         this.isMainLoaded = false;
-        this.isAdminView = false;
     }
     getCardSize() {
         return 20;
@@ -95,11 +95,10 @@ let PanelCard = class PanelCard extends i {
         if (changedProps.has('hass') && this.hass) {
             const isAdmin = this.hass?.user?.is_admin || false;
             const isAdminMode = this.hass.states?.['input_boolean.admin_mode']?.state === 'on' || false;
-            this.isAdminView = isAdmin || isAdminMode;
+            this.adminView = isAdmin || isAdminMode;
         }
     }
     render() {
-        this.classList.toggle('admin-view', this.isAdminView);
         if (!this.isMainLoaded) {
             return x `
         <div class="loader">
@@ -111,6 +110,10 @@ let PanelCard = class PanelCard extends i {
         return x `
       <main-card .config=${this.config} .hass=${this.hass}></main-card>
     `;
+    }
+    updated() {
+        if (!this.isMainLoaded)
+            this.loadMainCard();
     }
     async loadMainCard(retries = 5) {
         try {
@@ -134,7 +137,7 @@ let PanelCard = class PanelCard extends i {
         background-color: var(--panel-color);
       }
 
-      :host(.admin-view) {
+      :host([admin-view]) {
         height: calc(100dvh - 56px);
       }
 
@@ -196,6 +199,9 @@ __decorate([
     n({ attribute: false })
 ], PanelCard.prototype, "hass", void 0);
 __decorate([
+    n({ type: Boolean, reflect: true, attribute: 'admin-view' })
+], PanelCard.prototype, "adminView", void 0);
+__decorate([
     r()
 ], PanelCard.prototype, "isMainLoaded", void 0);
 PanelCard = __decorate([
@@ -220,8 +226,8 @@ if (window.fully) {
     console.log('Device Model: ' + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-window.smartqasa.versionLoader = "6.1.53-beta.7";
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.53-beta.7"} (Built: ${"2025-12-13T18:04:13.193Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
+window.smartqasa.versionLoader = "6.1.53-beta.8";
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.53-beta.8"} (Built: ${"2025-12-13T18:42:12.549Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
 // Dynamically load dash-elements with version-based cache busting
 function loadElements() {
     const version = '6.1.80a';

@@ -22,9 +22,10 @@ export class PanelCard extends LitElement {
   @property({ attribute: false }) config?: LovelaceCardConfig;
   @property({ attribute: false }) hass?: HomeAssistant;
 
-  @state() isMainLoaded = false;
+  @property({ type: Boolean, reflect: true, attribute: 'admin-view' })
+  adminView = false;
 
-  private isAdminView = false;
+  @state() isMainLoaded = false;
 
   public getCardSize(): number | Promise<number> {
     return 20;
@@ -39,13 +40,11 @@ export class PanelCard extends LitElement {
       const isAdmin = this.hass?.user?.is_admin || false;
       const isAdminMode =
         this.hass.states?.['input_boolean.admin_mode']?.state === 'on' || false;
-      this.isAdminView = isAdmin || isAdminMode;
+      this.adminView = isAdmin || isAdminMode;
     }
   }
 
   protected render(): TemplateResult {
-    this.classList.toggle('admin-view', this.isAdminView);
-
     if (!this.isMainLoaded) {
       return html`
         <div class="loader">
@@ -58,6 +57,10 @@ export class PanelCard extends LitElement {
     return html`
       <main-card .config=${this.config} .hass=${this.hass}></main-card>
     `;
+  }
+
+  protected updated(): void {
+    if (!this.isMainLoaded) this.loadMainCard();
   }
 
   private async loadMainCard(retries = 5): Promise<void> {
@@ -83,7 +86,7 @@ export class PanelCard extends LitElement {
         background-color: var(--panel-color);
       }
 
-      :host(.admin-view) {
+      :host([admin-view]) {
         height: calc(100dvh - 56px);
       }
 
