@@ -13,6 +13,11 @@ import {
   PopupDialogElement,
 } from '../types';
 import { SettingsStorage, BrightnessMap } from '../utilities/settings-storage';
+import {
+  deviceFlash,
+  deviceRefresh,
+  deviceReboot,
+} from '../utilities/device-actions';
 import { setDisplayMode } from '../utilities/set-display-mode';
 
 window.customCards ??= [];
@@ -33,6 +38,9 @@ export class PanelCard extends LitElement {
   private isAdminView = false;
   private phase: string | null = null;
   private sun: string | null = null;
+  private flashTime: string | null = null;
+  private rebootTime: string | null = null;
+  private refreshTime: string | null = null;
 
   public getCardSize(): number | Promise<number> {
     return 20;
@@ -73,6 +81,7 @@ export class PanelCard extends LitElement {
 
     if (changedProps.has('hass') && this.hass) {
       this.syncPopups();
+      this.checkDeviceTriggers();
       this.handlePhaseChange();
       this.handleSunChange();
     }
@@ -133,6 +142,43 @@ export class PanelCard extends LitElement {
     const isDay = sun.state === 'above_horizon';
     setDisplayMode(isDay ? 'light' : 'dark');
     this.sun = sun.state;
+  }
+
+  private checkDeviceTriggers(): void {
+    if (!this.hass) return;
+
+    const triggers = [
+      {
+        key: 'flash',
+        entity: 'input_button.flash_devices',
+        action: deviceFlash,
+      },
+      {
+        key: 'reboot',
+        entity: 'input_button.reboot_devices',
+        action: deviceReboot,
+      },
+      {
+        key: 'refresh',
+        entity: 'input_button.refresh_devices',
+        action: deviceRefresh,
+      },
+    ];
+
+    for (const { key, entity, action } of triggers) {
+      const state = this.hass.states?.[entity]?.state;
+      const lastTime = (this as any)[`${key}Time`];
+
+      if (lastTime !== null && state !== lastTime) {
+        try {
+          action();
+        } catch (err) {
+          console.error(`[PanelCard] Device ${key} failed:`, err);
+        }
+      }
+
+      (this as any)[`${key}Time`] = state || null;
+    }
   }
 
   static get styles(): CSSResult {

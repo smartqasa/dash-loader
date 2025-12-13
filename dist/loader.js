@@ -148,62 +148,6 @@ class SettingsStorage {
     }
 }
 
-const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-async function executeFullyAction(action) {
-    if (typeof window.fully === 'undefined')
-        return;
-    const timings = {
-        bringToFore: 500,
-        regainFocus: 250,
-        clearCache: 2000,
-    };
-    if (!window.fully.isInForeground()) {
-        window.fully.bringToForeground();
-        await delay(timings.bringToFore);
-    }
-    window.fully.setStringSetting('timeToRegainFocus', '0');
-    await delay(timings.regainFocus);
-    window.fully.clearCache();
-    await delay(timings.clearCache);
-    window.fully[action]();
-}
-function bustCacheAndReload() {
-    const url = new URL(window.location.href);
-    url.searchParams.set('nocache', Date.now().toString());
-    window.history.replaceState(null, '', url.toString());
-    window.location.reload();
-}
-async function deviceFlash() {
-    if (typeof window.fully === 'undefined')
-        return;
-    try {
-        window.fully.turnScreenOff(true);
-        await delay(800);
-        window.fully.turnScreenOn();
-        await delay(1200);
-        window.location.reload();
-    }
-    catch (err) {
-        console.error('[deviceFlash] Error:', err);
-    }
-}
-function deviceRefresh() {
-    if (typeof window.fully === 'undefined') {
-        bustCacheAndReload();
-    }
-    else {
-        void executeFullyAction('restartApp');
-    }
-}
-function deviceReboot() {
-    if (typeof window.fully === 'undefined') {
-        bustCacheAndReload();
-    }
-    else {
-        void executeFullyAction('reboot');
-    }
-}
-
 function setDisplayMode(mode) {
     // 1️⃣ Apply HA theme via browser_mod
     /*
@@ -241,9 +185,6 @@ let PanelCard = class PanelCard extends i {
         this.isAdminView = false;
         this.phase = null;
         this.sun = null;
-        this.flashTime = null;
-        this.rebootTime = null;
-        this.refreshTime = null;
     }
     getCardSize() {
         return 20;
@@ -277,7 +218,6 @@ let PanelCard = class PanelCard extends i {
             this.loadMainCard();
         if (changedProps.has('hass') && this.hass) {
             this.syncPopups();
-            this.checkDeviceTriggers();
             this.handlePhaseChange();
             this.handleSunChange();
         }
@@ -331,40 +271,6 @@ let PanelCard = class PanelCard extends i {
         const isDay = sun.state === 'above_horizon';
         setDisplayMode(isDay ? 'light' : 'dark');
         this.sun = sun.state;
-    }
-    checkDeviceTriggers() {
-        if (!this.hass)
-            return;
-        const triggers = [
-            {
-                key: 'flash',
-                entity: 'input_button.flash_devices',
-                action: deviceFlash,
-            },
-            {
-                key: 'reboot',
-                entity: 'input_button.reboot_devices',
-                action: deviceReboot,
-            },
-            {
-                key: 'refresh',
-                entity: 'input_button.refresh_devices',
-                action: deviceRefresh,
-            },
-        ];
-        for (const { key, entity, action } of triggers) {
-            const state = this.hass.states?.[entity]?.state;
-            const lastTime = this[`${key}Time`];
-            if (lastTime !== null && state !== lastTime) {
-                try {
-                    action();
-                }
-                catch (err) {
-                    console.error(`[PanelCard] Device ${key} failed:`, err);
-                }
-            }
-            this[`${key}Time`] = state || null;
-        }
     }
     static get styles() {
         return i$3 `
@@ -461,8 +367,8 @@ if (window.fully) {
     console.log('Device Model: ' + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-window.smartqasa.versionLoader = "6.1.53-beta.2";
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.53-beta.2"} (Built: ${"2025-12-13T15:01:33.042Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
+window.smartqasa.versionLoader = "6.1.53-beta.3";
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.53-beta.3"} (Built: ${"2025-12-13T15:11:32.797Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
 // Dynamically load dash-elements with version-based cache busting
 function loadDashElements() {
     const version = window.smartqasa.versionElements || Date.now().toString();
