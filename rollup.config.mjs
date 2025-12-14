@@ -15,7 +15,7 @@ const timestamp = new Date().toISOString();
 export default {
   input: 'src/index.ts',
   output: {
-    file: 'dist/loader-v3.js',
+    file: 'dist/loader.js',
     format: 'esm',
     sourcemap: true,
   },
