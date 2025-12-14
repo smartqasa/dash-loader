@@ -226,18 +226,23 @@ if (window.fully) {
     console.log('Device Model: ' + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-window.smartqasa.versionLoader = "6.1.56-beta.1";
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.56-beta.1"} (Built: ${"2025-12-14T12:40:57.487Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
+window.smartqasa.versionLoader = "6.1.56-beta.2";
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.56-beta.2"} (Built: ${"2025-12-14T12:41:31.781Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
 // Dynamically load dash-elements with version-based cache busting
-function loadElements() {
-    const version = '6.1.80b';
-    const script = document.createElement('script');
-    script.type = 'module';
-    script.src = `/local/smartqasa/dash-elements/elements.js?v=${version}`;
-    script.onerror = () => {
-        console.error('[Loader] Failed to load dash-elements');
-    };
-    document.head.appendChild(script);
+/*
+function loadElements(): void {
+  const version = '6.1.80b';
+
+  const script = document.createElement('script');
+  script.type = 'module';
+  script.src = `/local/smartqasa/dash-elements/elements.js?v=${version}`;
+  script.onerror = () => {
+    console.error('[Loader] Failed to load dash-elements');
+  };
+
+  document.head.appendChild(script);
 }
+
 loadElements();
+*/
 //# sourceMappingURL=loader.js.map

@@ -29,6 +29,7 @@ console.info(
 );
 
 // Dynamically load dash-elements with version-based cache busting
+/*
 function loadElements(): void {
   const version = '6.1.80b';
 
@@ -43,3 +44,4 @@ function loadElements(): void {
 }
 
 loadElements();
+*/
