@@ -3,6 +3,6 @@
   "version": "2025.9.15",
   "homeassistant": "2025.2.0",
   "render_readme": true,
-  "filename": "loader-v4.js",
+  "filename": "loader-v5.js",
   "content_in_root": false
 }
