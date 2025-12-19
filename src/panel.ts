@@ -46,7 +46,7 @@ export class PanelCard extends LitElement {
     const isAdminMode = states['input_boolean.admin_mode']?.state === 'on';
     const isDemoMode = states['input_boolean.demo_mode']?.state === 'on';
 
-    const nextAdminView = isAdmin || (isAdminMode && !isDemoMode);
+    const nextAdminView = (isAdmin && !isDemoMode) || isAdminMode;
 
     if (this.adminView !== nextAdminView) {
       this.adminView = nextAdminView;
