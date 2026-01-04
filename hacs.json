@@ -1,8 +1,6 @@
 {
   "name": "SmartQasa Dashboard Loader",
-  "version": "2025.9.15",
   "homeassistant": "2025.2.0",
   "render_readme": true,
-  "filename": "loader-v6.2.js",
   "content_in_root": false
 }
