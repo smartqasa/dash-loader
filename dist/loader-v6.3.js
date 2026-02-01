@@ -72,19 +72,6 @@ const t=t=>(e,o)=>{ void 0!==o?o.addInitializer((()=>{customElements.define(t,e)
  * SPDX-License-Identifier: BSD-3-Clause
  */function r(r){return n({...r,state:true,attribute:false})}
 
-async function callService(hass, domain, service, data, target) {
-    if (!hass) {
-        console.error('[callService] Failed Hass Object is undefined');
-        return;
-    }
-    try {
-        await hass.callService(domain, service, data, target);
-    }
-    catch (error) {
-        console.error(`[callService] Service call failed: ${domain}.${service}`, error);
-    }
-}
-
 window.customCards ??= [];
 window.customCards.push({
     type: 'panel-card',
@@ -113,13 +100,10 @@ let PanelCard = class PanelCard extends i {
         const isAdminMode = states['input_boolean.admin_mode']?.state === 'on';
         const isDemoMode = states['input_boolean.demo_mode']?.state === 'on';
         const nextKioskView = (isUserAdmin && !isDemoMode) || isAdminMode;
-        if (this.kioskView !== nextKioskView) {
-            const domain = 'input_boolean';
-            const service = nextKioskView ? 'turn_on' : 'turn_off';
-            const data = { entity_id: 'input_boolean.kiosk_view' };
-            const target = undefined;
-            await callService(this.hass, domain, service, data, target);
+        if (this.kioskView !== nextKioskView ||
+            window.smartqasa.kioskView !== nextKioskView) {
             this.kioskView = nextKioskView;
+            window.smartqasa.kioskView = nextKioskView;
         }
     }
     render() {
@@ -238,6 +222,7 @@ window.smartqasa = window.smartqasa || {
     confirm: () => { },
     confirmClose: () => { },
     deviceModel: '',
+    kioskView: true,
     menuTab: 0,
     popupStack: [],
     popup: () => { },
@@ -250,8 +235,8 @@ if (window.fully) {
     console.log('Device Model: ' + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-window.smartqasa.versionLoader = "6.1.63-beta.2";
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.63-beta.2"} (Built: ${"2026-02-01T18:19:34.428Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
+window.smartqasa.versionLoader = "6.1.63-beta.3";
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.63-beta.3"} (Built: ${"2026-02-01T18:53:02.938Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
 // Dynamically load dash-elements with version-based cache busting
 /*
 function loadElements(): void {

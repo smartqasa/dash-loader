@@ -8,7 +8,6 @@ import {
 } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { HomeAssistant, LovelaceCardConfig } from './types';
-import { callService } from './call-service';
 
 window.customCards ??= [];
 window.customCards.push({
@@ -49,14 +48,12 @@ export class PanelCard extends LitElement {
 
     const nextKioskView = (isUserAdmin && !isDemoMode) || isAdminMode;
 
-    if (this.kioskView !== nextKioskView) {
-      const domain = 'input_boolean';
-      const service = nextKioskView ? 'turn_on' : 'turn_off';
-      const data = { entity_id: 'input_boolean.kiosk_view' };
-      const target = undefined;
-      await callService(this.hass, domain, service, data, target);
-
+    if (
+      this.kioskView !== nextKioskView ||
+      window.smartqasa.kioskView !== nextKioskView
+    ) {
       this.kioskView = nextKioskView;
+      window.smartqasa.kioskView = nextKioskView;
     }
   }
 
