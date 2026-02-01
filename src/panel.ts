@@ -23,7 +23,7 @@ export class PanelCard extends LitElement {
   @property({ attribute: false }) hass?: HomeAssistant;
 
   @property({ type: Boolean, reflect: true, attribute: 'kiosk-view' })
-  kioskView = false;
+  kioskView = true;
 
   @state() isMainLoaded = false;
 
@@ -46,7 +46,7 @@ export class PanelCard extends LitElement {
     const isAdminMode = states['input_boolean.admin_mode']?.state === 'on';
     const isDemoMode = states['input_boolean.demo_mode']?.state === 'on';
 
-    const nextKioskView = (isUserAdmin && !isDemoMode) || isAdminMode;
+    const nextKioskView = (!isUserAdmin && !isAdminMode) || isDemoMode;
 
     if (
       this.kioskView !== nextKioskView ||
@@ -95,12 +95,12 @@ export class PanelCard extends LitElement {
       :host {
         display: block;
         width: 100%;
-        height: 100dvh;
+        height: calc(100dvh - 56px);
         background-color: var(--panel-color);
       }
 
       :host([kiosk-view]) {
-        height: calc(100dvh - 56px);
+        height: 100dvh;
       }
 
       .loader {

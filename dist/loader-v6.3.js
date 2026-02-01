@@ -82,7 +82,7 @@ window.customCards.push({
 let PanelCard = class PanelCard extends i {
     constructor() {
         super(...arguments);
-        this.kioskView = false;
+        this.kioskView = true;
         this.isMainLoaded = false;
     }
     getCardSize() {
@@ -99,7 +99,7 @@ let PanelCard = class PanelCard extends i {
         const states = hass.states;
         const isAdminMode = states['input_boolean.admin_mode']?.state === 'on';
         const isDemoMode = states['input_boolean.demo_mode']?.state === 'on';
-        const nextKioskView = (isUserAdmin && !isDemoMode) || isAdminMode;
+        const nextKioskView = (!isUserAdmin && !isAdminMode) || isDemoMode;
         if (this.kioskView !== nextKioskView ||
             window.smartqasa.kioskView !== nextKioskView) {
             this.kioskView = nextKioskView;
@@ -141,12 +141,12 @@ let PanelCard = class PanelCard extends i {
       :host {
         display: block;
         width: 100%;
-        height: 100dvh;
+        height: calc(100dvh - 56px);
         background-color: var(--panel-color);
       }
 
       :host([kiosk-view]) {
-        height: calc(100dvh - 56px);
+        height: 100dvh;
       }
 
       .loader {
@@ -235,8 +235,8 @@ if (window.fully) {
     console.log('Device Model: ' + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-window.smartqasa.versionLoader = "6.1.63-beta.3";
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.63-beta.3"} (Built: ${"2026-02-01T18:53:02.938Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
+window.smartqasa.versionLoader = "6.1.63-beta.4";
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.63-beta.4"} (Built: ${"2026-02-01T19:11:31.304Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
 // Dynamically load dash-elements with version-based cache busting
 /*
 function loadElements(): void {
