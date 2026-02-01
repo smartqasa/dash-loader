@@ -22,8 +22,8 @@ export class PanelCard extends LitElement {
   @property({ attribute: false }) config?: LovelaceCardConfig;
   @property({ attribute: false }) hass?: HomeAssistant;
 
-  @property({ type: Boolean, reflect: true, attribute: 'kiosk-view' })
-  kioskView = true;
+  @property({ type: Boolean, reflect: true, attribute: 'admin-view' })
+  adminView = true;
 
   @state() isMainLoaded = false;
 
@@ -38,22 +38,20 @@ export class PanelCard extends LitElement {
   protected async willUpdate(changedProps: PropertyValues): Promise<void> {
     if (!changedProps.has('hass') || !this.hass) return;
 
-    const hass = this.hass;
+    const isUserAdmin = this.hass.user?.is_admin === true;
 
-    const isUserAdmin = hass.user?.is_admin === true;
-
-    const states = hass.states;
+    const states = this.hass.states;
     const isAdminMode = states['input_boolean.admin_mode']?.state === 'on';
     const isDemoMode = states['input_boolean.demo_mode']?.state === 'on';
 
-    const nextKioskView = (!isUserAdmin && !isAdminMode) || isDemoMode;
+    const adminView = (isUserAdmin && !isDemoMode) || isAdminMode;
 
     if (
-      this.kioskView !== nextKioskView ||
-      window.smartqasa.kioskView !== nextKioskView
+      this.adminView !== adminView ||
+      window.smartqasa.adminView !== adminView
     ) {
-      this.kioskView = nextKioskView;
-      window.smartqasa.kioskView = nextKioskView;
+      this.adminView = adminView;
+      window.smartqasa.adminView = adminView;
     }
   }
 
@@ -95,12 +93,12 @@ export class PanelCard extends LitElement {
       :host {
         display: block;
         width: 100%;
-        height: calc(100dvh - 56px);
+        height: 100dvh;
         background-color: var(--panel-color);
       }
 
-      :host([kiosk-view]) {
-        height: 100dvh;
+      :host([admin-view]) {
+        height: calc(100dvh - 56px);
       }
 
       .loader {

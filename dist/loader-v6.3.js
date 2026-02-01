@@ -82,7 +82,7 @@ window.customCards.push({
 let PanelCard = class PanelCard extends i {
     constructor() {
         super(...arguments);
-        this.kioskView = true;
+        this.adminView = true;
         this.isMainLoaded = false;
     }
     getCardSize() {
@@ -94,16 +94,15 @@ let PanelCard = class PanelCard extends i {
     async willUpdate(changedProps) {
         if (!changedProps.has('hass') || !this.hass)
             return;
-        const hass = this.hass;
-        const isUserAdmin = hass.user?.is_admin === true;
-        const states = hass.states;
+        const isUserAdmin = this.hass.user?.is_admin === true;
+        const states = this.hass.states;
         const isAdminMode = states['input_boolean.admin_mode']?.state === 'on';
         const isDemoMode = states['input_boolean.demo_mode']?.state === 'on';
-        const nextKioskView = (!isUserAdmin && !isAdminMode) || isDemoMode;
-        if (this.kioskView !== nextKioskView ||
-            window.smartqasa.kioskView !== nextKioskView) {
-            this.kioskView = nextKioskView;
-            window.smartqasa.kioskView = nextKioskView;
+        const adminView = (isUserAdmin && !isDemoMode) || isAdminMode;
+        if (this.adminView !== adminView ||
+            window.smartqasa.adminView !== adminView) {
+            this.adminView = adminView;
+            window.smartqasa.adminView = adminView;
         }
     }
     render() {
@@ -141,12 +140,12 @@ let PanelCard = class PanelCard extends i {
       :host {
         display: block;
         width: 100%;
-        height: calc(100dvh - 56px);
+        height: 100dvh;
         background-color: var(--panel-color);
       }
 
-      :host([kiosk-view]) {
-        height: 100dvh;
+      :host([admin-view]) {
+        height: calc(100dvh - 56px);
       }
 
       .loader {
@@ -207,8 +206,8 @@ __decorate([
     n({ attribute: false })
 ], PanelCard.prototype, "hass", void 0);
 __decorate([
-    n({ type: Boolean, reflect: true, attribute: 'kiosk-view' })
-], PanelCard.prototype, "kioskView", void 0);
+    n({ type: Boolean, reflect: true, attribute: 'admin-view' })
+], PanelCard.prototype, "adminView", void 0);
 __decorate([
     r()
 ], PanelCard.prototype, "isMainLoaded", void 0);
@@ -218,11 +217,11 @@ PanelCard = __decorate([
 
 window.customCards = window.customCards || [];
 window.smartqasa = window.smartqasa || {
+    adminView: true,
     chipsConfig: [],
     confirm: () => { },
     confirmClose: () => { },
     deviceModel: '',
-    kioskView: true,
     menuTab: 0,
     popupStack: [],
     popup: () => { },
@@ -235,8 +234,8 @@ if (window.fully) {
     console.log('Device Model: ' + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-window.smartqasa.versionLoader = "6.1.63-beta.4";
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.63-beta.4"} (Built: ${"2026-02-01T19:11:31.304Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
+window.smartqasa.versionLoader = "6.1.63-beta.5";
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.63-beta.5"} (Built: ${"2026-02-01T19:29:20.367Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
 // Dynamically load dash-elements with version-based cache busting
 /*
 function loadElements(): void {

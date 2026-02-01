@@ -1,11 +1,11 @@
 window.customCards = window.customCards || [];
 
 window.smartqasa = window.smartqasa || {
+  adminView: true,
   chipsConfig: [],
   confirm: () => {},
   confirmClose: () => {},
   deviceModel: '',
-  kioskView: true,
   menuTab: 0,
   popupStack: [],
   popup: () => {},

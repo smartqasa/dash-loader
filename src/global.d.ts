@@ -68,11 +68,11 @@ declare interface Window {
   };
 
   smartqasa: {
+    adminView: boolean;
     chipsConfig: any;
     confirm: (data: any) => void;
     confirmClose: () => void;
     deviceModel: string;
-    kioskView: boolean;
     menuTab: number;
     popup: (data: any) => void;
     popupClose: () => void;
