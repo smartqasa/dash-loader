@@ -1,7 +1,7 @@
 window.customCards = window.customCards || [];
 
 window.smartqasa = window.smartqasa || {
-  adminView: true,
+  adminView: false,
   chipsConfig: [],
   confirm: () => {},
   confirmClose: () => {},

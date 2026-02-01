@@ -82,7 +82,7 @@ window.customCards.push({
 let PanelCard = class PanelCard extends i {
     constructor() {
         super(...arguments);
-        this.adminView = true;
+        this.adminView = false;
         this.isMainLoaded = false;
     }
     getCardSize() {
@@ -217,7 +217,7 @@ PanelCard = __decorate([
 
 window.customCards = window.customCards || [];
 window.smartqasa = window.smartqasa || {
-    adminView: true,
+    adminView: false,
     chipsConfig: [],
     confirm: () => { },
     confirmClose: () => { },
@@ -234,8 +234,8 @@ if (window.fully) {
     console.log('Device Model: ' + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-window.smartqasa.versionLoader = "6.1.63-beta.5";
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.63-beta.5"} (Built: ${"2026-02-01T19:29:20.367Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
+window.smartqasa.versionLoader = "6.1.63-beta.6";
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.63-beta.6"} (Built: ${"2026-02-01T19:37:59.417Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
 // Dynamically load dash-elements with version-based cache busting
 /*
 function loadElements(): void {
