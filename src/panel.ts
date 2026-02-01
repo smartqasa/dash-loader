@@ -8,6 +8,7 @@ import {
 } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { HomeAssistant, LovelaceCardConfig } from './types';
+import { callService } from './call-service';
 
 window.customCards ??= [];
 window.customCards.push({
@@ -22,8 +23,8 @@ export class PanelCard extends LitElement {
   @property({ attribute: false }) config?: LovelaceCardConfig;
   @property({ attribute: false }) hass?: HomeAssistant;
 
-  @property({ type: Boolean, reflect: true, attribute: 'admin-view' })
-  adminView = false;
+  @property({ type: Boolean, reflect: true, attribute: 'kiosk-view' })
+  kioskView = false;
 
   @state() isMainLoaded = false;
 
@@ -35,21 +36,27 @@ export class PanelCard extends LitElement {
     this.config = config;
   }
 
-  protected willUpdate(changedProps: PropertyValues): void {
+  protected async willUpdate(changedProps: PropertyValues): Promise<void> {
     if (!changedProps.has('hass') || !this.hass) return;
 
     const hass = this.hass;
 
-    const isAdmin = hass.user?.is_admin === true;
+    const isUserAdmin = hass.user?.is_admin === true;
 
     const states = hass.states;
     const isAdminMode = states['input_boolean.admin_mode']?.state === 'on';
     const isDemoMode = states['input_boolean.demo_mode']?.state === 'on';
 
-    const nextAdminView = (isAdmin && !isDemoMode) || isAdminMode;
+    const nextKioskView = (isUserAdmin && !isDemoMode) || isAdminMode;
 
-    if (this.adminView !== nextAdminView) {
-      this.adminView = nextAdminView;
+    if (this.kioskView !== nextKioskView) {
+      const domain = 'input_boolean';
+      const service = nextKioskView ? 'turn_on' : 'turn_off';
+      const data = { entity_id: 'input_boolean.kiosk_view' };
+      const target = undefined;
+      await callService(this.hass, domain, service, data, target);
+
+      this.kioskView = nextKioskView;
     }
   }
 
@@ -95,7 +102,7 @@ export class PanelCard extends LitElement {
         background-color: var(--panel-color);
       }
 
-      :host([admin-view]) {
+      :host([kiosk-view]) {
         height: calc(100dvh - 56px);
       }
 

@@ -72,6 +72,19 @@ const t=t=>(e,o)=>{ void 0!==o?o.addInitializer((()=>{customElements.define(t,e)
  * SPDX-License-Identifier: BSD-3-Clause
  */function r(r){return n({...r,state:true,attribute:false})}
 
+async function callService(hass, domain, service, data, target) {
+    if (!hass) {
+        console.error('[callService] Failed Hass Object is undefined');
+        return;
+    }
+    try {
+        await hass.callService(domain, service, data, target);
+    }
+    catch (error) {
+        console.error(`[callService] Service call failed: ${domain}.${service}`, error);
+    }
+}
+
 window.customCards ??= [];
 window.customCards.push({
     type: 'panel-card',
@@ -82,7 +95,7 @@ window.customCards.push({
 let PanelCard = class PanelCard extends i {
     constructor() {
         super(...arguments);
-        this.adminView = false;
+        this.kioskView = false;
         this.isMainLoaded = false;
     }
     getCardSize() {
@@ -91,17 +104,22 @@ let PanelCard = class PanelCard extends i {
     setConfig(config) {
         this.config = config;
     }
-    willUpdate(changedProps) {
+    async willUpdate(changedProps) {
         if (!changedProps.has('hass') || !this.hass)
             return;
         const hass = this.hass;
-        const isAdmin = hass.user?.is_admin === true;
+        const isUserAdmin = hass.user?.is_admin === true;
         const states = hass.states;
         const isAdminMode = states['input_boolean.admin_mode']?.state === 'on';
         const isDemoMode = states['input_boolean.demo_mode']?.state === 'on';
-        const nextAdminView = (isAdmin && !isDemoMode) || isAdminMode;
-        if (this.adminView !== nextAdminView) {
-            this.adminView = nextAdminView;
+        const nextKioskView = (isUserAdmin && !isDemoMode) || isAdminMode;
+        if (this.kioskView !== nextKioskView) {
+            const domain = 'input_boolean';
+            const service = nextKioskView ? 'turn_on' : 'turn_off';
+            const data = { entity_id: 'input_boolean.kiosk_view' };
+            const target = undefined;
+            await callService(this.hass, domain, service, data, target);
+            this.kioskView = nextKioskView;
         }
     }
     render() {
@@ -143,7 +161,7 @@ let PanelCard = class PanelCard extends i {
         background-color: var(--panel-color);
       }
 
-      :host([admin-view]) {
+      :host([kiosk-view]) {
         height: calc(100dvh - 56px);
       }
 
@@ -205,8 +223,8 @@ __decorate([
     n({ attribute: false })
 ], PanelCard.prototype, "hass", void 0);
 __decorate([
-    n({ type: Boolean, reflect: true, attribute: 'admin-view' })
-], PanelCard.prototype, "adminView", void 0);
+    n({ type: Boolean, reflect: true, attribute: 'kiosk-view' })
+], PanelCard.prototype, "kioskView", void 0);
 __decorate([
     r()
 ], PanelCard.prototype, "isMainLoaded", void 0);
@@ -232,8 +250,8 @@ if (window.fully) {
     console.log('Device Model: ' + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-window.smartqasa.versionLoader = "6.1.63-beta.1";
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.63-beta.1"} (Built: ${"2026-01-05T20:11:36.386Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
+window.smartqasa.versionLoader = "6.1.63-beta.2";
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.63-beta.2"} (Built: ${"2026-02-01T18:19:34.428Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
 // Dynamically load dash-elements with version-based cache busting
 /*
 function loadElements(): void {
