@@ -99,11 +99,8 @@ let PanelCard = class PanelCard extends i {
         const isAdminMode = states['input_boolean.admin_mode']?.state === 'on';
         const isDemoMode = states['input_boolean.demo_mode']?.state === 'on';
         const adminView = (isUserAdmin && !isDemoMode) || isAdminMode;
-        if (this.adminView !== adminView ||
-            window.smartqasa.adminView !== adminView) {
+        if (this.adminView !== adminView)
             this.adminView = adminView;
-            window.smartqasa.adminView = adminView;
-        }
     }
     render() {
         if (!this.isMainLoaded) {
@@ -234,8 +231,8 @@ if (window.fully) {
     console.log('Device Model: ' + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-window.smartqasa.versionLoader = "6.1.63-beta.6";
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.63-beta.6"} (Built: ${"2026-02-01T19:37:59.417Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
+window.smartqasa.versionLoader = "6.1.63-beta.7";
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.63-beta.7"} (Built: ${"2026-02-02T00:12:11.562Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
 // Dynamically load dash-elements with version-based cache busting
 /*
 function loadElements(): void {

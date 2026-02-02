@@ -46,13 +46,7 @@ export class PanelCard extends LitElement {
 
     const adminView = (isUserAdmin && !isDemoMode) || isAdminMode;
 
-    if (
-      this.adminView !== adminView ||
-      window.smartqasa.adminView !== adminView
-    ) {
-      this.adminView = adminView;
-      window.smartqasa.adminView = adminView;
-    }
+    if (this.adminView !== adminView) this.adminView = adminView;
   }
 
   protected render(): TemplateResult {
