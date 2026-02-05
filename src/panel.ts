@@ -23,7 +23,7 @@ export class PanelCard extends LitElement {
   @property({ attribute: false }) hass?: HomeAssistant;
 
   @property({ type: Boolean, reflect: true, attribute: 'admin-view' })
-  adminView = false;
+  adminView = true;
 
   @state() isMainLoaded = false;
 
