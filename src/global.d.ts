@@ -68,11 +68,11 @@ declare interface Window {
   };
 
   smartqasa: {
-    areaTileConfigs: any;
-    locationChipConfigs: any;
+    areaTiles: any;
     confirm: (data: any) => void;
     confirmClose: () => void;
     deviceModel: string;
+    locationChipConfigs: any;
     menuTab: number;
     popup: (data: any) => void;
     popupClose: () => void;
