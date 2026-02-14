@@ -213,7 +213,6 @@ PanelCard = __decorate([
 
 window.customCards = window.customCards || [];
 window.smartqasa = window.smartqasa || {
-    chipsConfig: [],
     confirm: () => { },
     confirmClose: () => { },
     deviceModel: '',
@@ -229,8 +228,8 @@ if (window.fully) {
     console.log('Device Model: ' + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-window.smartqasa.versionLoader = "6.1.65-beta.1";
-console.info(`%c SmartQasa Loader ⏏ ${"6.1.65-beta.1"} (Built: ${"2026-02-05T21:57:01.949Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
+window.smartqasa.versionLoader = "6.1.65-beta.2";
+console.info(`%c SmartQasa Loader ⏏ ${"6.1.65-beta.2"} (Built: ${"2026-02-14T11:53:02.050Z"}) `, 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
 // Dynamically load dash-elements with version-based cache busting
 /*
 function loadElements(): void {
