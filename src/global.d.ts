@@ -68,7 +68,8 @@ declare interface Window {
   };
 
   smartqasa: {
-    chipsConfig: any;
+    areaTileConfigs: any;
+    locationChipConfigs: any;
     confirm: (data: any) => void;
     confirmClose: () => void;
     deviceModel: string;
