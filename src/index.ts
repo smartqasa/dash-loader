@@ -27,20 +27,3 @@ console.info(
   'background-color: #0000ff; color: #ffffff; font-weight: 700;'
 );
 
-// Dynamically load dash-elements with version-based cache busting
-/*
-function loadElements(): void {
-  const version = '6.1.80b';
-
-  const script = document.createElement('script');
-  script.type = 'module';
-  script.src = `/local/smartqasa/dash-elements/elements.js?v=${version}`;
-  script.onerror = () => {
-    console.error('[Loader] Failed to load dash-elements');
-  };
-
-  document.head.appendChild(script);
-}
-
-loadElements();
-*/

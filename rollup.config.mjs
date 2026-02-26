@@ -17,7 +17,7 @@ export default {
   output: {
     file: 'dist/loader-v6.7.js',
     format: 'esm',
-    sourcemap: true,
+    sourcemap: false,
   },
   plugins: [
     image(),
