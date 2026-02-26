@@ -23,6 +23,6 @@ import './panel';
 window.smartqasa.versionLoader = __BUILD_VERSION__;
 
 console.info(
-  `%c SmartQasa Loader ⏏ ${__BUILD_VERSION__} `,
+  '%c SmartQasa Loader ⏏ ' + __BUILD_VERSION__ + ' ',
   'background-color: #0000ff; color: #ffffff; font-weight: 700;'
 );
