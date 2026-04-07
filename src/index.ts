@@ -4,6 +4,7 @@ window.smartqasa = window.smartqasa || {
   confirm: () => {},
   confirmClose: () => {},
   deviceModel: '',
+  lock_condition: '',
   menuTab: 0,
   popupStack: [],
   popup: () => {},

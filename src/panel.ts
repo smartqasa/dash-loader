@@ -32,6 +32,7 @@ export class PanelCard extends LitElement {
   }
 
   public setConfig(config: LovelaceCardConfig): void {
+    window.smartqasa.lock_condition = config.lock_condition || '';
     this.config = config;
   }
 

@@ -325,6 +325,7 @@ export type PopupConfig = {
   timeout?: number;
   scrollable?: boolean;
   orientation?: 'auto' | 'landscape' | 'portrait';
+  lock_condition?: string;
   card: LovelaceCardConfig & { type: string };
   hass?: HomeAssistant;
   button1?: string;
