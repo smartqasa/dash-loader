@@ -73,12 +73,12 @@ declare interface Window {
     confirmClose: () => void;
     deviceModel: string;
     locationChipConfigs: any;
-    lock_condition: string;
     menuTab: number;
     popup: (data: any) => void;
     popupClose: () => void;
     popupReset: () => void;
     popupStack: any[];
+    restrictDialogs: boolean;
     startArea: string | undefined;
     service: (service: string, data?: object) => void;
     versionElements: string;

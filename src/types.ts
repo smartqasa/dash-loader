@@ -358,6 +358,13 @@ export interface Resources {
   [language: string]: Record<string, string>;
 }
 
+export interface RestrictPolicy {
+  restricted_modes?: string[];
+  allow_admin_mode?: boolean;
+  allow_admin_users?: boolean;
+  allowed_users?: string[];
+}
+
 /** Request object for service calls. */
 export interface ServiceCallRequest {
   domain: string;

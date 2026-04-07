@@ -7,7 +7,8 @@ import {
   TemplateResult,
 } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { HomeAssistant, LovelaceCardConfig } from './types';
+import { HomeAssistant, LovelaceCardConfig, RestrictPolicy } from './types';
+import { loadYamlAsJson } from './load-yaml-as-json';
 
 window.customCards ??= [];
 window.customCards.push({
@@ -26,14 +27,15 @@ export class PanelCard extends LitElement {
   adminView?: boolean;
 
   @state() isMainLoaded = false;
+  private restrictPolicy?: RestrictPolicy;
 
   public getCardSize(): number | Promise<number> {
     return 20;
   }
 
   public setConfig(config: LovelaceCardConfig): void {
-    window.smartqasa.lock_condition = config.lock_condition || '';
     this.config = config;
+    void this.loadRestrictPolicy();
   }
 
   protected async willUpdate(changedProps: PropertyValues): Promise<void> {
@@ -48,6 +50,33 @@ export class PanelCard extends LitElement {
     const adminView = (isUserAdmin && !isDemoMode) || isAdminMode;
 
     if (this.adminView !== adminView) this.adminView = adminView;
+
+    if (this.restrictPolicy) {
+      let restrictDialogs = true;
+
+      const restrictedModes = this.restrictPolicy.restricted_modes ?? [];
+      const allowAdminMode = this.restrictPolicy.allow_admin_mode === true;
+      const allowAdminUsers = this.restrictPolicy.allow_admin_users === true;
+      const allowedUsers = this.restrictPolicy.allowed_users ?? [];
+
+      const currentMode =
+        this.hass.states['input_select.location_mode']?.state ?? '';
+
+      const currentUser = this.hass.user?.name?.trim().toLowerCase() ?? '';
+
+      if (!restrictedModes.includes(currentMode)) {
+        restrictDialogs = false;
+      } else {
+        if (allowAdminMode && isAdminMode) restrictDialogs = false;
+        else if (allowAdminUsers && isUserAdmin) restrictDialogs = false;
+        else if (
+          allowedUsers.some((user) => user.trim().toLowerCase() === currentUser)
+        ) {
+          restrictDialogs = false;
+        }
+      }
+      window.smartqasa.restrictDialogs = restrictDialogs;
+    }
   }
 
   protected render(): TemplateResult {
@@ -66,7 +95,7 @@ export class PanelCard extends LitElement {
   }
 
   protected updated(): void {
-    if (!this.isMainLoaded) this.loadMainCard();
+    if (!this.isMainLoaded) void this.loadMainCard();
   }
 
   private async loadMainCard(retries = 5): Promise<void> {
@@ -81,6 +110,20 @@ export class PanelCard extends LitElement {
     }
 
     this.isMainLoaded = true;
+  }
+
+  private async loadRestrictPolicy(): Promise<void> {
+    try {
+      this.restrictPolicy = await loadYamlAsJson<RestrictPolicy>(
+        '/local/smartqasa/config/restrict_policy.yaml'
+      );
+    } catch (error) {
+      console.log('[PanelCard] Failed to load restrict_policy.yaml:', error);
+      this.restrictPolicy = undefined;
+      window.smartqasa.restrictDialogs = false;
+    } finally {
+      this.requestUpdate();
+    }
   }
 
   static get styles(): CSSResult {

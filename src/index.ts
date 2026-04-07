@@ -4,12 +4,12 @@ window.smartqasa = window.smartqasa || {
   confirm: () => {},
   confirmClose: () => {},
   deviceModel: '',
-  lock_condition: '',
   menuTab: 0,
   popupStack: [],
   popup: () => {},
   popupClose: () => {},
   popupReset: () => {},
+  restrictDialogs: false,
   service: () => {},
   startArea: location.pathname.split('/').pop(),
 };
