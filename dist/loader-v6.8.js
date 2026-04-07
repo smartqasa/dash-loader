@@ -3965,6 +3965,7 @@ let PanelCard = class PanelCard extends i$1 {
         if (this.adminView !== adminView)
             this.adminView = adminView;
         if (this.restrictPolicy) {
+            console.log('[PanelCard] Evaluating restrict policy:', this.restrictPolicy);
             let restrictDialogs = true;
             const restrictedModes = this.restrictPolicy.restricted_modes ?? [];
             const allowAdminMode = this.restrictPolicy.allow_admin_mode === true;
@@ -3976,6 +3977,7 @@ let PanelCard = class PanelCard extends i$1 {
                 restrictDialogs = false;
             }
             else {
+                console.log(`[PanelCard] Current mode "${currentMode}" is restricted. Checking overrides...`);
                 if (allowAdminMode && isAdminMode)
                     restrictDialogs = false;
                 else if (allowAdminUsers && isUserAdmin)
@@ -4128,5 +4130,5 @@ if (window.fully) {
     console.log('Device Model: ' + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-window.smartqasa.versionLoader = "6.2.2-beta.5";
-console.info('%c SmartQasa Loader ⏏ ' + "6.2.2-beta.5" + ' ', 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
+window.smartqasa.versionLoader = "6.2.2-beta.6";
+console.info('%c SmartQasa Loader ⏏ ' + "6.2.2-beta.6" + ' ', 'background-color: #0000ff; color: #ffffff; font-weight: 700;');

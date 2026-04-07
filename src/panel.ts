@@ -52,6 +52,10 @@ export class PanelCard extends LitElement {
     if (this.adminView !== adminView) this.adminView = adminView;
 
     if (this.restrictPolicy) {
+      console.log(
+        '[PanelCard] Evaluating restrict policy:',
+        this.restrictPolicy
+      );
       let restrictDialogs = true;
 
       const restrictedModes = this.restrictPolicy.restricted_modes ?? [];
@@ -67,6 +71,9 @@ export class PanelCard extends LitElement {
       if (!restrictedModes.includes(currentMode)) {
         restrictDialogs = false;
       } else {
+        console.log(
+          `[PanelCard] Current mode "${currentMode}" is restricted. Checking overrides...`
+        );
         if (allowAdminMode && isAdminMode) restrictDialogs = false;
         else if (allowAdminUsers && isUserAdmin) restrictDialogs = false;
         else if (
