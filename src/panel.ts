@@ -115,7 +115,7 @@ export class PanelCard extends LitElement {
   private async loadRestrictPolicy(): Promise<void> {
     try {
       this.restrictPolicy = await loadYamlAsJson<RestrictPolicy>(
-        '/local/smartqasa/config/restrict_policy.yaml'
+        '/config/restrict_policy.yaml'
       );
     } catch (error) {
       console.log('[PanelCard] Failed to load restrict_policy.yaml:', error);

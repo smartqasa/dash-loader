@@ -4019,7 +4019,7 @@ let PanelCard = class PanelCard extends i$1 {
     }
     async loadRestrictPolicy() {
         try {
-            this.restrictPolicy = await loadYamlAsJson('/local/smartqasa/config/restrict_policy.yaml');
+            this.restrictPolicy = await loadYamlAsJson('/config/restrict_policy.yaml');
         }
         catch (error) {
             console.log('[PanelCard] Failed to load restrict_policy.yaml:', error);
@@ -4128,5 +4128,5 @@ if (window.fully) {
     console.log('Device Model: ' + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-window.smartqasa.versionLoader = "6.2.2-beta.4";
-console.info('%c SmartQasa Loader ⏏ ' + "6.2.2-beta.4" + ' ', 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
+window.smartqasa.versionLoader = "6.2.2-beta.5";
+console.info('%c SmartQasa Loader ⏏ ' + "6.2.2-beta.5" + ' ', 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
