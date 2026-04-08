@@ -153,6 +153,7 @@ export class PanelCard extends LitElement {
       this.restrictionPolicy = policies.dialog_restriction;
     } catch (error) {
       this.restrictionPolicy = undefined;
+      window.smartqasa.restrictedDomains = [];
       window.smartqasa.restrictDialogs = false;
     }
   }
