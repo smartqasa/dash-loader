@@ -4133,5 +4133,5 @@ if (window.fully) {
     console.log('Device Model: ' + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-window.smartqasa.versionLoader = "6.2.2-beta.9";
-console.info('%c SmartQasa Loader ⏏ ' + "6.2.2-beta.9" + ' ', 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
+window.smartqasa.versionLoader = "6.2.2-beta.10";
+console.info('%c SmartQasa Loader ⏏ ' + "6.2.2-beta.10" + ' ', 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
