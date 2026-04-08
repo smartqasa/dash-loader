@@ -79,6 +79,9 @@ export class PanelCard extends LitElement {
 
       if (!restrictCurrentMode) {
         restrictDialogs = false;
+        console.log(
+          `[PanelCard] Current mode "${currentMode}" is not restricted. Dialogs will be allowed.`
+        );
       } else if (allowAdminMode && isAdminMode) {
         restrictDialogs = false;
       } else if (allowAdminUsers && isUserAdmin) {
@@ -130,7 +133,6 @@ export class PanelCard extends LitElement {
       const policies = await loadYamlAsJson<Policies>(
         '/local/smartqasa/custom/policies.yaml'
       );
-      console.log('[PanelCard] Loaded policies.yaml:', policies);
       this.restrictionPolicy = policies.dialog_restriction;
     } catch (error) {
       console.log('[PanelCard] Failed to load policies.yaml:', error);

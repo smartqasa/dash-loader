@@ -3977,6 +3977,7 @@ let PanelCard = class PanelCard extends i$1 {
             const restrictCurrentMode = restrictedModes.length === 0 || restrictedModes.includes(currentMode);
             if (!restrictCurrentMode) {
                 restrictDialogs = false;
+                console.log(`[PanelCard] Current mode "${currentMode}" is not restricted. Dialogs will be allowed.`);
             }
             else if (allowAdminMode && isAdminMode) {
                 restrictDialogs = false;
@@ -4023,7 +4024,6 @@ let PanelCard = class PanelCard extends i$1 {
     async loadRestrictPolicy() {
         try {
             const policies = await loadYamlAsJson('/local/smartqasa/custom/policies.yaml');
-            console.log('[PanelCard] Loaded policies.yaml:', policies);
             this.restrictionPolicy = policies.dialog_restriction;
         }
         catch (error) {
@@ -4133,5 +4133,5 @@ if (window.fully) {
     console.log('Device Model: ' + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-window.smartqasa.versionLoader = "6.2.2-beta.8";
-console.info('%c SmartQasa Loader ⏏ ' + "6.2.2-beta.8" + ' ', 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
+window.smartqasa.versionLoader = "6.2.2-beta.9";
+console.info('%c SmartQasa Loader ⏏ ' + "6.2.2-beta.9" + ' ', 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
