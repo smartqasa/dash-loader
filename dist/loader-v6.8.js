@@ -3966,6 +3966,7 @@ let PanelCard = class PanelCard extends i$1 {
         if (this.adminView !== adminView)
             this.adminView = adminView;
         if (this.restrictionPolicy) {
+            window.smartqasa.restrictedDomains = this.restrictionPolicy.domains ?? [];
             let restrictDialogs = true;
             const restrictedModes = this.restrictionPolicy.restricted_modes ?? [];
             const allowAdminMode = this.restrictionPolicy.allow_admin_mode === true;
@@ -4123,6 +4124,7 @@ window.smartqasa = window.smartqasa || {
     popupClose: () => { },
     popupReset: () => { },
     restrictDialogs: false,
+    restrictableDialogs: [],
     service: () => { },
     startArea: location.pathname.split('/').pop(),
 };
@@ -4130,5 +4132,5 @@ if (window.fully) {
     console.log('Device Model: ' + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-window.smartqasa.versionLoader = "6.2.2-beta.13";
-console.info('%c SmartQasa Loader ⏏ ' + "6.2.2-beta.13" + ' ', 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
+window.smartqasa.versionLoader = "6.2.2-beta.14";
+console.info('%c SmartQasa Loader ⏏ ' + "6.2.2-beta.14" + ' ', 'background-color: #0000ff; color: #ffffff; font-weight: 700;');

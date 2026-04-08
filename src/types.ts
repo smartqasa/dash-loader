@@ -125,6 +125,7 @@ export interface DialogEntry {
 }
 
 export interface DialogRestrictionPolicy {
+  domains: string[];
   restricted_modes?: string[];
   allow_admin_mode?: boolean;
   allow_admin_users?: boolean;
@@ -337,6 +338,7 @@ export type PopupConfig = {
   scrollable?: boolean;
   orientation?: 'auto' | 'landscape' | 'portrait';
   lock_condition?: string;
+  restrictable?: boolean;
   card: LovelaceCardConfig & { type: string };
   hass?: HomeAssistant;
   button1?: string;

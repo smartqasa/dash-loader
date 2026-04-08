@@ -61,6 +61,8 @@ export class PanelCard extends LitElement {
     if (this.adminView !== adminView) this.adminView = adminView;
 
     if (this.restrictionPolicy) {
+      window.smartqasa.restrictedDomains = this.restrictionPolicy.domains ?? [];
+
       let restrictDialogs = true;
 
       const restrictedModes = this.restrictionPolicy.restricted_modes ?? [];

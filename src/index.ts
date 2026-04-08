@@ -10,6 +10,7 @@ window.smartqasa = window.smartqasa || {
   popupClose: () => {},
   popupReset: () => {},
   restrictDialogs: false,
+  restrictableDialogs: [],
   service: () => {},
   startArea: location.pathname.split('/').pop(),
 };
