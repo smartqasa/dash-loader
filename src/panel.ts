@@ -74,10 +74,10 @@ export class PanelCard extends LitElement {
 
       const currentUser = this.hass.user?.name?.trim().toLowerCase() ?? '';
 
-      const restrictInThisMode =
+      const restrictCurrentMode =
         restrictedModes.length === 0 || restrictedModes.includes(currentMode);
 
-      if (!restrictInThisMode) {
+      if (!restrictCurrentMode) {
         restrictDialogs = false;
       } else if (allowAdminMode && isAdminMode) {
         restrictDialogs = false;
@@ -130,6 +130,7 @@ export class PanelCard extends LitElement {
       const policies = await loadYamlAsJson<Policies>(
         '/local/smartqasa/custom/policies.yaml'
       );
+      console.log('[PanelCard] Loaded policies.yaml:', policies);
       this.restrictionPolicy = policies.dialog_restriction;
     } catch (error) {
       console.log('[PanelCard] Failed to load policies.yaml:', error);

@@ -3974,8 +3974,8 @@ let PanelCard = class PanelCard extends i$1 {
             const allowedUsers = this.restrictionPolicy.allowed_users ?? [];
             const currentMode = this.hass.states['input_select.location_mode']?.state ?? '';
             const currentUser = this.hass.user?.name?.trim().toLowerCase() ?? '';
-            const restrictInThisMode = restrictedModes.length === 0 || restrictedModes.includes(currentMode);
-            if (!restrictInThisMode) {
+            const restrictCurrentMode = restrictedModes.length === 0 || restrictedModes.includes(currentMode);
+            if (!restrictCurrentMode) {
                 restrictDialogs = false;
             }
             else if (allowAdminMode && isAdminMode) {
@@ -4023,6 +4023,7 @@ let PanelCard = class PanelCard extends i$1 {
     async loadRestrictPolicy() {
         try {
             const policies = await loadYamlAsJson('/local/smartqasa/custom/policies.yaml');
+            console.log('[PanelCard] Loaded policies.yaml:', policies);
             this.restrictionPolicy = policies.dialog_restriction;
         }
         catch (error) {
@@ -4132,5 +4133,5 @@ if (window.fully) {
     console.log('Device Model: ' + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-window.smartqasa.versionLoader = "6.2.2-beta.7";
-console.info('%c SmartQasa Loader ⏏ ' + "6.2.2-beta.7" + ' ', 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
+window.smartqasa.versionLoader = "6.2.2-beta.8";
+console.info('%c SmartQasa Loader ⏏ ' + "6.2.2-beta.8" + ' ', 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
