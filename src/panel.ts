@@ -62,6 +62,10 @@ export class PanelCard extends LitElement {
     if (this.adminView !== adminView) this.adminView = adminView;
 
     if (this.restrictionPolicy) {
+      console.log(
+        '[PanelCard] Evaluating dialog restrictions with policy:',
+        this.restrictionPolicy
+      );
       let restrictDialogs = true;
 
       const restrictedModes = this.restrictionPolicy.restricted_modes ?? [];
@@ -84,12 +88,21 @@ export class PanelCard extends LitElement {
         );
       } else if (allowAdminMode && isAdminMode) {
         restrictDialogs = false;
+        console.log(
+          '[PanelCard] Admin mode is active and allowed. Dialogs will be allowed.'
+        );
       } else if (allowAdminUsers && isUserAdmin) {
         restrictDialogs = false;
+        console.log(
+          '[PanelCard] User is admin and allowed. Dialogs will be allowed.'
+        );
       } else if (
         allowedUsers.some((user) => user.trim().toLowerCase() === currentUser)
       ) {
         restrictDialogs = false;
+        console.log(
+          `[PanelCard] User "${currentUser}" is allowed. Dialogs will be allowed.`
+        );
       }
       window.smartqasa.restrictDialogs = restrictDialogs;
     }
