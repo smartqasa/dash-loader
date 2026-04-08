@@ -3966,7 +3966,6 @@ let PanelCard = class PanelCard extends i$1 {
         if (this.adminView !== adminView)
             this.adminView = adminView;
         if (this.restrictionPolicy) {
-            console.log('[PanelCard] Evaluating dialog restrictions with policy:', this.restrictionPolicy);
             let restrictDialogs = true;
             const restrictedModes = this.restrictionPolicy.restricted_modes ?? [];
             const allowAdminMode = this.restrictionPolicy.allow_admin_mode === true;
@@ -3977,19 +3976,15 @@ let PanelCard = class PanelCard extends i$1 {
             const restrictCurrentMode = restrictedModes.length === 0 || restrictedModes.includes(currentMode);
             if (!restrictCurrentMode) {
                 restrictDialogs = false;
-                console.log(`[PanelCard] Current mode "${currentMode}" is not restricted. Dialogs will be allowed.`);
             }
             else if (allowAdminMode && isAdminMode) {
                 restrictDialogs = false;
-                console.log('[PanelCard] Admin mode is active and allowed. Dialogs will be allowed.');
             }
             else if (allowAdminUsers && isUserAdmin) {
                 restrictDialogs = false;
-                console.log('[PanelCard] User is admin and allowed. Dialogs will be allowed.');
             }
             else if (allowedUsers.some((user) => user.trim().toLowerCase() === currentUser)) {
                 restrictDialogs = false;
-                console.log(`[PanelCard] User "${currentUser}" is allowed. Dialogs will be allowed.`);
             }
             window.smartqasa.restrictDialogs = restrictDialogs;
         }
@@ -4030,7 +4025,6 @@ let PanelCard = class PanelCard extends i$1 {
             this.restrictionPolicy = policies.dialog_restriction;
         }
         catch (error) {
-            console.log('[PanelCard] Failed to load policies.yaml:', error);
             this.restrictionPolicy = undefined;
             window.smartqasa.restrictDialogs = false;
         }
@@ -4136,5 +4130,5 @@ if (window.fully) {
     console.log('Device Model: ' + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-window.smartqasa.versionLoader = "6.2.2-beta.12";
-console.info('%c SmartQasa Loader ⏏ ' + "6.2.2-beta.12" + ' ', 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
+window.smartqasa.versionLoader = "6.2.2-beta.13";
+console.info('%c SmartQasa Loader ⏏ ' + "6.2.2-beta.13" + ' ', 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
