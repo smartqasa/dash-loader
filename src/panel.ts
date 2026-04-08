@@ -46,8 +46,7 @@ export class PanelCard extends LitElement {
   protected async willUpdate(changedProps: PropertyValues): Promise<void> {
     if (
       !this.hass ||
-      !changedProps.has('hass') ||
-      !changedProps.has('restrictionPolicy')
+      (!changedProps.has('hass') && !changedProps.has('restrictionPolicy'))
     )
       return;
 

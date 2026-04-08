@@ -3956,8 +3956,7 @@ let PanelCard = class PanelCard extends i$1 {
     }
     async willUpdate(changedProps) {
         if (!this.hass ||
-            !changedProps.has('hass') ||
-            !changedProps.has('restrictionPolicy'))
+            (!changedProps.has('hass') && !changedProps.has('restrictionPolicy')))
             return;
         const isUserAdmin = this.hass.user?.is_admin === true;
         const states = this.hass.states;
@@ -4137,5 +4136,5 @@ if (window.fully) {
     console.log('Device Model: ' + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-window.smartqasa.versionLoader = "6.2.2-beta.11";
-console.info('%c SmartQasa Loader ⏏ ' + "6.2.2-beta.11" + ' ', 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
+window.smartqasa.versionLoader = "6.2.2-beta.12";
+console.info('%c SmartQasa Loader ⏏ ' + "6.2.2-beta.12" + ' ', 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
