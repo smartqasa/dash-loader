@@ -3955,7 +3955,9 @@ let PanelCard = class PanelCard extends i$1 {
         void this.loadRestrictPolicy();
     }
     async willUpdate(changedProps) {
-        if (!changedProps.has('hass') || !this.hass)
+        if (!this.hass ||
+            !changedProps.has('hass') ||
+            !changedProps.has('restrictionPolicy'))
             return;
         const isUserAdmin = this.hass.user?.is_admin === true;
         const states = this.hass.states;
@@ -3964,27 +3966,26 @@ let PanelCard = class PanelCard extends i$1 {
         const adminView = (isUserAdmin && !isDemoMode) || isAdminMode;
         if (this.adminView !== adminView)
             this.adminView = adminView;
-        if (this.restrictPolicy) {
-            console.log('[PanelCard] Evaluating restrict policy:', this.restrictPolicy);
+        if (this.restrictionPolicy) {
             let restrictDialogs = true;
-            const restrictedModes = this.restrictPolicy.restricted_modes ?? [];
-            const allowAdminMode = this.restrictPolicy.allow_admin_mode === true;
-            const allowAdminUsers = this.restrictPolicy.allow_admin_users === true;
-            const allowedUsers = this.restrictPolicy.allowed_users ?? [];
+            const restrictedModes = this.restrictionPolicy.restricted_modes ?? [];
+            const allowAdminMode = this.restrictionPolicy.allow_admin_mode === true;
+            const allowAdminUsers = this.restrictionPolicy.allow_admin_users === true;
+            const allowedUsers = this.restrictionPolicy.allowed_users ?? [];
             const currentMode = this.hass.states['input_select.location_mode']?.state ?? '';
             const currentUser = this.hass.user?.name?.trim().toLowerCase() ?? '';
-            if (!restrictedModes.includes(currentMode)) {
+            const restrictInThisMode = restrictedModes.length === 0 || restrictedModes.includes(currentMode);
+            if (!restrictInThisMode) {
                 restrictDialogs = false;
             }
-            else {
-                console.log(`[PanelCard] Current mode "${currentMode}" is restricted. Checking overrides...`);
-                if (allowAdminMode && isAdminMode)
-                    restrictDialogs = false;
-                else if (allowAdminUsers && isUserAdmin)
-                    restrictDialogs = false;
-                else if (allowedUsers.some((user) => user.trim().toLowerCase() === currentUser)) {
-                    restrictDialogs = false;
-                }
+            else if (allowAdminMode && isAdminMode) {
+                restrictDialogs = false;
+            }
+            else if (allowAdminUsers && isUserAdmin) {
+                restrictDialogs = false;
+            }
+            else if (allowedUsers.some((user) => user.trim().toLowerCase() === currentUser)) {
+                restrictDialogs = false;
             }
             window.smartqasa.restrictDialogs = restrictDialogs;
         }
@@ -4021,15 +4022,13 @@ let PanelCard = class PanelCard extends i$1 {
     }
     async loadRestrictPolicy() {
         try {
-            this.restrictPolicy = await loadYamlAsJson('/config/restrict_policy.yaml');
+            const policies = await loadYamlAsJson('/local/smartqasa/custom/policies.yaml');
+            this.restrictionPolicy = policies.dialog_restriction;
         }
         catch (error) {
-            console.log('[PanelCard] Failed to load restrict_policy.yaml:', error);
-            this.restrictPolicy = undefined;
+            console.log('[PanelCard] Failed to load policies.yaml:', error);
+            this.restrictionPolicy = undefined;
             window.smartqasa.restrictDialogs = false;
-        }
-        finally {
-            this.requestUpdate();
         }
     }
     static get styles() {
@@ -4108,6 +4107,9 @@ __decorate([
 __decorate([
     r()
 ], PanelCard.prototype, "isMainLoaded", void 0);
+__decorate([
+    r()
+], PanelCard.prototype, "restrictionPolicy", void 0);
 PanelCard = __decorate([
     t('panel-card')
 ], PanelCard);
@@ -4130,5 +4132,5 @@ if (window.fully) {
     console.log('Device Model: ' + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-window.smartqasa.versionLoader = "6.2.2-beta.6";
-console.info('%c SmartQasa Loader ⏏ ' + "6.2.2-beta.6" + ' ', 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
+window.smartqasa.versionLoader = "6.2.2-beta.7";
+console.info('%c SmartQasa Loader ⏏ ' + "6.2.2-beta.7" + ' ', 'background-color: #0000ff; color: #ffffff; font-weight: 700;');

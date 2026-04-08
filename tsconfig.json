@@ -6,7 +6,7 @@
     "isolatedModules": true,
     "lib": ["esnext", "dom"],
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "noEmitOnError": true,
     "resolveJsonModule": true,
     "strict": true,

@@ -7,7 +7,12 @@ import {
   TemplateResult,
 } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { HomeAssistant, LovelaceCardConfig, RestrictPolicy } from './types';
+import {
+  DialogRestrictionPolicy,
+  HomeAssistant,
+  LovelaceCardConfig,
+  Policies,
+} from './types';
 import { loadYamlAsJson } from './load-yaml-as-json';
 
 window.customCards ??= [];
@@ -27,7 +32,7 @@ export class PanelCard extends LitElement {
   adminView?: boolean;
 
   @state() isMainLoaded = false;
-  private restrictPolicy?: RestrictPolicy;
+  @state() restrictionPolicy?: DialogRestrictionPolicy;
 
   public getCardSize(): number | Promise<number> {
     return 20;
@@ -39,7 +44,12 @@ export class PanelCard extends LitElement {
   }
 
   protected async willUpdate(changedProps: PropertyValues): Promise<void> {
-    if (!changedProps.has('hass') || !this.hass) return;
+    if (
+      !this.hass ||
+      !changedProps.has('hass') ||
+      !changedProps.has('restrictionPolicy')
+    )
+      return;
 
     const isUserAdmin = this.hass.user?.is_admin === true;
 
@@ -51,36 +61,32 @@ export class PanelCard extends LitElement {
 
     if (this.adminView !== adminView) this.adminView = adminView;
 
-    if (this.restrictPolicy) {
-      console.log(
-        '[PanelCard] Evaluating restrict policy:',
-        this.restrictPolicy
-      );
+    if (this.restrictionPolicy) {
       let restrictDialogs = true;
 
-      const restrictedModes = this.restrictPolicy.restricted_modes ?? [];
-      const allowAdminMode = this.restrictPolicy.allow_admin_mode === true;
-      const allowAdminUsers = this.restrictPolicy.allow_admin_users === true;
-      const allowedUsers = this.restrictPolicy.allowed_users ?? [];
+      const restrictedModes = this.restrictionPolicy.restricted_modes ?? [];
+      const allowAdminMode = this.restrictionPolicy.allow_admin_mode === true;
+      const allowAdminUsers = this.restrictionPolicy.allow_admin_users === true;
+      const allowedUsers = this.restrictionPolicy.allowed_users ?? [];
 
       const currentMode =
         this.hass.states['input_select.location_mode']?.state ?? '';
 
       const currentUser = this.hass.user?.name?.trim().toLowerCase() ?? '';
 
-      if (!restrictedModes.includes(currentMode)) {
+      const restrictInThisMode =
+        restrictedModes.length === 0 || restrictedModes.includes(currentMode);
+
+      if (!restrictInThisMode) {
         restrictDialogs = false;
-      } else {
-        console.log(
-          `[PanelCard] Current mode "${currentMode}" is restricted. Checking overrides...`
-        );
-        if (allowAdminMode && isAdminMode) restrictDialogs = false;
-        else if (allowAdminUsers && isUserAdmin) restrictDialogs = false;
-        else if (
-          allowedUsers.some((user) => user.trim().toLowerCase() === currentUser)
-        ) {
-          restrictDialogs = false;
-        }
+      } else if (allowAdminMode && isAdminMode) {
+        restrictDialogs = false;
+      } else if (allowAdminUsers && isUserAdmin) {
+        restrictDialogs = false;
+      } else if (
+        allowedUsers.some((user) => user.trim().toLowerCase() === currentUser)
+      ) {
+        restrictDialogs = false;
       }
       window.smartqasa.restrictDialogs = restrictDialogs;
     }
@@ -121,15 +127,14 @@ export class PanelCard extends LitElement {
 
   private async loadRestrictPolicy(): Promise<void> {
     try {
-      this.restrictPolicy = await loadYamlAsJson<RestrictPolicy>(
-        '/config/restrict_policy.yaml'
+      const policies = await loadYamlAsJson<Policies>(
+        '/local/smartqasa/custom/policies.yaml'
       );
+      this.restrictionPolicy = policies.dialog_restriction;
     } catch (error) {
-      console.log('[PanelCard] Failed to load restrict_policy.yaml:', error);
-      this.restrictPolicy = undefined;
+      console.log('[PanelCard] Failed to load policies.yaml:', error);
+      this.restrictionPolicy = undefined;
       window.smartqasa.restrictDialogs = false;
-    } finally {
-      this.requestUpdate();
     }
   }
 

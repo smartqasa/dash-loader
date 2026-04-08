@@ -124,6 +124,13 @@ export interface DialogEntry {
   data: any;
 }
 
+export interface DialogRestrictionPolicy {
+  restricted_modes?: string[];
+  allow_admin_mode?: boolean;
+  allow_admin_users?: boolean;
+  allowed_users?: string[];
+}
+
 export interface DialogTable {
   [key: string]: DialogEntry;
 }
@@ -318,6 +325,10 @@ export interface PanelInfo<T = Record<string, any> | null> {
 
 export type Panels = Record<string, PanelInfo>;
 
+export interface Policies {
+  dialog_restriction?: DialogRestrictionPolicy;
+}
+
 export type PopupConfig = {
   title?: string;
   size?: 'normal' | 'fullscreen';
@@ -356,13 +367,6 @@ export interface RegistryEntry {
 /** Translation resources */
 export interface Resources {
   [language: string]: Record<string, string>;
-}
-
-export interface RestrictPolicy {
-  restricted_modes?: string[];
-  allow_admin_mode?: boolean;
-  allow_admin_users?: boolean;
-  allowed_users?: string[];
 }
 
 /** Request object for service calls. */
