@@ -3965,16 +3965,28 @@ let PanelCard = class PanelCard extends i$1 {
         const adminView = (isUserAdmin && !isDemoMode) || isAdminMode;
         if (this.adminView !== adminView)
             this.adminView = adminView;
+        const normalize = (value) => value.trim().toLowerCase();
         if (this.restrictionPolicy) {
-            window.smartqasa.restrictedDomains = this.restrictionPolicy.domains ?? [];
+            const domains = this.restrictionPolicy.domains ?? [];
+            if (domains.length === 0) {
+                window.smartqasa.restrictDialogs = false;
+                window.smartqasa.restrictedDomains = [];
+                return;
+            }
+            window.smartqasa.restrictedDomains = domains.map(normalize);
             let restrictDialogs = true;
             const restrictedModes = this.restrictionPolicy.restricted_modes ?? [];
             const allowAdminMode = this.restrictionPolicy.allow_admin_mode === true;
             const allowAdminUsers = this.restrictionPolicy.allow_admin_users === true;
             const allowedUsers = this.restrictionPolicy.allowed_users ?? [];
             const currentMode = this.hass.states['input_select.location_mode']?.state ?? '';
-            const currentUser = this.hass.user?.name?.trim().toLowerCase() ?? '';
-            const restrictCurrentMode = restrictedModes.length === 0 || restrictedModes.includes(currentMode);
+            const normalizedRestrictedModes = restrictedModes.map(normalize);
+            const normalizedCurrentMode = normalize(currentMode);
+            const normalizedAllowedUsers = allowedUsers.map(normalize);
+            const normalizedCurrentUser = normalize(this.hass.user?.name ?? '');
+            const restrictCurrentMode = normalizedRestrictedModes.length === 0 ||
+                normalizedRestrictedModes.includes(normalizedCurrentMode);
+            const isAllowedUser = normalizedAllowedUsers.includes(normalizedCurrentUser);
             if (!restrictCurrentMode) {
                 restrictDialogs = false;
             }
@@ -3984,7 +3996,7 @@ let PanelCard = class PanelCard extends i$1 {
             else if (allowAdminUsers && isUserAdmin) {
                 restrictDialogs = false;
             }
-            else if (allowedUsers.some((user) => user.trim().toLowerCase() === currentUser)) {
+            else if (isAllowedUser) {
                 restrictDialogs = false;
             }
             window.smartqasa.restrictDialogs = restrictDialogs;
@@ -4132,5 +4144,5 @@ if (window.fully) {
     console.log('Device Model: ' + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-window.smartqasa.versionLoader = "6.2.2-beta.14";
-console.info('%c SmartQasa Loader ⏏ ' + "6.2.2-beta.14" + ' ', 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
+window.smartqasa.versionLoader = "6.2.2-beta.15";
+console.info('%c SmartQasa Loader ⏏ ' + "6.2.2-beta.15" + ' ', 'background-color: #0000ff; color: #ffffff; font-weight: 700;');

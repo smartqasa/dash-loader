@@ -51,17 +51,25 @@ export class PanelCard extends LitElement {
       return;
 
     const isUserAdmin = this.hass.user?.is_admin === true;
-
     const states = this.hass.states;
     const isAdminMode = states['input_boolean.admin_mode']?.state === 'on';
     const isDemoMode = states['input_boolean.demo_mode']?.state === 'on';
-
     const adminView = (isUserAdmin && !isDemoMode) || isAdminMode;
 
     if (this.adminView !== adminView) this.adminView = adminView;
 
+    const normalize = (value: string): string => value.trim().toLowerCase();
+
     if (this.restrictionPolicy) {
-      window.smartqasa.restrictedDomains = this.restrictionPolicy.domains ?? [];
+      const domains = this.restrictionPolicy.domains ?? [];
+
+      if (domains.length === 0) {
+        window.smartqasa.restrictDialogs = false;
+        window.smartqasa.restrictedDomains = [];
+        return;
+      }
+
+      window.smartqasa.restrictedDomains = domains.map(normalize);
 
       let restrictDialogs = true;
 
@@ -73,10 +81,19 @@ export class PanelCard extends LitElement {
       const currentMode =
         this.hass.states['input_select.location_mode']?.state ?? '';
 
-      const currentUser = this.hass.user?.name?.trim().toLowerCase() ?? '';
+      const normalizedRestrictedModes = restrictedModes.map(normalize);
+      const normalizedCurrentMode = normalize(currentMode);
+
+      const normalizedAllowedUsers = allowedUsers.map(normalize);
+      const normalizedCurrentUser = normalize(this.hass.user?.name ?? '');
 
       const restrictCurrentMode =
-        restrictedModes.length === 0 || restrictedModes.includes(currentMode);
+        normalizedRestrictedModes.length === 0 ||
+        normalizedRestrictedModes.includes(normalizedCurrentMode);
+
+      const isAllowedUser = normalizedAllowedUsers.includes(
+        normalizedCurrentUser
+      );
 
       if (!restrictCurrentMode) {
         restrictDialogs = false;
@@ -84,11 +101,10 @@ export class PanelCard extends LitElement {
         restrictDialogs = false;
       } else if (allowAdminUsers && isUserAdmin) {
         restrictDialogs = false;
-      } else if (
-        allowedUsers.some((user) => user.trim().toLowerCase() === currentUser)
-      ) {
+      } else if (isAllowedUser) {
         restrictDialogs = false;
       }
+
       window.smartqasa.restrictDialogs = restrictDialogs;
     }
   }
