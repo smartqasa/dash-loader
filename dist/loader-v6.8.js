@@ -3952,9 +3952,11 @@ let PanelCard = class PanelCard extends i$1 {
     }
     setConfig(config) {
         this.config = config;
-        void this.loadRestrictPolicy();
     }
     async willUpdate(changedProps) {
+        if (changedProps.has('config')) {
+            await this.loadRestrictPolicy();
+        }
         if (!this.hass ||
             (!changedProps.has('hass') && !changedProps.has('restrictionPolicy')))
             return;
@@ -3987,7 +3989,6 @@ let PanelCard = class PanelCard extends i$1 {
             const restrictCurrentMode = normalizedRestrictedModes.length === 0 ||
                 normalizedRestrictedModes.includes(normalizedCurrentMode);
             const isAllowedUser = normalizedAllowedUsers.includes(normalizedCurrentUser);
-            console.log('Admin Mode:', allowAdminMode, isAdminMode);
             if (!restrictCurrentMode) {
                 restrictDialogs = false;
             }
@@ -4145,5 +4146,5 @@ if (window.fully) {
     console.log('Device Model: ' + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-window.smartqasa.versionLoader = "6.2.2-beta.16";
-console.info('%c SmartQasa Loader ⏏ ' + "6.2.2-beta.16" + ' ', 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
+window.smartqasa.versionLoader = "6.2.2-beta.17";
+console.info('%c SmartQasa Loader ⏏ ' + "6.2.2-beta.17" + ' ', 'background-color: #0000ff; color: #ffffff; font-weight: 700;');

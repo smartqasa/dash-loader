@@ -40,10 +40,13 @@ export class PanelCard extends LitElement {
 
   public setConfig(config: LovelaceCardConfig): void {
     this.config = config;
-    void this.loadRestrictPolicy();
   }
 
   protected async willUpdate(changedProps: PropertyValues): Promise<void> {
+    if (changedProps.has('config')) {
+      await this.loadRestrictPolicy();
+    }
+
     if (
       !this.hass ||
       (!changedProps.has('hass') && !changedProps.has('restrictionPolicy'))
@@ -94,8 +97,6 @@ export class PanelCard extends LitElement {
       const isAllowedUser = normalizedAllowedUsers.includes(
         normalizedCurrentUser
       );
-
-      console.log('Admin Mode:', allowAdminMode, isAdminMode);
 
       if (!restrictCurrentMode) {
         restrictDialogs = false;
