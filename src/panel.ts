@@ -95,6 +95,8 @@ export class PanelCard extends LitElement {
         normalizedCurrentUser
       );
 
+      console.log('Admin Mode:', allowAdminMode, isAdminMode);
+
       if (!restrictCurrentMode) {
         restrictDialogs = false;
       } else if (allowAdminMode && isAdminMode) {
