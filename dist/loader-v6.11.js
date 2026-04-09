@@ -3926,13 +3926,24 @@ var jsYaml = {
 	safeDump: safeDump
 };
 
-const loadYamlAsJson = async (yamlFilePath) => {
-    const response = await fetch(yamlFilePath);
-    if (!response.ok) {
-        throw new Error(`[loadYamlAsJson] Failed to fetch YAML file. HTTP Status: ${response.status} - ${response.statusText}`);
+const loadYamlAsJson = async (yamlFilePath, reportErrors = true) => {
+    try {
+        const response = await fetch(yamlFilePath);
+        if (!response.ok) {
+            // Handle 404 (or any non-OK)
+            if (!reportErrors)
+                return undefined;
+            throw new Error(`[loadYamlAsJson] Failed to fetch YAML file. HTTP Status: ${response.status} - ${response.statusText}`);
+        }
+        const yamlContent = await response.text();
+        return jsYaml.load(yamlContent);
     }
-    const yamlContent = await response.text();
-    return jsYaml.load(yamlContent);
+    catch (err) {
+        // Network errors, CORS, etc.
+        if (!reportErrors)
+            return undefined;
+        throw err;
+    }
 };
 
 window.customCards ??= [];
@@ -4035,14 +4046,21 @@ let PanelCard = class PanelCard extends i$1 {
         this.isMainLoaded = true;
     }
     async loadRestrictPolicy() {
+        const resetRestrictionState = () => {
+            this.restrictionPolicy = undefined;
+            window.smartqasa.restrictDialogs = false;
+            window.smartqasa.restrictedDomains = [];
+        };
         try {
-            const policies = await loadYamlAsJson('/local/smartqasa/custom/policies.yaml');
+            const policies = await loadYamlAsJson('/local/smartqasa/custom/policies.yaml', false);
+            if (!policies?.dialog_restriction) {
+                resetRestrictionState();
+                return;
+            }
             this.restrictionPolicy = policies.dialog_restriction;
         }
-        catch (error) {
-            this.restrictionPolicy = undefined;
-            window.smartqasa.restrictedDomains = [];
-            window.smartqasa.restrictDialogs = false;
+        catch {
+            resetRestrictionState();
         }
     }
     static get styles() {
@@ -4147,5 +4165,5 @@ if (window.fully) {
     console.log('Device Model: ' + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-window.smartqasa.versionLoader = "6.2.2-beta.20";
-console.info('%c SmartQasa Loader ⏏ ' + "6.2.2-beta.20" + ' ', 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
+window.smartqasa.versionLoader = "6.2.3-beta.1";
+console.info('%c SmartQasa Loader ⏏ ' + "6.2.3-beta.1" + ' ', 'background-color: #0000ff; color: #ffffff; font-weight: 700;');

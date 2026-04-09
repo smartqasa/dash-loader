@@ -146,15 +146,26 @@ export class PanelCard extends LitElement {
   }
 
   private async loadRestrictPolicy(): Promise<void> {
+    const resetRestrictionState = (): void => {
+      this.restrictionPolicy = undefined;
+      window.smartqasa.restrictDialogs = false;
+      window.smartqasa.restrictedDomains = [];
+    };
+
     try {
       const policies = await loadYamlAsJson<Policies>(
-        '/local/smartqasa/custom/policies.yaml'
+        '/local/smartqasa/custom/policies.yaml',
+        false
       );
+
+      if (!policies?.dialog_restriction) {
+        resetRestrictionState();
+        return;
+      }
+
       this.restrictionPolicy = policies.dialog_restriction;
-    } catch (error) {
-      this.restrictionPolicy = undefined;
-      window.smartqasa.restrictedDomains = [];
-      window.smartqasa.restrictDialogs = false;
+    } catch {
+      resetRestrictionState();
     }
   }
 
