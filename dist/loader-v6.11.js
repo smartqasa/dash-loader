@@ -3926,12 +3926,12 @@ var jsYaml = {
 	safeDump: safeDump
 };
 
-const loadYamlAsJson = async (yamlFilePath, reportErrors = true) => {
+const loadYamlAsJson = async (yamlFilePath, reportMissing = true) => {
     try {
         const response = await fetch(yamlFilePath);
         if (!response.ok) {
             // Handle 404 (or any non-OK)
-            if (!reportErrors)
+            if (!reportMissing)
                 return undefined;
             throw new Error(`[loadYamlAsJson] Failed to fetch YAML file. HTTP Status: ${response.status} - ${response.statusText}`);
         }
@@ -3940,7 +3940,7 @@ const loadYamlAsJson = async (yamlFilePath, reportErrors = true) => {
     }
     catch (err) {
         // Network errors, CORS, etc.
-        if (!reportErrors)
+        if (!reportMissing)
             return undefined;
         throw err;
     }
@@ -4165,5 +4165,5 @@ if (window.fully) {
     console.log('Device Model: ' + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-window.smartqasa.versionLoader = "6.2.3-beta.1";
-console.info('%c SmartQasa Loader ⏏ ' + "6.2.3-beta.1" + ' ', 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
+window.smartqasa.versionLoader = "6.2.3-beta.2";
+console.info('%c SmartQasa Loader ⏏ ' + "6.2.3-beta.2" + ' ', 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
