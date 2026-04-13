@@ -16,6 +16,7 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "build": "./build.sh",
+    "publish": "./publish.sh",
     "promote": "./promote.sh"
   },
   "keywords": [],

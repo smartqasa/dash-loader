@@ -1,75 +1,64 @@
 #!/usr/bin/env bash
-set -e
 
-# Ensure we're on beta branch
-BRANCH=$(git rev-parse --abbrev-ref HEAD)
-if [ "$BRANCH" != "beta" ]; then
-  echo "❌ Must be on 'beta' branch. Current: $BRANCH"
-  exit 1
-fi
+# Exit on error (-e), fail on unset vars (-u), and fail pipelines if any command fails
+set -euo pipefail
 
-# Bump prerelease version (semver: 6.1.2-beta.N)
-npm version prerelease --preid=beta --no-git-tag-version
+# Standard failure helper: print message and exit
+fail() {
+    echo "❌ $1" >&2
+    exit 1
+}
 
-# Get new version
-VERSION=$(node -p "require('./package.json').version")
+# Ensure a required command exists in PATH
+require_cmd() {
+    command -v "$1" >/dev/null 2>&1 || fail "Missing required command: $1"
+}
 
-# Build dev bundle (for testing via HACS)
+# Prevent running during a rebase (repo is in unstable/transitional state)
+ensure_not_mid_rebase() {
+    if [ -d ".git/rebase-merge" ] || [ -d ".git/rebase-apply" ]; then
+        fail "Rebase in progress. Complete or abort it first."
+    fi
+}
+
+echo "🔍 Checking prerequisites..."
+
+# Verify required tools are installed
+for cmd in git npm node rollup; do
+    require_cmd "$cmd"
+done
+
+# Ensure we are inside a git repository
+git rev-parse --is-inside-work-tree >/dev/null 2>&1 || fail "Not inside a git repository"
+
+# Ensure repo is not mid-rebase (avoids corrupting version bumps)
+ensure_not_mid_rebase
+
+# Enforce that all development happens on beta branch
+# This keeps versioning and release flow consistent
+BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+[ "$BRANCH" = "beta" ] || fail "Must be on 'beta' branch. Current: $BRANCH"
+
+# Bump the prerelease version in package.json
+# Example: 6.2.7-beta.3 → 6.2.7-beta.4
+# This is the version that will be committed next
+echo "📦 Bumping beta prerelease version..."
+npm version prerelease --preid=beta --no-git-tag-version >/dev/null
+
+# Read the updated version from package.json (source of truth)
+VERSION="$(node -p "require('./package.json').version")"
+[ -n "$VERSION" ] || fail "Unable to read version from package.json"
+
+# Build the development bundle
+# This regenerates dist/ so it can be committed and tested
+echo "🏗 Building dev bundle..."
 rm -rf dist
 rollup -c
 
-# Stage everything (src, config, dist) for commit
-git add -A
+# At this point:
+# - package.json has the new beta version
+# - dist/ contains the transpiled output
+# Next step (outside this script) is to commit via VS Code
 
-# Defaults
-COMMIT_MSG="🔖 Beta release $VERSION"
-
-# Try AI-generated commit message
-if [ -n "$OPENAI_API_KEY" ]; then
-  LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
-  if [ -n "$LAST_TAG" ]; then
-    DIFF_STAT=$(git diff --stat $LAST_TAG HEAD)
-  else
-    DIFF_STAT=$(git diff --stat HEAD)
-  fi
-
-  COMMIT_PAYLOAD=$(jq -n \
-    --arg version "$VERSION" \
-    --arg diff "$DIFF_STAT" \
-    '{
-      model: "gpt-4o-mini",
-      messages: [
-        {role: "system", content: "Write a concise git commit message for a beta prerelease."},
-        {role: "user", content: ("Generate a commit message for beta release " + $version + ":\n" + $diff)}
-      ],
-      max_tokens: 50,
-      temperature: 0.3
-    }')
-
-  RAW=$(echo "$COMMIT_PAYLOAD" | \
-    curl -s https://api.openai.com/v1/chat/completions \
-      -H "Authorization: Bearer $OPENAI_API_KEY" \
-      -H "Content-Type: application/json" \
-      -d @-)
-
-  AI_MSG=$(echo "$RAW" | jq -r '.choices[0].message.content' || true)
-  if [ -n "$AI_MSG" ] && [ "$AI_MSG" != "null" ]; then
-    COMMIT_MSG="$AI_MSG"
-  fi
-fi
-
-# Commit + tag
-git commit -m "$COMMIT_MSG"
-git tag "v$VERSION"
-
-# Push branch + tag
-git push origin beta
-git push origin "v$VERSION"
-
-# Create GitHub prerelease for HACS
-gh release create "v$VERSION" --prerelease --notes "Beta release $VERSION – for testing"
-
-echo "✅ Beta released"
+echo "✅ Build complete"
 echo "  package.json = $VERSION"
-echo "  tag          = v$VERSION"
-echo "  commit msg   = $COMMIT_MSG"
