@@ -4053,11 +4053,11 @@ let PanelCard = class PanelCard extends i$1 {
         };
         try {
             const policies = await loadYamlAsJson('/local/smartqasa/custom/policies.yaml', false);
-            if (!policies?.dialog_restriction) {
+            if (!policies?.access_restriction) {
                 resetRestrictionState();
                 return;
             }
-            this.restrictionPolicy = policies.dialog_restriction;
+            this.restrictionPolicy = policies.access_restriction;
         }
         catch {
             resetRestrictionState();
@@ -4165,5 +4165,5 @@ if (window.fully) {
     console.log('Device Model: ' + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-window.smartqasa.versionLoader = "6.2.5-beta.1";
-console.info('%c SmartQasa Loader ⏏ ' + "6.2.5-beta.1" + ' ', 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
+window.smartqasa.versionLoader = "6.2.5-beta.3";
+console.info('%c SmartQasa Loader ⏏ ' + "6.2.5-beta.3" + ' ', 'background-color: #0000ff; color: #ffffff; font-weight: 700;');

@@ -124,8 +124,11 @@ export interface DialogEntry {
   data: any;
 }
 
-export interface DialogRestrictionPolicy {
+export interface AccessRestrictionPolicy {
   domains: string[];
+  home: boolean;
+  areas: boolean;
+  menu: boolean;
   restricted_modes?: string[];
   allow_admin_mode?: boolean;
   allow_admin_users?: boolean;
@@ -327,7 +330,7 @@ export interface PanelInfo<T = Record<string, any> | null> {
 export type Panels = Record<string, PanelInfo>;
 
 export interface Policies {
-  dialog_restriction?: DialogRestrictionPolicy;
+  access_restriction?: AccessRestrictionPolicy;
 }
 
 export type PopupConfig = {

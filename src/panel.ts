@@ -7,12 +7,8 @@ import {
   TemplateResult,
 } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import {
-  DialogRestrictionPolicy,
-  HomeAssistant,
-  LovelaceCardConfig,
-  Policies,
-} from './types';
+import { HomeAssistant, LovelaceCardConfig } from './types-ha';
+import { AccessRestrictionPolicy, Policies } from './types-sq';
 import { loadYamlAsJson } from './load-yaml-as-json';
 
 window.customCards ??= [];
@@ -32,7 +28,7 @@ export class PanelCard extends LitElement {
   adminView?: boolean;
 
   @state() isMainLoaded = false;
-  @state() restrictionPolicy?: DialogRestrictionPolicy;
+  @state() restrictionPolicy?: AccessRestrictionPolicy;
 
   public getCardSize(): number | Promise<number> {
     return 20;
@@ -158,12 +154,12 @@ export class PanelCard extends LitElement {
         false
       );
 
-      if (!policies?.dialog_restriction) {
+      if (!policies?.access_restriction) {
         resetRestrictionState();
         return;
       }
 
-      this.restrictionPolicy = policies.dialog_restriction;
+      this.restrictionPolicy = policies.access_restriction;
     } catch {
       resetRestrictionState();
     }
