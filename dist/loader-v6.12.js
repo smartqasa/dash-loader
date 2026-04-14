@@ -3979,41 +3979,34 @@ let PanelCard = class PanelCard extends i$1 {
         if (this.adminView !== adminView)
             this.adminView = adminView;
         const normalize = (value) => value.trim().toLowerCase();
-        if (this.restrictionPolicy) {
-            const domains = this.restrictionPolicy.domains ?? [];
-            if (domains.length === 0) {
-                window.smartqasa.restrictedAccess = false;
-                window.smartqasa.restrictedDomains = [];
-                return;
-            }
-            window.smartqasa.restrictedDomains = domains.map(normalize);
-            let restrictedAccess = true;
-            const restrictedModes = this.restrictionPolicy.restricted_modes ?? [];
-            const allowAdminMode = this.restrictionPolicy.allow_admin_mode === true;
-            const allowAdminUsers = this.restrictionPolicy.allow_admin_users === true;
-            const allowedUsers = this.restrictionPolicy.allowed_users ?? [];
-            const currentMode = this.hass.states['input_select.location_mode']?.state ?? '';
-            const normalizedRestrictedModes = restrictedModes.map(normalize);
-            const normalizedCurrentMode = normalize(currentMode);
-            const normalizedAllowedUsers = allowedUsers.map(normalize);
-            const normalizedCurrentUser = normalize(this.hass.user?.name ?? '');
-            const restrictCurrentMode = normalizedRestrictedModes.length === 0 ||
-                normalizedRestrictedModes.includes(normalizedCurrentMode);
-            const isAllowedUser = normalizedAllowedUsers.includes(normalizedCurrentUser);
-            if (!restrictCurrentMode) {
-                restrictedAccess = false;
-            }
-            else if (allowAdminMode && isAdminMode) {
-                restrictedAccess = false;
-            }
-            else if (allowAdminUsers && isUserAdmin) {
-                restrictedAccess = false;
-            }
-            else if (isAllowedUser) {
-                restrictedAccess = false;
-            }
-            window.smartqasa.restrictedAccess = restrictedAccess;
+        if (!this.restrictionPolicy)
+            return;
+        let enforceRestrictions = true;
+        const restrictedModes = this.restrictionPolicy.restricted_modes ?? [];
+        const allowAdminMode = this.restrictionPolicy.allow_admin_mode === true;
+        const allowAdminUsers = this.restrictionPolicy.allow_admin_users === true;
+        const allowedUsers = this.restrictionPolicy.allowed_users ?? [];
+        const currentMode = this.hass.states['input_select.location_mode']?.state ?? '';
+        const normalizedRestrictedModes = restrictedModes.map(normalize);
+        const normalizedCurrentMode = normalize(currentMode);
+        const normalizedAllowedUsers = allowedUsers.map(normalize);
+        const normalizedCurrentUser = normalize(this.hass.user?.name ?? '');
+        const restrictCurrentMode = normalizedRestrictedModes.length === 0 ||
+            normalizedRestrictedModes.includes(normalizedCurrentMode);
+        const isAllowedUser = normalizedAllowedUsers.includes(normalizedCurrentUser);
+        if (!restrictCurrentMode) {
+            enforceRestrictions = false;
         }
+        else if (allowAdminMode && isAdminMode) {
+            enforceRestrictions = false;
+        }
+        else if (allowAdminUsers && isUserAdmin) {
+            enforceRestrictions = false;
+        }
+        else if (isAllowedUser) {
+            enforceRestrictions = false;
+        }
+        window.smartqasa.enforceRestrictions = enforceRestrictions;
     }
     render() {
         if (!this.isMainLoaded) {
@@ -4048,8 +4041,17 @@ let PanelCard = class PanelCard extends i$1 {
     async loadRestrictPolicy() {
         const resetRestrictionState = () => {
             this.restrictionPolicy = undefined;
-            window.smartqasa.restrictedAccess = false;
-            window.smartqasa.restrictedDomains = [];
+            window.smartqasa.enforceRestrictions = false;
+            window.smartqasa.restrictions = {
+                domains: [],
+                home: false,
+                areas: false,
+                menu: false,
+                restricted_modes: [],
+                allow_admin_mode: false,
+                allow_admin_users: false,
+                allowed_users: [],
+            };
         };
         try {
             const policies = await loadYamlAsJson('/local/smartqasa/custom/policies.yaml', false);
@@ -4058,6 +4060,16 @@ let PanelCard = class PanelCard extends i$1 {
                 return;
             }
             this.restrictionPolicy = policies.access_restriction;
+            window.smartqasa.restrictions = {
+                domains: policies.access_restriction.domains ?? [],
+                home: policies.access_restriction.home ?? false,
+                areas: policies.access_restriction.areas ?? false,
+                menu: policies.access_restriction.menu ?? false,
+                restricted_modes: policies.access_restriction.restricted_modes ?? [],
+                allow_admin_mode: policies.access_restriction.allow_admin_mode ?? false,
+                allow_admin_users: policies.access_restriction.allow_admin_users ?? false,
+                allowed_users: policies.access_restriction.allowed_users ?? [],
+            };
         }
         catch {
             resetRestrictionState();
@@ -4151,13 +4163,22 @@ window.smartqasa = window.smartqasa || {
     confirm: () => { },
     confirmClose: () => { },
     deviceModel: '',
+    enforceRestrictions: false,
     menuTab: 0,
     popupStack: [],
     popup: () => { },
     popupClose: () => { },
     popupReset: () => { },
-    restrictedAccess: false,
-    restrictedDomains: [],
+    restrictions: {
+        domains: [],
+        home: false,
+        areas: false,
+        menu: false,
+        restricted_modes: [],
+        allow_admin_mode: false,
+        allow_admin_users: false,
+        allowed_users: [],
+    },
     service: () => { },
     startArea: location.pathname.split('/').pop(),
 };
@@ -4165,5 +4186,5 @@ if (window.fully) {
     console.log('Device Model: ' + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-window.smartqasa.versionLoader = "6.2.6-beta.0";
-console.info('%c SmartQasa Loader ⏏ ' + "6.2.6-beta.0" + ' ', 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
+window.smartqasa.versionLoader = "6.2.6-beta.1";
+console.info('%c SmartQasa Loader ⏏ ' + "6.2.6-beta.1" + ' ', 'background-color: #0000ff; color: #ffffff; font-weight: 700;');

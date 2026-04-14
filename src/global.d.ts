@@ -78,8 +78,17 @@ declare interface Window {
     popupClose: () => void;
     popupReset: () => void;
     popupStack: any[];
-    restrictedAccess: boolean;
-    restrictedDomains: string[];
+    enforceRestrictions: boolean;
+    restrictions: {
+      domains: string[];
+      home: boolean;
+      areas: boolean;
+      menu: boolean;
+      restricted_modes?: string[];
+      allow_admin_mode?: boolean;
+      allow_admin_users?: boolean;
+      allowed_users?: string[];
+    };
     startArea: string | undefined;
     service: (service: string, data?: object) => void;
     versionElements: string;
