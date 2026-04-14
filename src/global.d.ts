@@ -27,6 +27,13 @@ declare module '*.webp' {
   export default value;
 }
 
+declare interface ToastOptions {
+  message: string;
+  duration?: number;
+  position?: 'top' | 'bottom';
+  type?: 'info' | 'success' | 'error' | 'warning';
+}
+
 declare interface Window {
   browser_mod?: {
     refresh: () => void;
@@ -68,7 +75,7 @@ declare interface Window {
   };
 
   smartqasa: {
-    areaTileConfigs: any;
+    areaTileConfigs: string[];
     confirm: (data: any) => void;
     confirmClose: () => void;
     deviceModel: string;
