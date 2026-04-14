@@ -1,6 +1,6 @@
 {
   "name": "dash-loader",
-  "version": "6.2.5-beta.3",
+  "version": "6.2.5-beta.4",
   "description": "Dashboard Loader",
   "type": "module",
   "author": "Tom Bruno",
@@ -15,9 +15,9 @@
   "scripts": {
     "lint": "eslint .",
     "format": "prettier --write .",
-    "build": "./scripts/build.sh",
-    "publish": "./scripts/publish.sh",
-    "promote": "./scripts/promote.sh"
+    "build": "scripts/build.sh",
+    "publish": "scripts/publish.sh",
+    "promote": "scripts/promote.sh"
   },
   "keywords": [],
   "license": "ISC",
