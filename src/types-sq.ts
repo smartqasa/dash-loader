@@ -1,8 +1,19 @@
 import type {
+  HomeAssistant,
   LovelaceCard,
   LovelaceCardConfig,
-  HomeAssistant,
 } from './types-ha';
+
+export interface AccessRestrictionPolicy {
+  domains: string[];
+  home: boolean;
+  areas: boolean;
+  menu: boolean;
+  restricted_modes?: string[];
+  allow_admin_mode?: boolean;
+  allow_admin_users?: boolean;
+  allowed_users?: string[];
+}
 
 export type ActionItem =
   | {
@@ -31,8 +42,9 @@ export interface ConfirmElement extends LovelaceCard {
 }
 
 export interface CustomObj {
-  icon: string;
+  icon?: string;
   icon_entity?: string;
+  icon_state_attribute?: string;
   show_info?: boolean;
   info_entity?: string;
   info_entity_units?: string;
@@ -46,17 +58,6 @@ export interface DialogEntry {
   entity?: string;
   color?: string;
   data: any;
-}
-
-export interface AccessRestrictionPolicy {
-  domains: string[];
-  home: boolean;
-  areas: boolean;
-  menu: boolean;
-  restricted_modes?: string[];
-  allow_admin_mode?: boolean;
-  allow_admin_users?: boolean;
-  allowed_users?: string[];
 }
 
 export interface DialogTable {
@@ -74,7 +75,6 @@ export type PopupConfig = {
   timeout?: number;
   scrollable?: boolean;
   orientation?: 'auto' | 'landscape' | 'portrait';
-  lock_condition?: string;
   restrictable?: boolean;
   card: LovelaceCardConfig & { type: string };
   hass?: HomeAssistant;
