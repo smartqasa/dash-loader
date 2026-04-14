@@ -67,14 +67,14 @@ export class PanelCard extends LitElement {
       const domains = this.restrictionPolicy.domains ?? [];
 
       if (domains.length === 0) {
-        window.smartqasa.restrictDialogs = false;
+        window.smartqasa.restrictedAccess = false;
         window.smartqasa.restrictedDomains = [];
         return;
       }
 
       window.smartqasa.restrictedDomains = domains.map(normalize);
 
-      let restrictDialogs = true;
+      let restrictedAccess = true;
 
       const restrictedModes = this.restrictionPolicy.restricted_modes ?? [];
       const allowAdminMode = this.restrictionPolicy.allow_admin_mode === true;
@@ -99,16 +99,16 @@ export class PanelCard extends LitElement {
       );
 
       if (!restrictCurrentMode) {
-        restrictDialogs = false;
+        restrictedAccess = false;
       } else if (allowAdminMode && isAdminMode) {
-        restrictDialogs = false;
+        restrictedAccess = false;
       } else if (allowAdminUsers && isUserAdmin) {
-        restrictDialogs = false;
+        restrictedAccess = false;
       } else if (isAllowedUser) {
-        restrictDialogs = false;
+        restrictedAccess = false;
       }
 
-      window.smartqasa.restrictDialogs = restrictDialogs;
+      window.smartqasa.restrictedAccess = restrictedAccess;
     }
   }
 
@@ -148,7 +148,7 @@ export class PanelCard extends LitElement {
   private async loadRestrictPolicy(): Promise<void> {
     const resetRestrictionState = (): void => {
       this.restrictionPolicy = undefined;
-      window.smartqasa.restrictDialogs = false;
+      window.smartqasa.restrictedAccess = false;
       window.smartqasa.restrictedDomains = [];
     };
 

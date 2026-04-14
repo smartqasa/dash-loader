@@ -79,8 +79,7 @@ declare interface Window {
     popupReset: () => void;
     popupStack: any[];
     restrictedAccess: boolean;
-    restrictDialogs: boolean;
-    restrictedDomains?: string[];
+    restrictedDomains: string[];
     startArea: string | undefined;
     service: (service: string, data?: object) => void;
     versionElements: string;

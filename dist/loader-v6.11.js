@@ -3982,12 +3982,12 @@ let PanelCard = class PanelCard extends i$1 {
         if (this.restrictionPolicy) {
             const domains = this.restrictionPolicy.domains ?? [];
             if (domains.length === 0) {
-                window.smartqasa.restrictDialogs = false;
+                window.smartqasa.restrictedAccess = false;
                 window.smartqasa.restrictedDomains = [];
                 return;
             }
             window.smartqasa.restrictedDomains = domains.map(normalize);
-            let restrictDialogs = true;
+            let restrictedAccess = true;
             const restrictedModes = this.restrictionPolicy.restricted_modes ?? [];
             const allowAdminMode = this.restrictionPolicy.allow_admin_mode === true;
             const allowAdminUsers = this.restrictionPolicy.allow_admin_users === true;
@@ -4001,18 +4001,18 @@ let PanelCard = class PanelCard extends i$1 {
                 normalizedRestrictedModes.includes(normalizedCurrentMode);
             const isAllowedUser = normalizedAllowedUsers.includes(normalizedCurrentUser);
             if (!restrictCurrentMode) {
-                restrictDialogs = false;
+                restrictedAccess = false;
             }
             else if (allowAdminMode && isAdminMode) {
-                restrictDialogs = false;
+                restrictedAccess = false;
             }
             else if (allowAdminUsers && isUserAdmin) {
-                restrictDialogs = false;
+                restrictedAccess = false;
             }
             else if (isAllowedUser) {
-                restrictDialogs = false;
+                restrictedAccess = false;
             }
-            window.smartqasa.restrictDialogs = restrictDialogs;
+            window.smartqasa.restrictedAccess = restrictedAccess;
         }
     }
     render() {
@@ -4048,7 +4048,7 @@ let PanelCard = class PanelCard extends i$1 {
     async loadRestrictPolicy() {
         const resetRestrictionState = () => {
             this.restrictionPolicy = undefined;
-            window.smartqasa.restrictDialogs = false;
+            window.smartqasa.restrictedAccess = false;
             window.smartqasa.restrictedDomains = [];
         };
         try {
@@ -4156,8 +4156,8 @@ window.smartqasa = window.smartqasa || {
     popup: () => { },
     popupClose: () => { },
     popupReset: () => { },
-    restrictDialogs: false,
-    restrictableDialogs: [],
+    restrictedAccess: false,
+    restrictedDomains: [],
     service: () => { },
     startArea: location.pathname.split('/').pop(),
 };
@@ -4165,5 +4165,5 @@ if (window.fully) {
     console.log('Device Model: ' + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-window.smartqasa.versionLoader = "6.2.5-beta.0";
-console.info('%c SmartQasa Loader ⏏ ' + "6.2.5-beta.0" + ' ', 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
+window.smartqasa.versionLoader = "6.2.5-beta.1";
+console.info('%c SmartQasa Loader ⏏ ' + "6.2.5-beta.1" + ' ', 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
