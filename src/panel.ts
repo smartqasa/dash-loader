@@ -149,8 +149,7 @@ export class PanelCard extends LitElement {
 
     try {
       const policies = await loadYamlAsJson<Policies>(
-        '/local/smartqasa/custom/policies.yaml',
-        false
+        '/local/smartqasa/custom/policies.yaml'
       );
 
       if (!policies?.access_restriction) {
