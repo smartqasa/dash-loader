@@ -1,6 +1,6 @@
 {
   "name": "dash-loader",
-  "version": "6.2.8-beta.0",
+  "version": "6.2.8-beta.2",
   "description": "Dashboard Loader",
   "type": "module",
   "author": "Tom Bruno",
@@ -37,7 +37,6 @@
   "dependencies": {
     "@rollup/plugin-replace": "^6.0.2",
     "home-assistant-js-websocket": "^9.4.0",
-    "js-yaml": "^4.1.1",
-    "replace": "^1.2.2"
+    "js-yaml": "^4.1.1"
   }
 }

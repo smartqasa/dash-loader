@@ -100,10 +100,16 @@ export class PanelCard extends LitElement {
 
   protected render(): TemplateResult {
     if (!this.isMainLoaded) {
+      const dedication =
+        this.hass?.states['input_text.design_dedication']?.state ?? '';
       return html`
         <div class="loader">
           <div class="loader-text">SmartQasa is loading</div>
           <div class="dots"><span></span><span></span><span></span></div>
+
+          ${dedication
+            ? html`<div class="design-dedication">${dedication}</div>`
+            : ''}
         </div>
       `;
     }
@@ -233,6 +239,36 @@ export class PanelCard extends LitElement {
         }
         40% {
           transform: scale(1);
+        }
+      }
+
+      .design-dedication {
+        position: absolute;
+        bottom: 2rem;
+        left: 0;
+        width: 100%;
+        text-align: center;
+
+        font-size: 1rem;
+        font-family: 'Great Vibes', 'Brush Script MT', cursive;
+        font-weight: 400;
+
+        color: var(--secondary-text-color);
+        opacity: 0.85;
+      }
+
+      .design-dedication {
+        animation: fadeIn 1.5s ease-in-out;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(5px);
+        }
+        to {
+          opacity: 0.85;
+          transform: translateY(0);
         }
       }
     `;

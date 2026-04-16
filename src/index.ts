@@ -24,6 +24,17 @@ window.smartqasa = window.smartqasa || {
   startArea: location.pathname.split('/').pop(),
 };
 
+const fontId = 'sq-font-great-vibes';
+
+if (!document.getElementById(fontId)) {
+  const link = document.createElement('link');
+  link.id = fontId;
+  link.href =
+    'https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap';
+  link.rel = 'stylesheet';
+  document.head.appendChild(link);
+}
+
 if (window.fully) {
   console.log('Device Model: ' + window.fully.getDeviceModel());
   window.smartqasa.deviceModel = window.fully.getDeviceModel();

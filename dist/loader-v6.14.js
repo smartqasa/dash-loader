@@ -4008,10 +4008,15 @@ let PanelCard = class PanelCard extends i$1 {
     }
     render() {
         if (!this.isMainLoaded) {
+            const dedication = this.hass?.states['input_text.design_dedication']?.state ?? '';
             return x `
         <div class="loader">
           <div class="loader-text">SmartQasa is loading</div>
           <div class="dots"><span></span><span></span><span></span></div>
+
+          ${dedication
+                ? x `<div class="design-dedication">${dedication}</div>`
+                : ''}
         </div>
       `;
         }
@@ -4134,6 +4139,36 @@ let PanelCard = class PanelCard extends i$1 {
           transform: scale(1);
         }
       }
+
+      .design-dedication {
+        position: absolute;
+        bottom: 2rem;
+        left: 0;
+        width: 100%;
+        text-align: center;
+
+        font-size: 1rem;
+        font-family: 'Great Vibes', 'Brush Script MT', cursive;
+        font-weight: 400;
+
+        color: var(--secondary-text-color);
+        opacity: 0.85;
+      }
+
+      .design-dedication {
+        animation: fadeIn 1.5s ease-in-out;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(5px);
+        }
+        to {
+          opacity: 0.85;
+          transform: translateY(0);
+        }
+      }
     `;
     }
 };
@@ -4180,9 +4215,18 @@ window.smartqasa = window.smartqasa || {
     service: () => { },
     startArea: location.pathname.split('/').pop(),
 };
+const fontId = 'sq-font-great-vibes';
+if (!document.getElementById(fontId)) {
+    const link = document.createElement('link');
+    link.id = fontId;
+    link.href =
+        'https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap';
+    link.rel = 'stylesheet';
+    document.head.appendChild(link);
+}
 if (window.fully) {
     console.log('Device Model: ' + window.fully.getDeviceModel());
     window.smartqasa.deviceModel = window.fully.getDeviceModel();
 }
-window.smartqasa.versionLoader = "6.2.8-beta.0";
-console.info('%c SmartQasa Loader ⏏ ' + "6.2.8-beta.0" + ' ', 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
+window.smartqasa.versionLoader = "6.2.8-beta.2";
+console.info('%c SmartQasa Loader ⏏ ' + "6.2.8-beta.2" + ' ', 'background-color: #0000ff; color: #ffffff; font-weight: 700;');
