@@ -36,8 +36,9 @@ if (!document.getElementById(fontId)) {
 }
 
 if (window.fully) {
-  console.log('Device Model: ' + window.fully.getDeviceModel());
-  window.smartqasa.deviceModel = window.fully.getDeviceModel();
+  const deviceModel = window.fully.getDeviceModel();
+  console.log('Device Model: ' + deviceModel);
+  window.smartqasa.deviceModel = deviceModel;
 }
 
 import './panel';

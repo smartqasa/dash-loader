@@ -52,7 +52,7 @@ git diff --cached --quiet || fail "Working tree has staged but uncommitted chang
 echo "🔄 Fetching remote state..."
 
 # Fetch latest remote beta and tags for accurate comparison
-git fetch origin beta --tags >/dev/null 2>&1 || fail "Unable to fetch origin/beta"
+git fetch origin beta >/dev/null || fail "Unable to fetch origin/beta"
 
 # Read current version from package.json (source of truth)
 VERSION="$(node -p "require('./package.json').version")"
